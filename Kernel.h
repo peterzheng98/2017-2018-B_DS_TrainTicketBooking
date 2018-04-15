@@ -6,6 +6,7 @@
 #define INC_2018DATASTRUCTUREBIGWORK_KERNEL_H
 
 #include "CoreData.h"
+#include "BigNum.hpp"
 
 using namespace myAlgorithm;
 
@@ -64,6 +65,7 @@ public:
 
 class user {
 private:
+    long long p_id;
     wchar_t *p_username;
     wchar_t *p_password;
     BigNum<short> p_passwordHash;
@@ -71,6 +73,8 @@ private:
     long long p_phone;
     Set<ticket> p_ticketBooked;
 public:
+    long long M_id() const;
+
     wchar_t *M_username() const;
 
     wchar_t *M_password() const;
@@ -88,9 +92,7 @@ public:
 
 
 namespace Kernel {
-    class Interface {
-        virtual ~Interface() {}
-    };
+    class Interface { virtual ~Interface() {} };
 
     class Insert : public Interface {
     public:
