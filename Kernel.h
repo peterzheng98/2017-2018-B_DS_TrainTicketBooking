@@ -140,6 +140,10 @@ namespace Kernel {
         Status I_deleteTrain(int p_id);
     };
 
+    class Grant : public Interface{
+    public:
+    };
+
 };
 
 
