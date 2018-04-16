@@ -117,6 +117,10 @@ namespace myAlgorithm {
             return BigNum(rdata, rlen);
         }
 
+        BigNum M_multiplyFastFourierTransform(const BigNum &rhs){
+            //ToDo: FFT
+        }
+
         BigNum &operator*=(const BigNum &rhs) {
             *this = operator*(rhs);
             return *this;
