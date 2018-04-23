@@ -8,8 +8,11 @@
 // only for std::less<T>
 #include <functional>
 #include <cstddef>
-#include "exceptions.hpp"
-using namespace sjtu;
+#include "Exception.hpp"
+
+//For Test
+#define invalid_iterator() 1
+
 
 namespace myAlgorithm {
 
