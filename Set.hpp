@@ -275,7 +275,7 @@ protected:
         }
     }
 
-    _TreeNode *_search(const Key &x) const{
+    _TreeNode *_search(const value_type &x) const{
         _TreeNode *p = root;
         while (p != nullptr){
             if (comp(x, p->key))
@@ -650,15 +650,21 @@ public:
 
 	std::pair<iterator, bool> insert(const value_type &value) {
         bool b = _insert(value);
-        _TreeNode *p = _search(value.first);
+        _TreeNode *p = _search(value);
         return std::make_pair(iterator(p->ln, this), b);
 	}
 
 	void erase(iterator pos) {
         if (pos._container != this || pos._ptr == tail)
             throw invalid_iterator();
-        _remove(pos->first);
+        _remove(*pos);
 	}
+
+    void erase(const Key &key){
+        iterator t = find(key);
+        if (t._ptr != tail)
+            erase(t);
+    }
 
 	size_type count(const Key &key) const {
         return (_search(key) == nullptr ? 0 : 1);
