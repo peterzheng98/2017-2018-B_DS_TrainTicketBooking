@@ -1,4 +1,4 @@
-// 
+//
 // Created by FineArtz on 2018/04/10
 //
 
@@ -657,7 +657,7 @@ public:
 	void erase(iterator pos) {
         if (pos._container != this || pos._ptr == tail)
             throw invalid_iterator();
-        _remove(*pos);
+        _remove(*(pos));
 	}
 
     void erase(const Key &key){
