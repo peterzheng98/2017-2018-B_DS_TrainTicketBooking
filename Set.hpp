@@ -650,14 +650,14 @@ public:
 
 	std::pair<iterator, bool> insert(const value_type &value) {
         bool b = _insert(value);
-        _TreeNode *p = _search(value.first);
+        _TreeNode *p = _search(value);
         return std::make_pair(iterator(p->ln, this), b);
 	}
 
 	void erase(iterator pos) {
         if (pos._container != this || pos._ptr == tail)
             throw invalid_iterator();
-        _remove(pos->first);
+        _remove(*(pos));
 	}
 
 	size_type count(const Key &key) const {
