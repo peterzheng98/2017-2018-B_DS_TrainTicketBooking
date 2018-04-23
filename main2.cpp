@@ -67,37 +67,18 @@ int main() {
                 tmp = Random();
                 Set<int>::iterator ite = mySet12.end();
                 std::set<int>::iterator ite2 = answerSet.end();
-                for (int i = 0; i < tmp % mySet12.size(); i++) ite--, ite2--;
-                bool caught = false;
-                try {
-                    mySet12.erase(ite);
-                } catch(...){
-                    caught = true;
-                }
-                try {
-                    answerSet.erase(ite2);
-                } catch(...){
-                    if(!caught) printf("Runtime Error Occurred.\n");
-                }
-
+                for (int i = 0; i < tmp % answerSet.size(); i++) ite--, ite2--;
+                mySet12.erase(*ite);
+                answerSet.erase(*ite2);
                 break;
             }
             case 1: {
                 tmp = Random();
                 Set<int>::iterator ite3 = mySet12.begin();
                 std::set<int>::iterator ite4 = answerSet.begin();
-                for (int i = 0; i < tmp % mySet12.size(); i++) ite3++, ite4++;
-                bool caught = false;
-                try {
-                    mySet12.erase(ite3);
-                } catch(...){
-                    caught = true;
-                }
-                try {
-                    answerSet.erase(ite4);
-                } catch(...){
-                    if(!caught) printf("Runtime Error Occurred.\n");
-                }
+                for (int i = 0; i < tmp % answerSet.size(); i++) ite3++, ite4++;
+                mySet12.erase(*ite3);
+                answerSet.erase(*ite4);
                 break;
             }
             default:
