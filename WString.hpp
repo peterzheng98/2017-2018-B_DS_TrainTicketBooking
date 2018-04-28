@@ -26,7 +26,7 @@ public:
     using difference_type   = std::ptrdiff_t;
     using size_type         = size_t;
 private:
-    wchar_t s[50];
+    wchar_t s[128];
     size_type _size = 0;;
 public:
     //contructors

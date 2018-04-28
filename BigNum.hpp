@@ -1,5 +1,6 @@
 //
-// Created by Peter Zheng on 2018/04/14.
+// Created by Peter Zheng on 2018/04/15.
+// Modified by Peter Zheng on 2018/4/28. (Upd Ver.1 : Add operator==,!=,<,>,<=,>=)
 //
 
 #ifndef INC_2018DATASTRUCTUREBIGWORK_BIGNUM_H
@@ -175,6 +176,40 @@ namespace myAlgorithm {
         friend std::ostream &operator<<(std::ostream &os, const BigNum &bg) {
             for (int i = bg.length() - 1; i >= 0; i--) os << bg[i];
             return os;
+        }
+
+        bool operator==(const BigNum& rhs){
+            if(len != rhs.length()) return false;
+            for(int i = 0; i < len;i++) if(data[i] != rhs[i]) return false;
+            return true;
+        }
+
+        bool operator!=(const BigNum& rhs){
+            return !operator==(rhs);
+        }
+
+        bool operator<(const BigNum& rhs){
+            if(rhs.length() > len) return true;
+            if(len > rhs.length()) return false;
+            for(int i = len - 1; i >= 0;i--){
+                if(data[i] < rhs[i]) return true;
+                if(data[i] > rhs[i]) return false;
+            }
+            return false;
+        }
+        bool operator>(const BigNum& rhs){
+            if(operator==(rhs)) return false;
+            return !(operator<(rhs));
+        }
+
+        bool operator>=(const BigNum& rhs){
+            if(operator==(rhs)) return true;
+            return operator>(rhs);
+        }
+
+        bool operator<=(const BigNum& rhs){
+            if(operator==(rhs)) return true;
+            return operator<(rhs);
         }
     };
 }
