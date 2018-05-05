@@ -7,6 +7,7 @@
 
 #ifndef INC_IOSTREAM
 #define INC_IOSTREAM
+
 #include <iostream>
 
 #endif
@@ -31,6 +32,19 @@ enum TicketOnSale {
 };
 
 namespace myAlgorithm {
+    class Utilities {
+    public:
+        template<class T>
+        inline static T min(const T &a, const T &b) {
+            return a > b ? b : a;
+        }
+
+        template<class T>
+        inline static T max(const T &a, const T &b) {
+            return a > b ? a : b;
+        }
+    };
+
     /*
      * Shouldn't be used for pointer!!
      */
@@ -249,12 +263,6 @@ namespace myAlgorithm {
     class Vector {
 
     };
-
-    template<class T>
-    class Set {
-
-    };
-
 
 }
 

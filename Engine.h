@@ -9,7 +9,9 @@ class Engine {
     template <class T>
     class BPlusTree{
         const int NUMBER_OF_SON = 10; // 结点最多的儿子数目
+        const int SIZE_BLOCK = 4096;
         struct Node{
+            Node* prev, *next;
 
         };
     };
