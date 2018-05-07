@@ -3,6 +3,7 @@
 //
 
 #include "String.h"
+#include "CoreData.h"
 
 using namespace myAlgorithm;
 
@@ -192,9 +193,9 @@ void String::clear() {
     len = 0;
 }
 
-friend std::istream &String::operator>>(std::istream &is, String &rhs) {
+std::istream &operator>>(std::istream &is, String &rhs) {
     rhs.clear();
-    rhs.locale = ENGLISH;
+    rhs.locale = String::ENGLISH;
     char ch;
     ch = getchar();
     while (isspace(ch)) ch = getchar();
@@ -207,23 +208,23 @@ friend std::istream &String::operator>>(std::istream &is, String &rhs) {
     return is;
 }
 
-friend std::ostream &String::operator<<(std::ostream &os, const String &rhs) {
-    if (rhs.locale != ENGLISH) throw 1; //TODO: throw locale error(not English)
+std::ostream &operator<<(std::ostream &os, const String &rhs) {
+    if (rhs.locale != String::ENGLISH) throw 1; //TODO: throw locale error(not English)
     for (int i = 0; i < rhs.length(); i++)
         os << rhs.data[i];
     return os;
 }
 
-friend std::wostream &String::operator<<(std::wostream &os, const String &rhs) {
-    if (rhs.locale != CHINESE) throw 1; //TODO: throw locale error(not Chinese)
+std::wostream &operator<<(std::wostream &os, const String &rhs) {
+    if (rhs.locale != String::CHINESE) throw 1; //TODO: throw locale error(not Chinese)
     for (int i = 0; i < rhs.length(); i++)
         os << rhs.data[i];
     return os;
 }
 
-friend std::wistream &String::operator>>(std::wistream &wis, String &ws) {
+std::wistream &operator>>(std::wistream &wis, String &ws) {
     ws.clear();
-    ws.locale = CHINESE;
+    ws.locale = String::CHINESE;
     char ch;
     ch = getchar();
     while (iswspace(ch)) ch = getchar();
@@ -243,14 +244,14 @@ String& String::operator+=(const char &ch) {
     return *this;
 }
 
-friend String String::operator+(const String &lhs, const String &rhs) {
+String operator+(const String &lhs, const String &rhs) {
     String ret(lhs);
     ret += rhs;
     return ret;
 }
 
-String String::operator+(const String &lhs, const char &ch) {
+String operator+(const String &lhs, const char &ch) {
     String ret(lhs);
-    lhs += ch;
+    ret += ch;
     return ret;
 }

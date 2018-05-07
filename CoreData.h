@@ -8,7 +8,7 @@
 #ifndef INC_IOSTREAM
 #define INC_IOSTREAM
 
-#include <iostream>
+//#include <iostream>
 
 #endif
 
@@ -63,7 +63,7 @@ namespace myAlgorithm {
             t2 = rhs.t2;
         }
 
-        Pair &operator=(const TriplePair &rhs) {
+        Pair &operator=(const Pair &rhs) {
             if (&rhs == this) return *this;
             t1 = rhs.first();
             t2 = rhs.second();
