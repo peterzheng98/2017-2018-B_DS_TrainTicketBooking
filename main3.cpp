@@ -22,8 +22,9 @@ int main(){
 //            fout <<"Raw:[" << st << "] Copy:[" << st2 << "] Assign:[" << st3 << "]\n";
 //            fout.close();
             std::cout << "operator Result : " << (st == st2) << " " << (st <= st3) << "\n";
+            std::cout << "operator Result 2 :" << (st == "register") << "\n";
             std::cout << "operator [] Result : [" << st[0] << "]  [" << st[1] << "]\n";
-            
+
         }
 //        int t;
 //        std::cin >> t;

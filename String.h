@@ -177,9 +177,21 @@ namespace myAlgorithm {
             return true;
         }
 
+        bool operator==(const char* rhs){
+            if(strlen(rhs) != len) return false;
+            for(int i = 0; i < len; ++i) if(data[i] != rhs[i]) return false;
+            return true;
+        }
+
         bool operator!=(const String &rhs){
             if (rhs.len != len) return true;
             for (int i = 0; i < rhs.len; ++i) if (data[i] != rhs[i]) return true;
+            return false;
+        }
+
+        bool operator!=(const char* rhs){
+            if(strlen(rhs) != len) return true;
+            for(int i = 0; i < len; ++i) if(data[i] != rhs[i]) return true;
             return false;
         }
 
