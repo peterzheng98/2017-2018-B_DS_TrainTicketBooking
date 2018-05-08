@@ -1,3 +1,5 @@
 <resources>
 
-    <string name="action_settings">Settings</string></resources>
+    <string name="action_settings">Settings</string>
+    <string name="app_name">火车票订票系统</string>
+</resources>
