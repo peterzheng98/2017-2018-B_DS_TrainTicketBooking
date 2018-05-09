@@ -19,8 +19,6 @@ class MainActivity : AppCompatActivity() {
     var loginOfflineB : Button? = null
     var loginOnlineB : Button? = null
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -34,8 +32,8 @@ class MainActivity : AppCompatActivity() {
         // Example of a call to a native method
 //        sample_text.text = stringFromJNI()
         // 隐藏不需要的模块
-        textStatus.visibility = TextView.INVISIBLE;
-        testProgress.visibility = ProgressBar.INVISIBLE;
+        textStatus.visibility = TextView.INVISIBLE
+        testProgress.visibility = ProgressBar.INVISIBLE
 
         initView()
 

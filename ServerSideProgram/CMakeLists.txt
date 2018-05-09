@@ -3,4 +3,4 @@ project(ServerSideProgram)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(ServerSideProgram main.cpp)
+add_executable(ServerSideProgram main.cpp Timer.h)
