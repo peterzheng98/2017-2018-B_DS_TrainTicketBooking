@@ -34,168 +34,122 @@ namespace myAlgorithm {
         };
         Language locale;
     public:
-        int size = 512;
-        char *data = nullptr;
-        int len;
-
-
-        void extendSpace(){
-            size = size << 1;
-            char *newCharSeq = new char[size];
-            char *oldCharSeq = data;
-            for (int i = 0; i < len; i++) newCharSeq[i] = oldCharSeq[i];
-            data = newCharSeq;
-            delete oldCharSeq;
-        }
-
-        void smallerSpace(){
-            size = size >> 1;
-            char *newCharSeq = new char[size];
-            char *oldCharSeq = data;
-            for (int i = 0; i < len; i++) newCharSeq[i] = oldCharSeq[i];
-            data = newCharSeq;
-            delete oldCharSeq;
-        }
+        const static int sizeMax = 128; // 128 bits char
+    private:
+        char data[sizeMax];
+        int len = 0;
 
     public:
-        String(){
-            size = 512;
-            data = new char[size];
+        String() {
             len = 0;
-            locale = ENGLISH;
         }
 
-        String(const String &rhs){
-            size = rhs.size;
+        String(const String &rhs) {
             len = rhs.len;
+            for (int i = 0; i < len; i++) data[i] = rhs.data[i];
             locale = rhs.locale;
-            char *charSeq = new char[size];
-            for (int i = 0; i < len; i++) charSeq[i] = rhs.data[i];
-            data = charSeq;
         }
 
-        String &operator=(const String &rhs){
+        String &operator=(const String &rhs) {
             if (this == &rhs) return *this;
 
-            if (size != 0 && data != nullptr) delete data;
-            size = rhs.captity();
             len = rhs.length();
-            data = new char[size];
-
             for (int i = 0; i < len; i++) data[i] = rhs[i];
+            locale = rhs.Locale();
             return *this;
         }
 
-        explicit String(const int &initalSize){
-            if (initalSize <= 0) throw 1; // TODO: throw invalid length
-            size = initalSize;
-            data = new char[size];
-            len = 0;
-            locale = ENGLISH;
-        }
-
-        explicit String(const char &ch){
+        explicit String(const char &ch) {
             len = 1;
-            size = 512;
-            data = new char[size];
             data[0] = ch;
             locale = ENGLISH;
         }
 
-        explicit String(const char ch[], int loc){
-            if (loc != 0 && loc != 1) throw 1; // TODO: throw invalid option
+        explicit String(const char ch[], int loc = 1) {
+            int len = strlen(ch);
+            for (int i = 0; i < len; i++) data[i] = ch[i];
             locale = (Language) loc;
-            size = (strlen(ch) << 1 > 512 ? strlen(ch) << 1 : 512);
-            data = new char[size];
-            for (int i = 0; i < strlen(ch); i++) data[i] = ch[i];
-            len = strlen(ch);
         }
 
-        const char operator[](const int &index) const{
-            if (index < 0 || index >= len) throw 1; // TODO: throw out of bound
+        const Language Locale() const { return locale; }
+
+        const int length() const { return len; }
+
+        const bool empty() const { return len == 0; }
+
+        const char operator[](const int &index) const {
+            if (index < 0 || index >= len) throw 1; //TODO: out of bound
             return data[index];
         }
 
-        char operator[](const int &index){
-            if (index < 0 || index >= len) throw 1; // TODO: throw out of bound
+        char operator[](const int &index) {
+            if (index < 0 || index >= len) throw 1; //TODO: out of bound
             return data[index];
+        }
+
+        String &operator+=(const String &rhs) {
+            if (rhs.empty()) return *this;
+
+            if (len + rhs.length() > sizeMax) throw 1; //TODO: string too long
+            int newLen = len + rhs.length();
+            for (int i = len; i < newLen; ++i) data[i] = rhs[i - len];
+            return *this;
         }
 
         String &operator+=(const char &ch){
-            if (len + 1 >= size) extendSpace();
+            if (len + 1 > sizeMax) throw 1; //TODO: string too long
             data[len] = ch;
             len++;
             return *this;
         }
 
-        String &operator+=(const String &rhs){
-            if (rhs.empty()) return *this;
+        bool insert(const char &ch, const int &index) {
+            if (index < 0 || index > len) throw 1;//TODO: out of bound
+            if (len + 1 > sizeMax) throw 1; //TODO: string too long
 
-            if (rhs.len + len > size) extendSpace();
-            for (int i = len; i < rhs.len + len; ++i) data[i] = rhs[i - len];
-            len = rhs.len + len;
-            return *this;
-        }
-
-        const int length() const{
-            return len;
-        }
-
-        const bool empty() const{
-            return len == 0;
-        }
-
-        const int captity() const{
-            return size;
-        }
-
-        bool insert(const char &ch, const int &index){
-            if (index < 0 || index > len) throw 1; //TODO: throw out of bound
-            if (len + 1 > size) extendSpace();
             for (int i = len; i > index; --i) data[i] = data[i - 1];
             data[index] = ch;
             len++;
             return true;
         }
 
-        bool erase(const int &index){
+        bool erase(const int &index) {
             if (index < 0 || index >= len) throw 1; //TODO: throw out of bound
             for (int i = index; i < len - 1; ++i) data[i] = data[i + 1];
             len--;
-            if (len < (size / 2 - 1)) smallerSpace();
             return true;
         }
 
-        void changeLocale(int To){
+        void changeLocale(int To) {
             if (To != 0 && To != 1) throw 1; // TODO: throw invalid option
             locale = (Language) To;
         }
 
-        bool operator==(const String &rhs){
+        bool operator==(const String &rhs) {
             if (rhs.len != len) return false;
             for (int i = 0; i < rhs.len; ++i) if (data[i] != rhs[i]) return false;
             return true;
         }
 
-        bool operator==(const char* rhs){
-            if(strlen(rhs) != len) return false;
-            for(int i = 0; i < len; ++i) if(data[i] != rhs[i]) return false;
+        bool operator==(const char *rhs) {
+            if (strlen(rhs) != len) return false;
+            for (int i = 0; i < len; ++i) if (data[i] != rhs[i]) return false;
             return true;
         }
 
-        bool operator!=(const String &rhs){
+        bool operator!=(const String &rhs) {
             if (rhs.len != len) return true;
             for (int i = 0; i < rhs.len; ++i) if (data[i] != rhs[i]) return true;
             return false;
         }
 
-        bool operator!=(const char* rhs){
-            if(strlen(rhs) != len) return true;
-            for(int i = 0; i < len; ++i) if(data[i] != rhs[i]) return true;
+        bool operator!=(const char *rhs) {
+            if (strlen(rhs) != len) return true;
+            for (int i = 0; i < len; ++i) if (data[i] != rhs[i]) return true;
             return false;
         }
 
-        bool operator<=(const String &rhs){
+        bool operator<=(const String &rhs) {
             int minL = Utilities::min<int>(len, rhs.length());
             for (int i = 0; i < minL; i++) {
                 if (data[i] > rhs[i]) return false;
@@ -207,7 +161,7 @@ namespace myAlgorithm {
             return true;
         }
 
-        bool operator>=(const String &rhs){
+        bool operator>=(const String &rhs) {
             int minL = Utilities::min<int>(len, rhs.length());
             for (int i = 0; i < minL; i++) {
                 if (data[i] > rhs[i]) return true;
@@ -219,7 +173,7 @@ namespace myAlgorithm {
             return true;
         }
 
-        bool operator<(const String &rhs){
+        bool operator<(const String &rhs) {
             int minL = Utilities::min<int>(len, rhs.length());
             for (int i = 0; i < minL; i++) {
                 if (data[i] > rhs[i]) return false;
@@ -229,7 +183,7 @@ namespace myAlgorithm {
             return len <= rhs.length();
         }
 
-        bool operator>(const String &rhs){
+        bool operator>(const String &rhs) {
             int minL = Utilities::min<int>(len, rhs.length());
             for (int i = 0; i < minL; i++) {
                 if (data[i] > rhs[i]) return true;
@@ -239,15 +193,10 @@ namespace myAlgorithm {
         }
 
         void clear(){
-            char *old = data;
-            delete old;
-            data = new char[size];
+            for(int i = 0; i < sizeMax; ++i) data[i] = 0;
             len = 0;
         }
-
-
     };
-
     String operator+(const String &lhs, const String &rhs) {
         String ret(lhs);
         ret += rhs;
@@ -268,7 +217,6 @@ namespace myAlgorithm {
         while (isspace(ch)) ch = getchar();
         while (!isspace(ch)) {
             rhs.data[rhs.len++] = ch;
-            if (rhs.len >= rhs.size - 1) rhs.extendSpace();
             ch = getchar();
         }
         is.unget();
@@ -297,7 +245,6 @@ namespace myAlgorithm {
         while (iswspace(ch)) ch = getchar();
         while (!iswspace(ch)) {
             ws.data[ws.len++] = ch;
-            if (ws.len >= ws.size - 1) ws.extendSpace();
             ch = getchar();
         }
         wis.unget();
@@ -312,7 +259,6 @@ namespace myAlgorithm {
         while (isspace(ch)) is.get(ch);
         while (!isspace(ch)) {
             rhs.data[rhs.len++] = ch;
-            if (rhs.len >= rhs.size - 1) rhs.extendSpace();
             is.get(ch);
         }
         return is;

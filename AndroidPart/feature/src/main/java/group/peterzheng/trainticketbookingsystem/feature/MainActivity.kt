@@ -1,6 +1,10 @@
 package group.peterzheng.trainticketbookingsystem.feature
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
+import android.os.Message
+import android.os.WorkSource
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -8,9 +12,12 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
+import group.peterzheng.trainticketbookingsystem.feature.DataCenter.*
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.util.logging.Handler
 
 class MainActivity : AppCompatActivity() {
     var ipAddressT : TextView? = null
@@ -18,14 +25,13 @@ class MainActivity : AppCompatActivity() {
     var testConnB : Button? = null
     var loginOfflineB : Button? = null
     var loginOnlineB : Button? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+            Snackbar.make(view, "正在测试中", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
 
@@ -48,11 +54,46 @@ class MainActivity : AppCompatActivity() {
         loginOfflineB = findViewById<Button>(R.id.loginOffline)
         //绑定按钮监听
         loginOfflineB!!.setOnClickListener{
-            textStatus.visibility = TextView.VISIBLE
-            textStatus!!.setText("正在加载数据登录系统")
-            testProgress.visibility = ProgressBar.VISIBLE
+            if(!DataCenter.Companion.LoginScreen.lockLoginOffline){
+                textStatus.visibility = TextView.VISIBLE
+                textStatus!!.setText("正在加载数据登录系统")
+                testProgress.visibility = ProgressBar.VISIBLE
+                DataCenter.Companion.LoginScreen.lockLoginOffline = true
+            } else {
+                Toast.makeText(baseContext,"正在加载请勿重复单击按钮！", Toast.LENGTH_SHORT).show()
+            }
+
         }
         testConnB!!.setOnClickListener{
+            if(!DataCenter.Companion.LoginScreen.lockTestConnection){
+                DataCenter.Companion.LoginScreen.lockTestConnection = true
+            } else {
+                Toast.makeText(baseContext, "正在测试连接，请勿重复单击", Toast.LENGTH_SHORT).show()
+            }
+        }
+        loginOnlineB!!.setOnClickListener{
+            if(!DataCenter.Companion.LoginScreen.lockLoginOnline){
+                DataCenter.Companion.LoginScreen.lockLoginOnline = true
+            } else {
+                Toast.makeText(baseContext, "正在连接，请勿重复单击", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    fun testConnection(){
+        val cm = baseContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val networkInfo = cm.activeNetworkInfo
+
+        if(networkInfo != null && networkInfo.isConnected){
+            //Whether you are connected with the internet
+
+            if(networkInfo.type == ConnectivityManager.TYPE_WIFI){
+                //TODO：WIFI连接
+            }
+
+            if(networkInfo.type == ConnectivityManager.TYPE_MOBILE){
+                //TODO：蜂窝数据连接
+            }
         }
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
