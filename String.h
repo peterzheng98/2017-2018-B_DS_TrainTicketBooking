@@ -106,7 +106,7 @@ namespace myAlgorithm {
             if (loc != 0 && loc != 1) throw 1; // TODO: throw invalid option
             locale = (Language) loc;
             size = (strlen(ch) << 1 > 512 ? strlen(ch) << 1 : 512);
-
+            data = new char[size];
             for (int i = 0; i < strlen(ch); i++) data[i] = ch[i];
             len = strlen(ch);
         }
