@@ -42,6 +42,7 @@ namespace myAlgorithm {
     public:
         String() {
             len = 0;
+            for(int i = 0;i < len;i++) data[i] = 0;
         }
 
         String(const String &rhs) {
@@ -66,7 +67,7 @@ namespace myAlgorithm {
         }
 
         explicit String(const char ch[], int loc = 1) {
-            int len = strlen(ch);
+            len = strlen(ch);
             for (int i = 0; i < len; i++) data[i] = ch[i];
             locale = (Language) loc;
         }
