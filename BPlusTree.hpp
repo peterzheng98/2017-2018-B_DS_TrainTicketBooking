@@ -101,7 +101,8 @@ private:
     size_t write(T *val, off_t offset){
         openFile();
         fseek(fp, offset, SEEK_SET);
-        char ch[UNIT] = reinterpret_cast<char *>(val);
+        char *ch;
+        ch = reinterpret_cast<char *>(val);
         size_t s = fwrite(reinterpret_cast<void *>(ch), UNIT, 1, fp);
         closeFile();
         return s;
@@ -187,7 +188,7 @@ private:
     void updateChildIndex(off_t parent, const Key &oldKey, const Key &newKey){
         TreeNode tn;
         read(&tn, parent);
-        Index *id = binarySearchKey(&tn, oldKey);
+        Index *id = binarySearchKey(tn, oldKey);
         if (id == end(tn))
             return;
         id->key = newKey;
@@ -289,7 +290,7 @@ private:
         int l = 0, r = tn.size - 1, mid;
         while (l < r){
             mid = (l + r) >> 1;
-            if (!cmp(tn.index[mid].key, key))
+            if (!comp(tn.index[mid].key, key))
                 l = mid + 1;
             else
                 r = mid;
@@ -318,7 +319,7 @@ private:
         if (nx->succ != 0){
             TreeNode on;
             read(&on, nx->succ);
-            on->prev = tn->succ;
+            on.prev = tn->succ;
             write(&on, nx->succ);
         }
     }
@@ -330,7 +331,7 @@ private:
         if (nx->succ != 0){
             LeafNode on;
             read(&on, nx->succ);
-            on->prev = ln->succ;
+            on.prev = ln->succ;
             write(&on, nx->succ);
         }
     }
@@ -387,14 +388,14 @@ private:
         if (tn.size != L){
             int i;
             for (i = tn.size; i > 0; --i){
-                if (!cmp(key, tn.index[i - 1].key))
+                if (!comp(key, tn.index[i - 1].key))
                     break;
-                tn.index[i] - tn.index[i - 1];
+                tn.index[i] = tn.index[i - 1];
             }
             tn.index[i].key = key;
             tn.index[i].child = child;
             if (i == tn.size){
-                updateParentIndex(tn.parent, tn.index[i - 1].key, key);
+                updateChildIndex(tn.parent, tn.index[i - 1].key, key);
             }
             ++tn.size;
             write(&tn, offset);
@@ -416,7 +417,7 @@ private:
                 TreeNode newNode;
                 int newPos = alloc();
                 createTreeNode(newPos, &newNode, &sib);
-                Key old = tn.key[tn.size - 1].key;
+                Key old = tn.index[tn.size - 1].key;
                 copyIndex(end(tn) - M / 3, end(tn), begin(newNode));
                 copyIndex(begin(sib), begin(sib) + M / 3, end(newNode));
                 tn.size -= M / 3;
@@ -424,11 +425,11 @@ private:
                 sib.size -= M / 3;
                 newNode.size = M / 3 * 2;
                 updateChildIndex(tn.parent, old, tn.index[tn.size - 1].key);
-                insertNewIndex(tn.parent, newNode.index[newNode.size - 1].key);
+                insertNewIndex(tn.parent, newNode.index[newNode.size - 1].key, sib.prev);
                 write(&tn, offset);
                 write(&newNode, newPos);
                 write(&sib, newNode.succ);
-                if (cmp(key, tn.index[tn.size - 1].key))
+                if (comp(key, tn.index[tn.size - 1].key))
                     insertNewIndex(newNode.prev, key, child);
                 else
                     insertNewIndex(tn.succ, key, child);
@@ -436,18 +437,18 @@ private:
         }
         else{
             TreeNode newNode;
-            createTreeNode(offset, tn, newNode);
+            createTreeNode(offset, &tn, &newNode);
             int newPos = tn.succ;
             Key old = tn.index[tn.size - 1].key;
             copyIndex(end(tn) - L / 2, end(tn), begin(newNode));
             tn.size -= L / 2;
-            newNode.szie = L / 2;
+            newNode.size = L / 2;
             if (tn.parent != 0){
                 updateChildIndex(tn.parent, old, tn.index[tn.size - 1].key);
                 insertNewIndex(tn.parent, newNode.index[newNode.size - 1].key, tn.succ);
                 write(&tn, offset);
                 write(&newNode, newPos);
-                if (cmp(key, tn.index[tn.size - 1].key))
+                if (comp(key, tn.index[tn.size - 1].key))
                     insertNewIndex(newNode.prev, key, child);
                 else
                     insertNewIndex(tn.succ, key, child);
@@ -464,7 +465,7 @@ private:
                 write(&newRoot, rootPos);
                 root = rootPos;
                 ++height;
-                if (cmp(key, tn.index[tn.size - 1].key))
+                if (comp(key, tn.index[tn.size - 1].key))
                     insertNewIndex(newNode.prev, key, child);
                 else
                     insertNewIndex(tn.succ, key, child);
@@ -492,14 +493,14 @@ public:
         if (ln.size != L){
             int i;
             for (i = ln.size; i > 0; --i){
-                if (!cmp(key, ln.record[i - 1].key))
+                if (!comp(key, ln.record[i - 1].key))
                     break;
-                ln.record[i] - ln.record[i - 1];
+                ln.record[i] = ln.record[i - 1];
             }
             ln.record[i].key = key;
             ln.record[i].value = value;
             if (i == ln.size){
-                updateParentIndex(ln.parent, ln.record[i - 1].key, key);
+                updateChildIndex(ln.parent, ln.record[i - 1].key, key);
             }
             ++ln.size;
             write(&ln, childPos);
@@ -545,7 +546,7 @@ public:
             Key old = ln.record[ln.size - 1].key;
             copyRecord(end(ln) - L / 2, end(ln), begin(newNode));
             ln.size -= L / 2;
-            newNode.szie = L / 2;
+            newNode.size = L / 2;
             updateChildIndex(ln.parent, old, ln.record[ln.size - 1].key);
             insertNewIndex(ln.parent, newNode.record[newNode.size - 1].key, ln.succ);
             write(&ln, childPos);
@@ -563,7 +564,7 @@ public:
         int l = 0, r = ln.size - 1, mid;
         while (l < r){
             mid = (l + r) >> 1;
-            if (cmp(key, ln.record[mid].key))
+            if (comp(key, ln.record[mid].key))
                 l = mid + 1;
             else
                 r = mid;
@@ -589,7 +590,7 @@ public:
         int l = 0, r = ln.size - 1, mid;
         while (l < r){
             mid = (l + r) >> 1;
-            if (cmp(key, ln.record[mid].key))
+            if (comp(key, ln.record[mid].key))
                 l = mid + 1;
             else
                 r = mid;
