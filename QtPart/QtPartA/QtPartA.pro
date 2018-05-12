@@ -26,12 +26,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         loginui.cpp \
-    dialogforadditionquery.cpp
+    dialogforadditionquery.cpp \
+    mainwindow.cpp \
+    controlpanel.cpp
 
 HEADERS += \
         loginui.h \
-    dialogforadditionquery.h
+    dialogforadditionquery.h \
+    mainwindow.h \
+    controlpanel.h \
+    datacenter.h \
+    internetlibrary.h
 
 FORMS += \
         loginui.ui \
-    dialogforadditionquery.ui
+    dialogforadditionquery.ui \
+    mainwindow.ui \
+    controlpanel.ui
