@@ -7,6 +7,9 @@
         "vector": "cpp",
         "xstring": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "ostream": "cpp",
+        "set": "cpp",
+        "xiosbase": "cpp"
     }
 }
