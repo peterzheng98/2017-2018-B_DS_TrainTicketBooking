@@ -1,20 +1,25 @@
 //
 // Created by Peter Zheng on 2018/05/07.
 //
-#include "String.h"
+//#include "String.h"
 //#include <fstream>
 #include <unistd.h>
-using namespace myAlgorithm;
-int main(){
-    String s1("abcde", 1), s2("abcd", 1), s3("bcde", 1);
+#include "BPlusTree.hpp"
 
-    bool flag1 = (s1 >= s2);
-    bool flag2 = (s1 >= s3);
-    bool flag3 = (s2 >= s3);
-    bool flag4 = (s1 == s2);
-    bool flag5 = (s1 == s3);
-    bool flag6 = (s1 >= s3);
-    bool flag7 = (s1 < s3);
-    int p;
-    std::cin >> p;
+using namespace myAlgorithm;
+
+int A = 774;
+int B = 51702;
+int C = 21910;
+
+int randomR() {
+    int d = random() % 10000;
+    return A * d * d + B * d + C * d;
+}
+
+int main() {
+    BPlusTree<int, int> bpt;
+    srand(time(NULL));
+
+//    for(int i = 0; )
 }
