@@ -5,15 +5,14 @@
 #ifndef INC_2018DATASTRUCTUREBIGWORK_BPLUSTREE_H
 #define INC_2018DATASTRUCTUREBIGWORK_BPLUSTREE_H
 
-#include <iostream>
+#include <cstdio>
 #include <fstream>
 #include <functional>
 #include <cstring>
-#include "Exception.hpp"
 
 namespace myAlgorithm{
 
-static const char WRITE_PATH[20] = "tmp\\records.dat";
+static const char WRITE_PATH[256] = "../../tmp/records.txt";
 static const int UNIT = 4096;
 
 template <  
@@ -63,7 +62,8 @@ private:
     mutable int fileLevel = 0;
 
     off_t root = 0, slot = 0;
-    size_t height = 0, _size = 0;
+    size_t _size = 0;
+    int height = 0;
 
     Compare comp;
 
@@ -98,8 +98,8 @@ private:
     }
 
     template <class T>
-    size_t write(T *val, off_t offset){
-        openFile();
+    size_t write(T *val, off_t offset, char *mode = "wb+"){
+        openFile(mode);
         fseek(fp, offset, SEEK_SET);
         char *ch;
         ch = reinterpret_cast<char *>(val);
@@ -186,6 +186,8 @@ private:
     }
 
     void updateChildIndex(off_t parent, const Key &oldKey, const Key &newKey){
+        if (parent == 0)
+            return;
         TreeNode tn;
         read(&tn, parent);
         Index *id = binarySearchKey(tn, oldKey);
@@ -370,6 +372,8 @@ private:
     off_t findKey(const Key &key){
         TreeNode tn;
         read(&tn, root);
+        if (tn.size == 0)
+            return 0;
         Index *id;
         for (int i = 1; i <= height - 2; ++i){
             id = binarySearchKey(tn, key);
@@ -474,6 +478,15 @@ private:
     }
 
 public:
+    BPlusTree(bool CLEAR = false, const char *PATH = WRITE_PATH) {
+        strcpy(path, PATH);
+        TreeNode rt;
+        if (CLEAR)
+            write(&rt, root, "wb");
+        else
+            write(&rt, root, "wb+");
+    }
+
     std::pair<Val, bool> search(const Key &key){
         off_t pos = findKey(key);
         if (pos){
