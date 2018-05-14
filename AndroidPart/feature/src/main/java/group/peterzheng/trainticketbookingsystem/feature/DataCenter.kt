@@ -12,6 +12,15 @@ class DataCenter {
 
         }
 
+        class UserState{
+            companion object {
+                public var UserName : String = ""
+                public var UserWord : String = ""
+                public var UserLevel : Int = 0
+                public var UserLoginResult : Int = -1
+            }
+        }
+
         class NetworkInfo{
             companion object {
                 public var ipAddressURL : String = ""
@@ -23,7 +32,7 @@ class DataCenter {
             companion object {
                 fun QueryUser(userName : String, userWord : String) : Boolean {
                     //For Debug ONLY
-                    return userWord == "Test"
+                    return userWord == "Test" && userName != "Hzfengsy"
                 }
             }
         }

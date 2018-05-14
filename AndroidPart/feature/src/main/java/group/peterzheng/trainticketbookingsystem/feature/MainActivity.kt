@@ -8,6 +8,7 @@ import android.os.Message
 import android.os.WorkSource
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
@@ -81,27 +82,33 @@ class MainActivity : AppCompatActivity() {
                 textStatus!!.setText("正在测试连接")
                 testProgress.visibility = ProgressBar.VISIBLE;
                 DataCenter.Companion.LoginScreen.lockTestConnection = true
-                val TestURL: String = "http://" + ipAddr.text +"/test.lglo"
-                TestURL.httpGet().responseString { request, response, result ->
-                    when (result) {
-                        is Result.Success -> {
-                            println("Result: ${result.get()}")
-                            Toast.makeText(baseContext, "连接成功！", Toast.LENGTH_SHORT).show()
-                            textStatus!!.setText("连接成功！")
-                            testProgress.visibility = ProgressBar.INVISIBLE
-                            loginOnline.visibility = Button.VISIBLE
-                            testConn.visibility = Button.INVISIBLE
-                            DataCenter.Companion.LoginScreen.connectTestResult = true
-                        }
-                        is Result.Failure -> {
-                            println("Result: ${result.get()}  Request: ${request.headers}  Response: ${response.responseMessage}")
-                            Toast.makeText(baseContext, "连接失败！", Toast.LENGTH_SHORT).show()
-                            DataCenter.Companion.LoginScreen.lockTestConnection = false
+                try {
+                    val TestURL: String = "http://" + ipAddr.text + "/test.lglo"
+                    TestURL.httpGet().responseString { request, response, result ->
+                        when (result) {
+                            is Result.Success -> {
+                                println("Result: ${result.get()}")
+                                Toast.makeText(baseContext, "连接成功！", Toast.LENGTH_SHORT).show()
+                                textStatus!!.setText("连接成功！")
+                                testProgress.visibility = ProgressBar.INVISIBLE
+                                loginOnline.visibility = Button.VISIBLE
+                                testConn.visibility = Button.INVISIBLE
+                                DataCenter.Companion.LoginScreen.connectTestResult = true
+                            }
+                            is Result.Failure -> {
+                                println("Result: ${result.get()}  Request: ${request.headers}  Response: ${response.responseMessage}")
+                                Toast.makeText(baseContext, "连接失败！", Toast.LENGTH_SHORT).show()
+                                DataCenter.Companion.LoginScreen.lockTestConnection = false
+                            }
                         }
                     }
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "Runtime Error in testConnB(setOnClickedListener) , Message: " + e.toString());
+                    Toast.makeText(baseContext, "发生运行时错误！", Toast.LENGTH_SHORT).show()
                 }
+
             } else {
-                if(DataCenter.Companion.LoginScreen.connectTestResult)
+                if (DataCenter.Companion.LoginScreen.connectTestResult)
                     Toast.makeText(baseContext, "已经测试成功，请登录", Toast.LENGTH_SHORT).show()
                 else
                     Toast.makeText(baseContext, "正在测试连接，请勿重复单击", Toast.LENGTH_SHORT).show()
