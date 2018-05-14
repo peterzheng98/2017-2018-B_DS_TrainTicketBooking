@@ -40,7 +40,9 @@ class ticketBookingResultActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState, persistentState)
         setContentView(R.layout.fragment_item)
         val listViewR = findViewById(R.id.list) as RecyclerView
-        listViewR.adapter = TicketAdapter(items)
+        listViewR.adapter = TicketAdapter(items){
+
+        }
     }
 }
 /*
@@ -137,7 +139,7 @@ class resultFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        list.layoutManager = LinearLayoutManager(activity)
+//        list.layoutManager = LinearLayoutManager(activity)
 
     }
 }
