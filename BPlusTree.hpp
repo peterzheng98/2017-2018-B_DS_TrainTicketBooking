@@ -91,19 +91,19 @@ private:
         openFile();
         fseek(fp, offset, SEEK_SET);
         char ch[UNIT];
-        size_t s = fread(reinterpret_cast<void *>(ch), UNIT, 1, fp);
-        val = reinterpret_cast<T *>(ch);
+        size_t s = fread(ch, UNIT, 1, fp);
+        *val = *(reinterpret_cast<T *>(ch));
         closeFile();
         return s;
     }
 
     template <class T>
-    size_t write(T *val, off_t offset, char *mode = "wb+"){
+    size_t write(T *val, off_t offset, char *mode = "rb+"){
         openFile(mode);
         fseek(fp, offset, SEEK_SET);
         char *ch;
         ch = reinterpret_cast<char *>(val);
-        size_t s = fwrite(reinterpret_cast<void *>(ch), UNIT, 1, fp);
+        size_t s = fwrite(ch, UNIT, 1, fp);
         closeFile();
         return s;
     }
@@ -152,6 +152,8 @@ private:
     }
 
     Index *binarySearchKey(TreeNode &tn, const Key &key){
+        if (tn.size == 0)
+            return end(tn);
         size_t l = 0, r = tn.size - 1, mid;
         while (l < r){
             mid = (l + r) / 2;
@@ -164,6 +166,8 @@ private:
     }
 
     Record *binarySearchRecord(LeafNode &ln, const Key &key){
+        if (ln.size == 0)
+            return end(ln);
         size_t l = 0, r = ln.size - 1, mid;
         while (l < r){
             mid = (l + r) / 2;
@@ -190,13 +194,21 @@ private:
             return;
         TreeNode tn;
         read(&tn, parent);
-        Index *id = binarySearchKey(tn, oldKey);
-        if (id == end(tn))
-            return;
-        id->key = newKey;
-        write(&tn, parent);
-        if (id == end(tn) - 1)
+        if (tn.size == 0) {
+            tn.index[0].key = newKey;
+            ++tn.size;
+            write(&tn, parent);
             updateChildIndex(tn.parent, oldKey, newKey);
+        }
+        else {
+            Index *id = binarySearchKey(tn, oldKey);
+            if (id == end(tn))
+                return;
+            id->key = newKey;
+            write(&tn, parent);
+            if (id == end(tn) - 1)
+                updateChildIndex(tn.parent, oldKey, newKey);
+        }
     }
 
     bool getKeyFromRight(TreeNode &t, off_t offset){
@@ -369,17 +381,19 @@ private:
         removeTreeNode(&des, &from);
     }
 
-    off_t findKey(const Key &key){
+    off_t findKey(const Key &key, bool mode = false;) {
         TreeNode tn;
         read(&tn, root);
         if (tn.size == 0)
-            return 0;
+            return tn.index[0].child;
         Index *id;
         for (int i = 1; i <= height - 2; ++i){
             id = binarySearchKey(tn, key);
             read(&tn, id->child);
         }
         id = binarySearchKey(tn, key);
+        if (mode)
+            return id->child;
         if (id->key != key)
             return 0;
         else
@@ -480,27 +494,34 @@ private:
 public:
     BPlusTree(bool CLEAR = false, const char *PATH = WRITE_PATH) {
         strcpy(path, PATH);
+        if (CLEAR) {
+            openFile("w+");
+            closeFile();
+        }
         TreeNode rt;
-        if (CLEAR)
-            write(&rt, root, "wb");
-        else
-            write(&rt, root, "wb+");
+        alloc();
+        root = alloc();
+        LeafNode ln;
+        ln.parent = root;
+        rt.index[0].child = alloc();
+        write(&rt, root);
+        write(&ln, rt.index[0].child);
+        height = 2;
     }
 
     std::pair<Val, bool> search(const Key &key){
-        off_t pos = findKey(key);
-        if (pos){
-            LeafNode ln;
-            read(&ln, pos);
-            Record *rc = binarySearchRecord(ln, key);
+        off_t pos = findKey(key, true);
+        LeafNode ln;
+        read(&ln, pos);
+        Record *rc = binarySearchRecord(ln, key);
+        if (rc->key == key)
             return std::make_pair(rc->value, true);
-        }
         else
             return std::make_pair(Val(), false);
     }
 
     void insert(const Key &key, const Val &value){
-        off_t childPos = findKey(key);
+        off_t childPos = findKey(key, true);
         LeafNode ln;
         read(&ln, childPos);
         if (ln.size != L){

@@ -11,10 +11,10 @@ using namespace myAlgorithm;
 BPlusTree<int, int> bpt(true);
 
 int main(){
-    for (int i = 1; i <= 10; ++i){
+    for (int i = 1; i <= 2000; ++i){
         bpt.insert(i, i);
     }
-    for (int i = 1; i <= 10; ++i) {
+    for (int i = 1; i <= 2000; ++i) {
         auto p = bpt.search(i);
         if (!p.second || p.first != i)
             system("PAUSE");
