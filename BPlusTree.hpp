@@ -29,9 +29,6 @@ public:
     using difference_type   = std::ptrdiff_t;
 
 private:
-    static const size_t M = (4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Key) + sizeof(off_t));
-    static const size_t L = (4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Key) + sizeof(Val));
-
     struct Index{
         Key key;
         off_t child;
@@ -41,6 +38,9 @@ private:
         Key key;
         Val value;
     };
+
+    static const size_t M = (4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Index));
+    static const size_t L = (4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Record));
 
     struct LeafNode{
         off_t parent = 0;
@@ -67,7 +67,11 @@ private:
 
     Compare comp;
 
+#ifndef _NO_DEBUG
 private:
+#else
+public:
+#endif
     void openFile(const char *mode = "rb+") const{
         if (fileLevel == 0)
             fp = fopen(path, mode);
@@ -80,6 +84,7 @@ private:
         --fileLevel;
     }
 
+private:
     off_t alloc(){
         off_t s = slot;
         slot += UNIT;
@@ -88,23 +93,31 @@ private:
 
     template <class T>
     size_t read(T *val, off_t offset){
+#ifndef _NO_DEBUG
         openFile();
+#endif
         fseek(fp, offset, SEEK_SET);
         char ch[UNIT];
         size_t s = fread(ch, UNIT, 1, fp);
         *val = *(reinterpret_cast<T *>(ch));
+#ifndef _NO_DEBUG
         closeFile();
+#endif
         return s;
     }
 
     template <class T>
     size_t write(T *val, off_t offset, char *mode = "rb+"){
+#ifndef _NO_DEBUG
         openFile(mode);
+#endif
         fseek(fp, offset, SEEK_SET);
         char *ch;
         ch = reinterpret_cast<char *>(val);
         size_t s = fwrite(ch, UNIT, 1, fp);
+#ifndef _NO_DEBUG
         closeFile();
+#endif
         return s;
     }
 
@@ -301,10 +314,12 @@ private:
     void removeIndex(off_t offset, const Key &key){
         TreeNode tn;
         read(&tn, offset);
+        if (tn.size == 0)
+            return;
         int l = 0, r = tn.size - 1, mid;
         while (l < r){
             mid = (l + r) >> 1;
-            if (!comp(tn.index[mid].key, key))
+            if (comp(tn.index[mid].key, key))
                 l = mid + 1;
             else
                 r = mid;
@@ -323,6 +338,7 @@ private:
                 }
             }
         }
+        write(&tn, offset);
     }
 
     void createTreeNode(off_t offset, TreeNode *tn, TreeNode *nx){
@@ -354,26 +370,26 @@ private:
         if (pr->succ != 0){
             TreeNode on;
             read(&on, tn->succ);
-            on->prev = tn->prev;
+            on.prev = tn->prev;
             write(&on, tn->succ);
         }
-        removeIndex(tn.parent, tn.index[tn.size - 1].key);
+        removeIndex(tn->parent, tn->index[tn->size - 1].key);
     }
     void removeLeafNode(LeafNode *pr, LeafNode *ln){
         pr->succ = ln->succ;
         if (pr->succ != 0){
             LeafNode on;
             read(&on, ln->succ);
-            on->prev = ln->prev;
+            on.prev = ln->prev;
             write(&on, ln->succ);
         }
-        removeIndex(ln.parent, ln.record[ln.size - 1].key);
+        removeIndex(ln->parent, ln->record[ln->size - 1].key);
     }
 
     void mergeLeaf(LeafNode *des, LeafNode *from){
         copyRecord(begin(*from), end(*from), end(*des));
         des->size += from->size;
-        removeLeafNode(&des, &from);
+        removeLeafNode(des, from);
     }
     void mergeKey(TreeNode &des, TreeNode &from){
         copyIndex(begin(from), end(from), end(des));
@@ -403,7 +419,7 @@ private:
     void insertNewIndex(off_t offset, const Key &key, off_t child){
         TreeNode tn;
         read(&tn, offset);
-        if (tn.size != L){
+        if (tn.size != M){
             int i;
             for (i = tn.size; i > 0; --i){
                 if (!comp(key, tn.index[i - 1].key))
@@ -498,6 +514,7 @@ public:
             openFile("w+");
             closeFile();
         }
+        openFile();
         TreeNode rt;
         alloc();
         root = alloc();
@@ -514,7 +531,7 @@ public:
         LeafNode ln;
         read(&ln, pos);
         Record *rc = binarySearchRecord(ln, key);
-        if (rc->key == key)
+        if (rc != end(ln) && rc->key == key)
             return std::make_pair(rc->value, true);
         else
             return std::make_pair(Val(), false);
@@ -547,24 +564,39 @@ public:
                 copyBackRecord(begin(sib), end(sib), end(sib) + 1);
                 copyRecord(end(ln) - 1, end(ln), begin(sib));
                 ++sib.size;
+                --ln.size;
                 write(&sib, ln.succ);
                 int i = ln.size;
-                ln.record[i - 1].key = key;
-                ln.record[i - 1].value = value;
+                for (i = ln.size; i > 0; --i) {
+                    if (!comp(key, ln.record[i - 1].key))
+                        break;
+                    ln.record[i] = ln.record[i - 1];
+                }
+                ln.record[i].key = key;
+                ln.record[i].value = value;
+                if (i == ln.size) {
+                    updateChildIndex(ln.parent, ln.record[i - 1].key, key);
+                }
+                else {
+                    updateChildIndex(ln.parent, sib.record[0].key, ln.record[ln.size].key);
+                }
+                ++ln.size;
                 write(&ln, childPos);
                 ++_size;
             }
             else{
                 LeafNode newNode;
-                int newPos = alloc();
-                createLeafNode(newPos, &newNode, &sib);
+                createLeafNode(sib.prev, &ln, &newNode);
+                int newPos = ln.succ;
+                read(&sib, newNode.succ);
                 Key old = ln.record[ln.size - 1].key;
                 copyRecord(end(ln) - L / 3, end(ln), begin(newNode));
-                copyRecord(begin(sib), begin(sib) + L / 3, end(newNode));
                 ln.size -= L / 3;
-                copyRecord(begin(sib) + L / 3 + 1, end(sib), begin(sib));
+                newNode.size += L / 3;
+                copyRecord(begin(sib), begin(sib) + L / 3, end(newNode));
                 sib.size -= L / 3;
-                newNode.size = L / 3 * 2;
+                newNode.size += L / 3;
+                copyRecord(begin(sib) + L / 3, begin(sib) + L, begin(sib));
                 updateChildIndex(ln.parent, old, ln.record[ln.size - 1].key);
                 insertNewIndex(ln.parent, newNode.record[newNode.size - 1].key, sib.prev);
                 write(&ln, childPos);
@@ -590,7 +622,7 @@ public:
     }
 
     void erase(const Key &key){
-        off_t pos = findKey(key);
+        off_t pos = findKey(key, true);
         if (pos == 0)
             return;
         LeafNode ln;
@@ -598,18 +630,29 @@ public:
         int l = 0, r = ln.size - 1, mid;
         while (l < r){
             mid = (l + r) >> 1;
-            if (comp(key, ln.record[mid].key))
+            if (comp(ln.record[mid].key, key))
                 l = mid + 1;
             else
                 r = mid;
         }
-        copyRecord(begin(ln) + l + 1, end(ln), begin(ln) + l);
-        --ln.size;
-        if (ln.succ != 0){
-            LeafNode sib;
-            read(&sib, ln.succ);
-            if (ln.size + sib.size <= L)
-                mergeLeaf(ln, sib);
+        if (l == ln.size - 1) {
+            --ln.size;
+            if (ln.size != 0) {
+                updateChildIndex(ln.parent, ln.record[l].key, ln.record[l - 1].key);
+            }
+            else {
+                removeIndex(ln.parent, ln.record[l].key);
+            }
+        }
+        else {
+            copyRecord(begin(ln) + l + 1, end(ln), begin(ln) + l);
+            --ln.size;
+            if (ln.succ != 0) {
+                LeafNode sib;
+                read(&sib, ln.succ);
+                if (ln.size + sib.size <= L)
+                    mergeLeaf(&ln, &sib);
+            }
         }
         write(&ln, pos);
         --_size;
