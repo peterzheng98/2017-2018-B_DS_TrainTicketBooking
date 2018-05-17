@@ -11,34 +11,41 @@
 using namespace std;
 using namespace myAlgorithm;
 
-BPlusTree<int, pair<long long, long long>> bpt(true);
+struct BigSize {
+    int k = 0;
+    int a[100];
+
+    BigSize(int n = 0) : k(n) {}
+
+    BigSize &operator =(const BigSize &b) {
+        k = b.k;
+        return *this;
+    }
+
+    bool operator <(const BigSize &b) const {
+        return k < b.k;
+    }
+};
+
+BPlusTree<BigSize, BigSize> bpt(true);
 
 int main() {
     for (int i = MAXNN; i >= 1; --i) {
-        bpt.insert(i, make_pair(i, i));
-       // printf("Insertion %d Accepted.\n", i);
+        if (i == 99919)
+            system("PAUSE");
+        bpt.insert(BigSize(i), BigSize(i));
     }
     printf("After Insertion.\n");
     for (int i = 1; i <= MAXNN; ++i) {
-#ifndef _LINUX_MODE
-        if (i == 21690)
-            system("PAUSE");
-#endif // !_LINUX_MODE
 
         auto p = bpt.search(i);
-        if (p.first.first != i || !p.second) {
+        if (p.first.k != i || !p.second) {
             cout << i << endl;
-#ifndef _LINUX_MODE
-            system("PAUSE");
-#endif
         }
         bpt.erase(i);
         p = bpt.search(i);
         if (p.second) {
             cout << i << endl;
-#ifndef _LINUX_MODE
-            system("PAUSE");
-#endif
         }
     }
 #ifdef _NO_DEBUG

@@ -423,7 +423,9 @@ private:
         read(&tn, root);
         if (tn.size == 0)
             return tn.index[0].child;
-        Index *id;
+        //if (height == 3 && tn.size == 3)
+            //system("PAUSE");
+        Index *id;;
         for (int i = 1; i <= height - 2; ++i){
             id = binarySearchKey(tn, key);
             read(&tn, id->child);
@@ -431,7 +433,7 @@ private:
         id = binarySearchKey(tn, key);
         if (mode)
             return id->child;
-        if (id->key != key)
+        if (comp(id->key, key) || comp(key, id->key))
             return 0;
         else
             return id->child;
@@ -470,15 +472,17 @@ private:
             }
             else{
                 TreeNode newNode;
-                int newPos = alloc();
-                createTreeNode(newPos, &newNode, &sib);
+                createTreeNode(sib.prev, &tn, &newNode);
+                int newPos = tn.succ;
+                read(&sib, newNode.succ);
                 Key old = tn.index[tn.size - 1].key;
                 copyIndex(end(tn) - M / 3, end(tn), begin(newNode));
-                copyIndex(begin(sib), begin(sib) + M / 3, end(newNode));
                 tn.size -= M / 3;
-                copyIndex(begin(sib) + M / 3 + 1, end(sib), begin(sib));
+                newNode.size += M / 3;
+                copyIndex(begin(sib), begin(sib) + M / 3, end(newNode));
                 sib.size -= M / 3;
-                newNode.size = M / 3 * 2;
+                newNode.size += M / 3;
+                copyIndex(begin(sib) + M / 3, begin(sib) + M, begin(sib));
                 updateChildIndex(tn.parent, old, tn.index[tn.size - 1].key);
                 insertNewIndex(tn.parent, newNode.index[newNode.size - 1].key, sib.prev);
                 write(&tn, offset);
@@ -555,7 +559,7 @@ public:
         LeafNode ln;
         read(&ln, pos);
         Record *rc = binarySearchRecord(ln, key);
-        if (rc != end(ln) && rc->key == key)
+        if (rc != end(ln) && !comp(rc->key, key) && !comp(key, rc->key))
             return std::make_pair(rc->value, true);
         else
             return std::make_pair(Val(), false);
