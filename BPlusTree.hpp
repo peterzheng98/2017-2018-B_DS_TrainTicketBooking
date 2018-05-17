@@ -224,6 +224,23 @@ private:
         }
     }
 
+    void updateChildPos(off_t parent, const Key &oldKey, off_t newPos) {
+        if (parent == 0)
+            return;
+        TreeNode tn;
+        read(&tn, parent);
+        if (tn.size == 0) {
+            return;
+        }
+        else {
+            Index *id = binarySearchKey(tn, oldKey);
+            if (id == end(tn))
+                return;
+            id->child = newPos;
+            write(&tn, parent);
+        }
+    }
+
     bool getKeyFromRight(TreeNode &t, off_t offset){
         off_t pos = t.succ;
         TreeNode rn;
@@ -383,13 +400,17 @@ private:
             on.prev = ln->prev;
             write(&on, ln->succ);
         }
-        removeIndex(ln->parent, ln->record[ln->size - 1].key);
     }
 
     void mergeLeaf(LeafNode *des, LeafNode *from){
         copyRecord(begin(*from), end(*from), end(*des));
+        Key oldKey = des->record[des->size - 1].key;
+        Key key = from->record[from->size - 1].key;
+        off_t offset = from->prev;
         des->size += from->size;
         removeLeafNode(des, from);
+        removeIndex(des->parent, oldKey);
+        updateChildPos(des->parent, key, offset);
     }
     void mergeKey(TreeNode &des, TreeNode &from){
         copyIndex(begin(from), end(from), end(des));
@@ -397,7 +418,7 @@ private:
         removeTreeNode(&des, &from);
     }
 
-    off_t findKey(const Key &key, bool mode = false;) {
+    off_t findKey(const Key &key, bool mode = false) {
         TreeNode tn;
         read(&tn, root);
         if (tn.size == 0)
@@ -474,9 +495,9 @@ private:
             createTreeNode(offset, &tn, &newNode);
             int newPos = tn.succ;
             Key old = tn.index[tn.size - 1].key;
-            copyIndex(end(tn) - L / 2, end(tn), begin(newNode));
-            tn.size -= L / 2;
-            newNode.size = L / 2;
+            copyIndex(end(tn) - M / 2, end(tn), begin(newNode));
+            tn.size -= M / 2;
+            newNode.size = M / 2;
             if (tn.parent != 0){
                 updateChildIndex(tn.parent, old, tn.index[tn.size - 1].key);
                 insertNewIndex(tn.parent, newNode.index[newNode.size - 1].key, tn.succ);
@@ -499,6 +520,9 @@ private:
                 write(&newRoot, rootPos);
                 root = rootPos;
                 ++height;
+                tn.parent = newNode.parent = rootPos;
+                write(&tn, offset);
+                write(&newNode, newPos);
                 if (comp(key, tn.index[tn.size - 1].key))
                     insertNewIndex(newNode.prev, key, child);
                 else
