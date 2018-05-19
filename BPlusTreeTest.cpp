@@ -31,13 +31,10 @@ BPlusTree<BigSize, BigSize> bpt(true);
 
 int main() {
     for (int i = MAXNN; i >= 1; --i) {
-        if (i == 99919)
-            system("PAUSE");
         bpt.insert(BigSize(i), BigSize(i));
     }
     printf("After Insertion.\n");
-    for (int i = 1; i <= MAXNN; ++i) {
-
+    for (int i = MAXNN; i >= 1; --i) {
         auto p = bpt.search(i);
         if (p.first.k != i || !p.second) {
             cout << i << endl;

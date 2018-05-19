@@ -192,12 +192,22 @@ private:
         return ln.record + l;
     }
 
-    void updateParentIndex(Index *first, Index *last, off_t newParent){
+    void updateNodeParentPos(Index *first, Index *last, off_t newParent){
         TreeNode tn;
         while (first != last){
-            read(tn, first->child);
+            read(&tn, first->child);
             tn.parent = newParent;
-            write(tn, first->child);
+            write(&tn, first->child);
+            ++first;
+        }
+    }
+
+    void updateLeafParentPos(Index *first, Index *last, off_t newParent) {
+        LeafNode ln;
+        while (first != last) {
+            read(&ln, first->child);
+            ln.parent = newParent;
+            write(&ln, first->child);
             ++first;
         }
     }
@@ -241,6 +251,7 @@ private:
         }
     }
 
+    /*
     bool getKeyFromRight(TreeNode &t, off_t offset){
         off_t pos = t.succ;
         TreeNode rn;
@@ -326,9 +337,9 @@ private:
         --rn.size;
         write(&rn, pos);
         return true;
-    }
+    }*/
 
-    void removeIndex(off_t offset, const Key &key){
+    void removeIndex(off_t offset, const Key &key, bool mode = false){
         TreeNode tn;
         read(&tn, offset);
         if (tn.size == 0)
@@ -343,19 +354,50 @@ private:
         }
         copyIndex(begin(tn) + l + 1, end(tn), begin(tn) + l);
         --tn.size;
-        if (tn.succ != 0){
-            TreeNode sib;
-            read(&sib, tn.succ);
-            if (tn.size + sib.size <= M){
-                mergeKey(tn, sib);
-                if (tn.parent == root && tn.prev == 0 && tn.succ == 0){
-                    root = offset;
-                    tn.parent = 0;
+        if (tn.size == 0) {
+            if (tn.prev != 0) {
+                TreeNode sib;
+                read(&sib, tn.prev);
+                removeTreeNode(&sib, &tn);
+                if (sib.parent == root && sib.prev == 0 && sib.succ == 0) {
+                    root = tn.prev;
+                    sib.parent = 0;
                     --height;
                 }
+                write(&sib, tn.prev);
             }
+            else if (tn.succ != 0){
+                TreeNode sib;
+                read(&sib, tn.succ);
+                sib.prev = 0;
+                if (sib.parent == root && sib.prev == 0 && sib.succ == 0) {
+                    root = tn.succ;
+                    sib.parent = 0;
+                    --height;
+                }
+                write(&sib, tn.succ);
+            }
+            removeIndex(tn.parent, key);
         }
-        write(&tn, offset);
+        else {
+            if (tn.succ != 0) {
+                TreeNode sib;
+                read(&sib, tn.succ);
+                if (sib.parent == tn.parent && tn.size + sib.size <= M) {
+                    mergeKey(tn, sib, mode);
+                    if (tn.parent == root && tn.prev == 0 && tn.succ == 0) {
+                        root = offset;
+                        tn.parent = 0;
+                        --height;
+                    }
+                    write(&tn, offset);
+                }
+                else
+                    write(&tn, offset);
+            }
+            else
+                write(&tn, offset);
+        }
     }
 
     void createTreeNode(off_t offset, TreeNode *tn, TreeNode *nx){
@@ -390,7 +432,6 @@ private:
             on.prev = tn->prev;
             write(&on, tn->succ);
         }
-        removeIndex(tn->parent, tn->index[tn->size - 1].key);
     }
     void removeLeafNode(LeafNode *pr, LeafNode *ln){
         pr->succ = ln->succ;
@@ -408,14 +449,23 @@ private:
         Key key = from->record[from->size - 1].key;
         off_t offset = from->prev;
         des->size += from->size;
-        removeLeafNode(des, from);
-        removeIndex(des->parent, oldKey);
         updateChildPos(des->parent, key, offset);
+        removeLeafNode(des, from);
+        removeIndex(des->parent, oldKey, true);
     }
-    void mergeKey(TreeNode &des, TreeNode &from){
+    void mergeKey(TreeNode &des, TreeNode &from, bool mode = false){
         copyIndex(begin(from), end(from), end(des));
+        Key oldKey = des.index[des.size - 1].key;
+        Key key = from.index[from.size - 1].key;
+        off_t offset = from.prev;
         des.size += from.size;
+        updateChildPos(des.parent, key, offset);
+        if (!mode)
+            updateNodeParentPos(begin(from), end(from), offset);
+        else
+            updateLeafParentPos(begin(from), end(from), offset);
         removeTreeNode(&des, &from);
+        removeIndex(des.parent, oldKey);
     }
 
     off_t findKey(const Key &key, bool mode = false) {
@@ -423,9 +473,9 @@ private:
         read(&tn, root);
         if (tn.size == 0)
             return tn.index[0].child;
-        //if (height == 3 && tn.size == 3)
-            //system("PAUSE");
-        Index *id;;
+        //if (height == 6)
+        //    system("PAUSE");
+        Index *id;
         for (int i = 1; i <= height - 2; ++i){
             id = binarySearchKey(tn, key);
             read(&tn, id->child);
@@ -439,7 +489,7 @@ private:
             return id->child;
     }
 
-    void insertNewIndex(off_t offset, const Key &key, off_t child){
+    void insertNewIndex(off_t offset, const Key &key, off_t child, bool mode = false){
         TreeNode tn;
         read(&tn, offset);
         if (tn.size != M){
@@ -463,11 +513,28 @@ private:
             if (sib.size != M){
                 copyBackIndex(begin(sib), end(sib), end(sib) + 1);
                 copyIndex(end(tn) - 1, end(tn), begin(sib));
+                if (!mode)
+                    updateNodeParentPos(begin(sib), begin(sib) + 1, tn.succ);
+                else
+                    updateLeafParentPos(begin(sib), begin(sib) + 1, tn.succ);
                 ++sib.size;
+                --tn.size;
                 write(&sib, tn.succ);
-                int i = tn.size;
-                tn.index[i - 1].key = key;
-                tn.index[i - 1].child = child;
+                int i;
+                for (i = tn.size; i > 0; --i) {
+                    if (!comp(key, tn.index[i - 1].key))
+                        break;
+                    tn.index[i] = tn.index[i - 1];
+                }
+                tn.index[i].key = key;
+                tn.index[i].child = child;
+                if (i == tn.size) {
+                    updateChildIndex(tn.parent, tn.index[i - 1].key, key);
+                }
+                else {
+                    updateChildIndex(tn.parent, sib.index[0].key, tn.index[tn.size].key);
+                }
+                ++tn.size;
                 write(&tn, offset);
             }
             else{
@@ -483,6 +550,10 @@ private:
                 sib.size -= M / 3;
                 newNode.size += M / 3;
                 copyIndex(begin(sib) + M / 3, begin(sib) + M, begin(sib));
+                if (!mode)
+                    updateNodeParentPos(begin(newNode), end(newNode), newPos);
+                else
+                    updateLeafParentPos(begin(newNode), end(newNode), newPos);
                 updateChildIndex(tn.parent, old, tn.index[tn.size - 1].key);
                 insertNewIndex(tn.parent, newNode.index[newNode.size - 1].key, sib.prev);
                 write(&tn, offset);
@@ -502,6 +573,10 @@ private:
             copyIndex(end(tn) - M / 2, end(tn), begin(newNode));
             tn.size -= M / 2;
             newNode.size = M / 2;
+            if (!mode)
+                updateNodeParentPos(begin(newNode), end(newNode), newPos);
+            else
+                updateLeafParentPos(begin(newNode), end(newNode), newPos);
             if (tn.parent != 0){
                 updateChildIndex(tn.parent, old, tn.index[tn.size - 1].key);
                 insertNewIndex(tn.parent, newNode.index[newNode.size - 1].key, tn.succ);
@@ -626,7 +701,7 @@ public:
                 newNode.size += L / 3;
                 copyRecord(begin(sib) + L / 3, begin(sib) + L, begin(sib));
                 updateChildIndex(ln.parent, old, ln.record[ln.size - 1].key);
-                insertNewIndex(ln.parent, newNode.record[newNode.size - 1].key, sib.prev);
+                insertNewIndex(ln.parent, newNode.record[newNode.size - 1].key, sib.prev, true);
                 write(&ln, childPos);
                 write(&newNode, newPos);
                 write(&sib, newNode.succ);
@@ -642,7 +717,7 @@ public:
             ln.size -= L / 2;
             newNode.size = L / 2;
             updateChildIndex(ln.parent, old, ln.record[ln.size - 1].key);
-            insertNewIndex(ln.parent, newNode.record[newNode.size - 1].key, ln.succ);
+            insertNewIndex(ln.parent, newNode.record[newNode.size - 1].key, ln.succ, true);
             write(&ln, childPos);
             write(&newNode, newPos);
             insert(key, value);
@@ -669,7 +744,19 @@ public:
                 updateChildIndex(ln.parent, ln.record[l].key, ln.record[l - 1].key);
             }
             else {
-                removeIndex(ln.parent, ln.record[l].key);
+                if (ln.prev != 0) {
+                    LeafNode sib;
+                    read(&sib, ln.prev);
+                    removeLeafNode(&sib, &ln);
+                    write(&sib, ln.prev);
+                }
+                else if (ln.succ != 0) {
+                    LeafNode sib;
+                    read(&sib, ln.succ);
+                    sib.prev = 0;
+                    write(&sib, ln.succ);
+                }
+                removeIndex(ln.parent, ln.record[l].key, true);
             }
         }
         else {
@@ -678,7 +765,7 @@ public:
             if (ln.succ != 0) {
                 LeafNode sib;
                 read(&sib, ln.succ);
-                if (ln.size + sib.size <= L)
+                if (sib.parent == ln.parent && ln.size + sib.size <= L)
                     mergeLeaf(&ln, &sib);
             }
         }
