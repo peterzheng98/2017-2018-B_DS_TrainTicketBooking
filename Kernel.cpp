@@ -4,7 +4,7 @@
 
 #include "Kernel.h"
 
-Status Kernel::Insert::I_addUser(wchar_t *p_name, wchar_t *p_word, wchar_t *p_email, long long p_phone, int &p_id) {
+Status Kernel::Insert::I_addUser(String p_name, String p_word, String p_email, long long p_phone, int &p_id) {
     return NoRemainTicket;
 }
 
@@ -13,17 +13,17 @@ Status Kernel::Insert::I_addUserBookedTicket(int p_id, int tk_num, int tk_id, Pa
     return NoRemainTicket;
 }
 
-Status Kernel::Insert::I_addTrainTicket(int tk_id, wchar_t *t_name, int t_stationNum, int t_priceNum,
+Status Kernel::Insert::I_addTrainTicket(int tk_id, String t_name, int t_stationNum, int t_priceNum,
                                         const Vector<ticket> &t_ticketInside) {
     return NoRemainTicket;
 }
 
 
-Status Kernel::Select::I_selectUser(int p_id, wchar_t *p_word) {
+Status Kernel::Select::I_selectUser(int p_id, String p_word) {
     return NoRemainTicket;
 }
 
-Status Kernel::Select::I_selectUser(wchar_t *p_name, wchar_t *p_word) {
+Status Kernel::Select::I_selectUser(String p_name, String p_word) {
     return NoRemainTicket;
 }
 
@@ -73,11 +73,11 @@ Status Kernel::Delete::I_deleteTrain(int p_id) {
     return NoRemainTicket;
 }
 
-wchar_t *user::M_username() const {
+String user::M_username() const {
     return p_username;
 }
 
-wchar_t *user::M_password() const {
+String user::M_password() const {
     return p_password;
 }
 
@@ -85,7 +85,7 @@ BigNum<short> user::M_passwordHash() const {
     return BigNum<short>(p_passwordHash);
 }
 
-wchar_t *user::M_email() const {
+String user::M_email() const {
     return p_email;
 }
 
@@ -147,7 +147,7 @@ int train::M_trainID() const {
     return t_trainID;
 }
 
-wchar_t *train::M_name() const {
+String train::M_name() const {
     return t_name;
 }
 
@@ -159,7 +159,7 @@ int train::M_priceNumber() const {
     return t_priceNumber;
 }
 
-wchar_t *train::M_levelName() const {
+String train::M_levelName() const {
     return t_levelName;
 }
 

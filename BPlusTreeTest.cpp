@@ -2,7 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 //#define _NO_DEBUG
 //#define _LINUX_MODE
-#define MAXNN 100000
+//#define MAXNN 100000
 #include "BPlusTree.hpp"
 #include <algorithm>
 #include <iostream>
@@ -27,9 +27,12 @@ struct BigSize {
     }
 };
 
-BPlusTree<BigSize, BigSize> bpt(true);
+BPlusTree<BigSize, BigSize> bpt(true, "tmp/records.txt");
 
 int main() {
+    int pnt = 0;
+    cin >> pnt;
+    int MAXNN = pnt;
     for (int i = MAXNN; i >= 1; --i) {
         bpt.insert(BigSize(i), BigSize(i));
     }

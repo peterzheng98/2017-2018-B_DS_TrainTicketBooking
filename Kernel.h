@@ -7,6 +7,8 @@
 
 #include "CoreData.h"
 #include "BigNum.hpp"
+#include "String.h"
+#include "Set.hpp"
 
 using namespace myAlgorithm;
 
@@ -42,23 +44,23 @@ class train {
 private:
     int t_id;
     int t_trainID;
-    wchar_t *t_name;
+    String t_name;
     int t_stationNumber;
     int t_priceNumber;
-    wchar_t *t_levelName;
+    String t_levelName;
     Vector<ticket> t_ticketInside;
 public:
     int M_id() const;
 
     int M_trainID() const;
 
-    wchar_t *M_name() const;
+    String M_name() const;
 
     int M_stationNumber() const;
 
     int M_priceNumber() const;
 
-    wchar_t *M_levelName() const;
+    String M_levelName() const;
 
     Vector<ticket> M_ticketInside() const;
 };
@@ -66,22 +68,22 @@ public:
 class user {
 private:
     long long p_id;
-    wchar_t *p_username;
-    wchar_t *p_password;
+    String p_username;
+    String p_password;
     BigNum<short> p_passwordHash;
-    wchar_t *p_email;
+    String p_email;
     long long p_phone;
     Set<ticket> p_ticketBooked;
 public:
     long long M_id() const;
 
-    wchar_t *M_username() const;
+    String M_username() const;
 
-    wchar_t *M_password() const;
+    String M_password() const;
 
     BigNum<short> M_passwordHash() const;
 
-    wchar_t *M_email() const;
+    String M_email() const;
 
     long long M_phone() const;
 
@@ -96,20 +98,20 @@ namespace Kernel {
 
     class Insert : public Interface {
     public:
-        Status I_addUser(wchar_t *p_name, wchar_t *p_word, wchar_t *p_email, long long p_phone, int &p_id);
+        Status I_addUser(String p_name, String p_word, String p_email, long long p_phone, int &p_id);
 
         Status
         I_addUserBookedTicket(int p_id, int tk_num, int tk_id, Pair<int, int> tk_position, Date tk_date, int tk_kind);
 
-        Status I_addTrainTicket(int tk_id, wchar_t *t_name, int t_stationNum, int t_priceNum,
+        Status I_addTrainTicket(int tk_id, String t_name, int t_stationNum, int t_priceNum,
                                 const Vector<ticket> &t_ticketInside);
     };
 
     class Select : public Interface {
     public:
-        Status I_selectUser(int p_id, wchar_t *p_word);
+        Status I_selectUser(int p_id, String p_word);
 
-        Status I_selectUser(wchar_t *p_name, wchar_t *p_word);
+        Status I_selectUser(String p_name, String p_word);
 
         Status I_selectUser(int p_id, wchar_t &*p_name, wchar_t &*p_email, long long &p_phone);
 
