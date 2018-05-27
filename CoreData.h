@@ -149,10 +149,16 @@ namespace myAlgorithm {
             t2 = _t2;
             t3 = _t3;
         }
+
+        bool operator==(const TriplePair& rhs){
+            return t1 == rhs.first() &&
+                   t2 == rhs.second() &&
+                   t3 == rhs.third();
+        }
     };
 
     class Date {
-    private:
+    protected:
         TriplePair<short, short, short> dataOfDate;
     public:
         Date() = default;
@@ -257,13 +263,43 @@ namespace myAlgorithm {
             is >> t1 >> ch >> t2 >> ch2 >> t3;
             return is;
         }
+
+        bool operator==(const Date& rhs){
+            return dataOfDate == rhs.dataOfDate;
+        }
+
+        bool operator>=(const Date& rhs){
+            Date Cmp = Date(1, 1, 1);
+            int res1 = *this - (Cmp);
+            int res2 = rhs - Cmp;
+            return res1 >= res2;
+        }
+
+        bool operator>(const Date& rhs){
+            Date Cmp = Date(1, 1, 1);
+            int res1 = *this - (Cmp);
+            int res2 = rhs - Cmp;
+            return res1 > res2;
+        }
+
+        bool operator<=(const Date& rhs){
+            Date Cmp = Date(1, 1, 1);
+            int res1 = *this - (Cmp);
+            int res2 = rhs - Cmp;
+            return res1 <= res2;
+        }
+
+        bool operator<(const Date& rhs){
+            Date Cmp = Date(1, 1, 1);
+            int res1 = *this - (Cmp);
+            int res2 = rhs - Cmp;
+            return res1 < res2;
+        }
+
+        bool operator!=(const Date& rhs){
+            return !(dataOfDate == rhs.dataOfDate);
+        }
     };
-
-    template<class T>
-    class Vector {
-
-    };
-
 }
 
 
