@@ -61,9 +61,13 @@ private:
     mutable FILE *fp = nullptr;
     mutable int fileLevel = 0;
 
-    off_t root = 0, slot = 0;
-    size_t _size = 0;
-    int height = 0;
+    struct CoreData{
+        off_t root = 0, slot = 0, pos = UNIT * 2;
+        size_t _size = 0;
+        int height = 0;
+    };
+
+    CoreData core;
 
     Compare comp;
 
@@ -86,8 +90,9 @@ public:
 
 private:
     off_t alloc(){
-        off_t s = slot;
-        slot += UNIT;
+        off_t s = core.slot;
+        core.slot += UNIT;
+        write(&core, core.pos);
         return s;
     }
 
@@ -359,10 +364,11 @@ private:
                 TreeNode sib;
                 read(&sib, tn.prev);
                 removeTreeNode(&sib, &tn);
-                if (sib.parent == root && sib.prev == 0 && sib.succ == 0) {
-                    root = tn.prev;
+                if (sib.parent == core.root && sib.prev == 0 && sib.succ == 0) {
+                    core.root = tn.prev;
                     sib.parent = 0;
-                    --height;
+                    --core.height;
+                    write(&core, core.pos);
                 }
                 write(&sib, tn.prev);
             }
@@ -370,10 +376,11 @@ private:
                 TreeNode sib;
                 read(&sib, tn.succ);
                 sib.prev = 0;
-                if (sib.parent == root && sib.prev == 0 && sib.succ == 0) {
-                    root = tn.succ;
+                if (sib.parent == core.root && sib.prev == 0 && sib.succ == 0) {
+                    core.root = tn.succ;
                     sib.parent = 0;
-                    --height;
+                    --core.height;
+                    write(&core, core.pos);
                 }
                 write(&sib, tn.succ);
             }
@@ -385,10 +392,11 @@ private:
                 read(&sib, tn.succ);
                 if (sib.parent == tn.parent && tn.size + sib.size <= M) {
                     mergeKey(tn, sib, mode);
-                    if (tn.parent == root && tn.prev == 0 && tn.succ == 0) {
-                        root = offset;
+                    if (tn.parent == core.root && tn.prev == 0 && tn.succ == 0) {
+                        core.root = offset;
                         tn.parent = 0;
-                        --height;
+                        --core.height;
+                        write(&core, core.pos);
                     }
                     write(&tn, offset);
                 }
@@ -470,13 +478,13 @@ private:
 
     off_t findKey(const Key &key, bool mode = false) {
         TreeNode tn;
-        read(&tn, root);
+        read(&tn, core.root);
         if (tn.size == 0)
             return tn.index[0].child;
-        //if (height == 6)
+        //if (core.height == 6)
         //    system("PAUSE");
         Index *id;
-        for (int i = 1; i <= height - 2; ++i){
+        for (int i = 1; i <= core.height - 2; ++i){
             id = binarySearchKey(tn, key);
             read(&tn, id->child);
         }
@@ -597,8 +605,9 @@ private:
                 newRoot.index[1].key = newNode.index[newNode.size - 1].key;
                 newRoot.index[1].child = newPos;
                 write(&newRoot, rootPos);
-                root = rootPos;
-                ++height;
+                core.root = rootPos;
+                ++core.height;
+                write(&core, core.pos);
                 tn.parent = newNode.parent = rootPos;
                 write(&tn, offset);
                 write(&newNode, newPos);
@@ -616,17 +625,23 @@ public:
         if (CLEAR) {
             openFile("w+");
             closeFile();
+            openFile();
+            TreeNode rt;
+            alloc();
+            alloc();
+            core.root = alloc();
+            LeafNode ln;
+            ln.parent = core.root;
+            rt.index[0].child = alloc();
+            write(&rt, core.root);
+            write(&ln, rt.index[0].child);
+            core.height = 2;
+            write(&core, UNIT * 2);
         }
-        openFile();
-        TreeNode rt;
-        alloc();
-        root = alloc();
-        LeafNode ln;
-        ln.parent = root;
-        rt.index[0].child = alloc();
-        write(&rt, root);
-        write(&ln, rt.index[0].child);
-        height = 2;
+        else{
+            openFile();
+            read(&core, UNIT * 2);
+        }
     }
 
     std::pair<Val, bool> search(const Key &key){
@@ -658,7 +673,8 @@ public:
             }
             ++ln.size;
             write(&ln, childPos);
-            ++_size;
+            ++core._size;
+            write(&core, core.pos);
         }
         else if (ln.succ != 0){
             LeafNode sib;
@@ -685,7 +701,8 @@ public:
                 }
                 ++ln.size;
                 write(&ln, childPos);
-                ++_size;
+                ++core._size;
+                write(&core, core.pos);
             }
             else{
                 LeafNode newNode;
@@ -770,7 +787,8 @@ public:
             }
         }
         write(&ln, pos);
-        --_size;
+        --core._size;
+        write(&core, core.pos);
     }
 
     void update(const Key &key, const Val &value){
@@ -792,11 +810,11 @@ public:
     }
     
     size_t size(){
-        return _size; 
+        return core._size; 
     }
 
     bool empty(){
-        return (_size == 0);
+        return (core._size == 0);
     }
 };
 

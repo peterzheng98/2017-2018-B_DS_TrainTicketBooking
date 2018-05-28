@@ -8,22 +8,25 @@
 #ifndef INC_IOSTREAM
 #define INC_IOSTREAM
 
-//#include <iostream>
+#include <iostream>
 
 #endif
 
 
 enum Status {
     Success,
+    NameHasExisted,
     NoThisUser,
     NoRemainTicket,
     NoThisTrain,
+    NoTicketBooked,
+    NoPrivilege
 };
 
 enum UserPrivilege {
     Admin,
     User,
-    NotRegister,
+    NotRegister
 };
 
 enum TicketOnSale {
