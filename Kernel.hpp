@@ -26,7 +26,7 @@ class ticket {
     friend class Kernel::Select;
     friend class Kernel::Update;
 private:
-    Pair<int, int> tk_position;
+    Pair<int, int>  tk_position;
     Pair<Date, Date> tk_time;
     Date tk_date;
     int tk_catalog;

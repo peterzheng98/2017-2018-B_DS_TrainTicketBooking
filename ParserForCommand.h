@@ -8,28 +8,30 @@
 
 #include <iostream>
 #include "String.h"
+#include "Kernel.hpp"
 
 using namespace std;
 using namespace myAlgorithm;
+using namespace Kernel;
 
 class ParserForCommand {
+private:
+    Insert insert;
+    Update update;
+    Select select;
+    Delete delete;
 public:
-
     int Parser(ifstream &is) {
         myAlgorithm::String firstWord;
         is >> firstWord;
         if(firstWord == "register"){
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "register" << "\n";
-//#endif
-            String arg[4];
-            for (int i = 0; i < 4; ++i) is >> arg[i];
-//#ifdef DEBUGMODE_PARSER
-            cout << "Args: ";
-            for(int i = 0; i < 4; ++i)
-                cout << "[" << i + 1 << "] : [" << arg[i] << "]   "; 
-            cout << "\n";
-#endif
+            myAlgorithm::String p_name, p_word, p_email, p_phone;
+            is >> p_name >> p_word >> p_email >> p_phone;
+            int id = 0;
+//            long long test = p_phone.toLong();
+            Status ret = Insert().I_addUser(p_name, p_word, p_email, p_phone.toLong(), id);
+            if(ret == Success) cout << id << "\n"; else cout << "-1\n";
+            return true;
         }
         if(firstWord == "buy_ticket"){
 #ifdef DEBUGMODE_PARSER
