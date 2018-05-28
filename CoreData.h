@@ -93,6 +93,14 @@ namespace myAlgorithm {
             t1 = _t1;
             t2 = _t2;
         }
+
+        bool operator <(const Pair<T, U> &p) const{
+            return t1 < p.t1 || (t1 == p.t1 && t2 < p.t2);
+        }
+
+        bool operator ==(const Pair<T, U> &p) const{
+            return t1 == p.t1 && t2 == p.t2;
+        }
     };
 
     /*

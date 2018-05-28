@@ -133,25 +133,25 @@ namespace myAlgorithm {
             return true;
         }
 
-        bool operator==(const char *rhs) {
+        bool operator==(const char *rhs) const {
             if (strlen(rhs) != len) return false;
             for (int i = 0; i < len; ++i) if (data[i] != rhs[i]) return false;
             return true;
         }
 
-        bool operator!=(const String &rhs) {
+        bool operator!=(const String &rhs) const {
             if (rhs.len != len) return true;
             for (int i = 0; i < rhs.len; ++i) if (data[i] != rhs[i]) return true;
             return false;
         }
 
-        bool operator!=(const char *rhs) {
+        bool operator!=(const char *rhs) const {
             if (strlen(rhs) != len) return true;
             for (int i = 0; i < len; ++i) if (data[i] != rhs[i]) return true;
             return false;
         }
 
-        bool operator<=(const String &rhs) {
+        bool operator<=(const String &rhs) const {
             int minL = Utilities::min<int>(len, rhs.length());
             for (int i = 0; i < minL; i++) {
                 if (data[i] > rhs[i]) return false;
@@ -163,7 +163,7 @@ namespace myAlgorithm {
             return true;
         }
 
-        bool operator>=(const String &rhs) {
+        bool operator>=(const String &rhs) const {
             int minL = Utilities::min<int>(len, rhs.length());
             for (int i = 0; i < minL; i++) {
                 if (data[i] > rhs[i]) return true;
@@ -175,7 +175,7 @@ namespace myAlgorithm {
             return true;
         }
 
-        bool operator<(const String &rhs) {
+        bool operator<(const String &rhs) const {
             int minL = Utilities::min<int>(len, rhs.length());
             for (int i = 0; i < minL; i++) {
                 if (data[i] > rhs[i]) return false;
@@ -185,7 +185,7 @@ namespace myAlgorithm {
             return len <= rhs.length();
         }
 
-        bool operator>(const String &rhs) {
+        bool operator>(const String &rhs) const {
             int minL = Utilities::min<int>(len, rhs.length());
             for (int i = 0; i < minL; i++) {
                 if (data[i] > rhs[i]) return true;

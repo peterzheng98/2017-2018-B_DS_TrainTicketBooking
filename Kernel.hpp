@@ -22,20 +22,23 @@ namespace Kernel{
     class Delete;
 }
 
+class ticketKey;
+
 class ticket {
+    friend class ticketKey;
+    friend class Kernel::Insert;
     friend class Kernel::Select;
     friend class Kernel::Update;
 private:
-    Pair<int, int> tk_position;
+    Pair<short, short> tk_position;
     Pair<Date, Date> tk_time;
     Date tk_date;
-    int tk_catalog;
-    int tk_id;
-    Vector<int> tk_ticketRemain;
-    TicketOnSale tk_onSale;
-    Vector<int> tk_price;
+    short tk_catalog;
+    int tk_ticketID;
+    String tk_trainID;
+    float tk_price;
 public:
-    Pair<int, int> M_position() const{
+    Pair<short, short> M_position() const{
         return tk_position;
     }
 
@@ -47,74 +50,78 @@ public:
         return tk_date;
     }
 
-    int M_catalog() const{
+    short M_catalog() const{
         return tk_catalog;
     }
 
-    int M_id() const{
-        return tk_id;
+    String M_trainID() const{
+        return tk_trainID;
     }
 
-    Vector<int> M_ticketRemain() const{
-        return tk_ticketRemain;
-    }
-
-    TicketOnSale M_onSale() const{
-        return tk_onSale;
-    }
-
-    Vector<int> M_price() const{
+    float M_price() const{
         return tk_price;
     }
 };
 
-class trainKeyFrom;
-class trainKeyTo;
+class ticketKey{
+private:
+    Pair<short, short> station;
+    String trainID;
+public:
+    ticketKey() = default;
+    ticketKey(const Pair<short, short> &stt)
+        : station(stt);
+    ticketKey(const Pair<short, short> &stt, const String &tid)
+        : station(stt), trainID(tid) {}
+    ticketKey(const ticket &tk)
+        : station(tk.tk_position), trainID(tk.tk_trainID) {}
+    bool operator <(const ticketKey &tk) const{
+        return station < tk.station || (station == tk.station && trainID < tk.trainID);
+    }
+};
 
 class train {
-    friend class trainKeyFrom;
-    friend class trainKeyTo;
+    friend class Kernel::Insert;
     friend class Kernel::Select;
     friend class Kernel::Update;
 private:
-    int t_id;
-    int t_trainID;
+    String t_id;
     String t_name;
-    int t_stationFrom, t_stationTo;
-    int t_priceNumber;
-    String t_levelName;
-    Vector<ticket> t_ticketInside;
+    short t_station[60];
+    short t_ticketRemain[5][60];
+    short t_stationNum;
+    short t_tickedKind;
+    short t_catalog;
 public:
-    int M_id() const{
-        return t_id;
+    train() = default;
+
+    train(const train &tr)
+        : t_id(tr.t_id), t_name(tr.t_name), t_stationNum(tr.t_stationNum), t_tickedKind(tr.t_tickedKind), t_catalog(tr.t_catalog){
+        for (int i = 0; i < t_stationNum; ++i)
+            t_station[i] = tr.t_station[i];
+        for (int i = 0; i < t_tickedKind; ++i)
+            for (int j = 0; j < t_stationNum; ++j)
+                t_ticketRemain[i][j] = tr.t_ticketRemain[i][j];
     }
 
-    int M_trainID() const{
-        return t_trainID;
+    String M_id() const{
+        return t_id;
     }
 
     String M_name() const{
         return t_name;
     }
 
-    int M_stationFrom() const{
-        return t_stationFrom;
+    const short *M_station() const{
+        return t_station;
     }
 
-    int M_stationTo() const{
-        return t_stationTo;
+    short M_stationNum() const{
+        return t_stationNum;
     }
 
-    int M_priceNumber() const{
-        return t_priceNumber;
-    }
-
-    String M_levelName() const{
-        return t_levelName;
-    }
-
-    Vector<ticket> M_ticketInside() const{
-        return t_ticketInside;
+    short M_catalog() const{
+        return t_catalog;
     }
 };
 
@@ -125,10 +132,8 @@ private:
     int p_id;
     String p_username;
     String p_password;
-    BigNum<short> p_passwordHash;
     String p_email;
     long long p_phone;
-    Set<ticket> p_ticketBooked;
     UserPrivilege p_userPrivilege;
 public:
     user() = default;
@@ -150,10 +155,6 @@ public:
         return p_password;
     }
 
-    BigNum<short> M_passwordHash() const{
-        return p_passwordHash;
-    }
-
     String M_email() const{
         return p_email;
     }
@@ -162,50 +163,20 @@ public:
         return p_phone;
     }
 
-    Set<ticket> M_ticketBooked() const{
-        return p_ticketBooked;
-    }
-
     UserPrivilege M_privilege() const{
         return p_userPrivilege;
     }
 };
 
-class trainKeyFrom{
-private:
-    int t_id;
-    int t_stationFrom;
-public:
-    trainKeyFrom(int id = 0, int stationFrom = 0)
-        : t_id(id), t_stationFrom(stationFrom) {}
-    trainKeyFrom(const train &t)
-        : t_id(t.t_id), t_stationFrom(t.t_stationFrom) {}
-    bool operator <(const trainKeyFrom &tkf) const{
-        return t_stationFrom < tkf.t_stationFrom || (t_stationFrom == tkf.t_stationFrom && t_id < tkf.t_id);
-    }
-};
-
-class trainKeyTo{
-private:
-    int t_id;
-    int t_stationTo;
-public:
-    trainKeyTo(int id = 0, int stationTo = 0)
-        : t_id(id), t_stationTo(stationTo) {}
-    trainKeyTo(const train &t)
-        : t_id(t.t_id), t_stationTo(t.t_stationTo) {}
-    bool operator <(const trainKeyTo &tkf) const{
-        return t_stationTo < tkf.t_stationTo || (t_stationTo == tkf.t_stationTo && t_id < tkf.t_id);
-    }
-};
-
 static int nowId = 2018;
+static int ticketId = 0;
 
 BPlusTree<int, user> userIdTree(false, "tmp/user.dat");
-BPlusTree<String, int> userNameTree(false, "tmp/userName.dat"); 
-BPlusTree<trainKeyFrom, train> trainFromTree(false, "tmp/trainFrom.dat");
-BPlusTree<trainKeyTo, train> trainToTree(false, "tmp/trainTo.dat");
-BPlusTree<int, train> trainTree(false, "tmp/train.dat");
+BPlusTree<String, int> userNameTree(false, "tmp/userName.dat");
+BPlusTree<ticketKey, ticket> ticketTree(false, "tmp/ticket.dat");
+BPlusTree<int, ticket> ticketIdTree(false, "tmp/ticketId.dat");
+BPlusTree<int, int> userTicketTree(false, "tmp/userTicket.dat");
+BPlusTree<String, train> trainTree(false, "tmp/train.dat");
 
 namespace Kernel {
     class Interface { virtual ~Interface() {} };
@@ -225,10 +196,42 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_addUserBookedTicket(int p_id, int tk_num, int tk_id, Pair<int, int> tk_position, Date tk_date, int tk_kind);
+        Status I_addUserBookedTicket(int p_id, int tk_num, String tk_id, Pair<short, short> tk_position, Date tk_date, int tk_kind){
+            auto userSel = userIdTree.search(p_id);
+            if (!userSel.second)
+                return NoThisUser;
+            ticketKey newTk(tk_position, tk_id);
+            auto tkSel = ticketTree.search(newTk);
+            if (!tkSel.second)
+                return NoThisTrain;
+            auto trSel = trainTree.search(tk_id);
+            if (!trSel.second)
+                return NoThisTrain;
+            train upTrain(trSel.first);
+            short i, j;
+            for (i = 0; i < upTrain.t_stationNum; ++i)
+                if (i == tk_position.first())
+                    break;
+            for (j = 0; j < upTrain.t_stationNum; ++j)
+                if (j == tk_position.second())
+                    break;
+            if (i >= j || i == upTrain.t_stationNum || j == upTrain.t_stationNum)
+                return NoThisTrain;
+            for (short k = i; k < j; ++k){
+                if (upTrain.t_ticketRemain[tk_kind][k] < tk_num)
+                    return NoRemainTicket;
+                else
+                    upTrain.t_ticketRemain[tk_kind][k] -= tk_num;
+            }
+            trainTree.update(tk_id, upTrain);
+            int ticketID = tkSel.first.tk_ticketID;
+            userTicketTree.insert(p_id, ticketID);
+            return Success;
+        }
 
-        Status I_addTrainTicket(int tk_id, String t_name, int t_stationNum, int t_priceNum,
-                                const Vector<ticket> &t_ticketInside);
+        Status I_addTrainTicket(int tk_id, String t_name, int t_stationNum, int t_priceNum);
+
+        
 
         ~Insert();
     };
@@ -266,11 +269,46 @@ namespace Kernel {
             return Success;
         }
 
-        Status
-        I_selectTicket(Pair<int, int> tk_position, Date tk_date, int tk_catalog, int &retNum, Vector<ticket> &ret);
+        Status I_selectTicket(Pair<short, short> tk_position, Date tk_date, short tk_catalog, Vector<ticket> &ret){
+            ret.clear();
+            ticketKey tkKey(tk_position);
+            Vector<ticket> vt = ticketKey.searchFirst(tkKey);
+            for (int i = 0; i < vt.size(); ++i){
+                auto trSel = trainTree.search(vt[i].tk_trainID);
+                if (trSel.first.t_catalog & tk_catalog)
+                    ret.push_back(vt[i]);
+            }
+            if (ret.empty())
+                return NoThisTrain;
+            else
+                return Success;
+        }
 
-        Status I_selectTicketTransfer(Pair<int, int> tk_position, Date tk_date, int tk_catalog, int &retNum,
-                                      Vector<ticket> &ret);
+        Status I_selectTicketTransfer(Pair<short, short> tk_position, Date tk_date, short tk_catalog, 
+            short totStation, Vector<ticket> &ret){
+            ret.clear();
+            Vector<ticket> vt1, vt2;
+            ticket ans1, ans2;
+            Date minTime;
+            for (short i = 0; i < totStation; ++i){
+                if (i != tk_position.first() && t != tk_position.second())
+                I_selectTicket(Pair<short, short>(tk_position.first(), i), tk_date, tk_catalog, vt1);
+                I_selectTicket(Pair<short, short>(i, tk_position.second()), tk_date, tk_catalog, vt2);
+                for (int j = 0; j < vt1.size(); ++j){
+                    for (int k = 0; k < vt2.size(); ++k){
+                        if (minTime < vt2[k].tk_time.second() - vt1[j].tk_time.first()){
+                            minTime = vt2[k].tk_time.second() - vt1[j].tk_time.first();
+                            ans1 = vt1[j];
+                            ans2 = vt2[k];
+                        }
+                    }
+                }
+            }
+            if (ans1.tk_ticketID == 0 || ans2.tk_ticketID == 0)
+                return NoThisTrain;
+            ret.push_back(ans1);
+            ret.push_bakc(ans2);
+        }
 
         Status I_selectUserBookedTicket(int p_id, Date p_date, int tk_catalog, int &num, Vector<ticket> &ret){
             auto userSel = userIdTree.search(p_id);
