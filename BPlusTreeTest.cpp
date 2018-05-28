@@ -2,7 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 //#define _NO_DEBUG
 //#define _LINUX_MODE
-//#define MAXNN 100000
+#define MAXNN 1000000
 #include "BPlusTree.hpp"
 #include <algorithm>
 #include <iostream>
@@ -27,16 +27,17 @@ struct BigSize {
     }
 };
 
-BPlusTree<BigSize, BigSize> bpt(true, "tmp/records.txt");
+BPlusTree<int, int> bpt(true);
 
 int main() {
-    int pnt = 0;
-    cin >> pnt;
-    int MAXNN = pnt;
+    clock_t start, end;
+    cout << "START" << endl;
+    start = clock();
     for (int i = MAXNN; i >= 1; --i) {
-        bpt.insert(BigSize(i), BigSize(i));
+        int s = rand() % MAXNN;
+        bpt.insert(s, i);
     }
-    printf("After Insertion.\n");
+    /*printf("After Insertion.\n");
     for (int i = MAXNN; i >= 1; --i) {
         auto p = bpt.search(i);
         if (p.first.k != i || !p.second) {
@@ -47,9 +48,12 @@ int main() {
         if (p.second) {
             cout << i << endl;
         }
-    }
+    }*/
 #ifdef _NO_DEBUG
     bpt.closeFile();
 #endif
+    end = clock();
+    cout << (double)(end - start) / CLOCKS_PER_SEC << endl;
+    system("PAUSE");
     return 0;
 }
