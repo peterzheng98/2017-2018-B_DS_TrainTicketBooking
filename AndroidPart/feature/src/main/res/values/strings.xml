@@ -2,4 +2,5 @@
 
     <string name="action_settings">Settings</string>
     <string name="app_name">火车票订票系统</string>
+    <string name="title_activity_control_panell">controlPanell</string>
 </resources>
