@@ -8,28 +8,30 @@
 
 #include <iostream>
 #include "String.h"
+#include "Kernel.hpp"
 
 using namespace std;
 using namespace myAlgorithm;
+using namespace Kernel;
 
 class ParserForCommand {
+private:
+    Insert insert;
+    Update update;
+    Select select;
+    Delete deleteA;
 public:
-
-    int Parser(ifstream &is) {
+    int Parser(istream &is) {
         myAlgorithm::String firstWord;
         is >> firstWord;
         if(firstWord == "register"){
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "register" << "\n";
-//#endif
-            String arg[4];
-            for (int i = 0; i < 4; ++i) is >> arg[i];
-//#ifdef DEBUGMODE_PARSER
-            cout << "Args: ";
-            for(int i = 0; i < 4; ++i)
-                cout << "[" << i + 1 << "] : [" << arg[i] << "]   "; 
-            cout << "\n";
-#endif
+            myAlgorithm::String p_name, p_word, p_email, p_phone;
+            is >> p_name >> p_word >> p_email >> p_phone;
+            int id = 0;
+            long long test = p_phone.toLong();
+            Status ret = insert.I_addUser(p_name, p_word, p_email, p_phone.toLong(), id);
+            if(ret == Success) cout << id << "\n"; else cout << "-1\n";
+            return true;
         }
         if(firstWord == "buy_ticket"){
 #ifdef DEBUGMODE_PARSER
@@ -58,30 +60,21 @@ public:
 #endif
         }
         if(firstWord == "login"){
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "login\n";
-//#endif
-            String arg[2];
-            for (int i = 0; i < 2; ++i) is >> arg[i];
-//#ifdef DEBUGMODE_PARSER
-            cout << "Args: ";
-            for(int i = 0; i < 2; ++i)
-                cout << "[" << i + 1 << "] : [" << arg[i] << "]   "; 
-            cout << "\n";
-#endif
+            myAlgorithm::String p_id, p_word;
+            is >> p_id >> p_word;
+            Status ret = select.I_selectUser(p_id, p_word);
+            if(ret == Success) cout << "1\n"; else cout << "0\n";
+            return true;
         }
         if(firstWord == "query_profile"){
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "query_profile\n";
-//#endif
-            String arg[4];
-            for (int i = 0; i < 1; ++i) is >> arg[i];
-//#ifdef DEBUGMODE_PARSER
-            cout << "Args: ";
-            for(int i = 0; i < 1; ++i)
-                cout << "[" << i + 1 << "] : [" << arg[i] << "]   "; 
-            cout << "\n";
-#endif
+            int p_id;
+            is >> p_id;
+            myAlgorithm::String p_name, p_email;
+            long long p_phone;
+            //TODO : BUG HERE(Require User Priviliege)
+            Status ret = select.I_selectUser(p_id, p_name, p_email, p_phone);
+            if(ret == NoThisUser) cout << "0\n"; else cout << p_name << " " << p_email << " " << p_phone << " 0\n";
+            return true;
         }
         if(firstWord == "query_ticket"){
 #ifdef DEBUGMODE_PARSER
@@ -136,30 +129,21 @@ public:
 #endif
         }
         if(firstWord == "modify_profile"){
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "modify_profile\n";
-//#endif
-            String arg[4];
-            for (int i = 0; i < 5; ++i) is >> arg[i];
-//#ifdef DEBUGMODE_PARSER
-            cout << "Args: ";
-            for(int i = 0; i < 5; ++i)
-                cout << "[" << i + 1 << "] : [" << arg[i] << "]   "; 
-            cout << "\n";
-#endif
+            myAlgorithm::String p_name, p_word, p_email;
+            long long p_phone;
+            short p_id;
+            is >> p_id >> p_name >> p_word >> p_email >> p_phone;
+            //TODO : BUG HERE(Require Password)
+            Status ret = update.I_updateUser(p_id, p_name, p_email, p_phone);
+            if(ret == Success) cout << "1\n"; else cout << "0\n";
+            return true;
         }
         if(firstWord == "modify_privilege"){
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "modify_privilege\n";
-//#endif
-            String arg[4];
-            for (int i = 0; i < 3; ++i) is >> arg[i];
-//#ifdef DEBUGMODE_PARSER
-            cout << "Args: ";
-            for(int i = 0; i < 3; ++i)
-                cout << "[" << i + 1 << "] : [" << arg[i] << "]   "; 
-            cout << "\n";
-#endif
+            short p_id1, p_id2, privilege;
+            is >> p_id1 >> p_id2 >> privilege;
+            Status ret = update.I_updateUserPrivilege(p_id1, p_id2, privilege);
+            if(ret == Success) cout << "1\n"; else cout << "0\n";
+            return true;
         }
         if(firstWord == "sale_train"){
 #ifdef DEBUGMODE_PARSER

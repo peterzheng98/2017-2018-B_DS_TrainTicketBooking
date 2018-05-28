@@ -2,26 +2,22 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
-    
-
-
     defaultConfig {
         applicationId "group.peterzheng.trainticketbookingsystem.app"
-        minSdkVersion 15
+        minSdkVersion 21
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
 
-
+        multiDexEnabled true
     }
-
     buildTypes {
-       release {
-           minifyEnabled false
-           proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-       }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
-
+    buildToolsVersion '27.0.3'
 }
 
 dependencies {

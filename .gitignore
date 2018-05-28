@@ -1,3 +1,7 @@
+#Test Android Dictionary
+MyApplication/
+MyApplication/.idea
+
 # Windows thumbnail cache files
 Thumbs.db
 ehthumbs.db

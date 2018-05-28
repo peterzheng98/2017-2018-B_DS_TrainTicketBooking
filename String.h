@@ -12,6 +12,8 @@
 
 namespace myAlgorithm {
     class String {
+
+
         friend std::ostream &operator<<(std::ostream &os, const String &rhs);
 
         friend std::istream &operator>>(std::istream &is, String &rhs);
@@ -27,7 +29,9 @@ namespace myAlgorithm {
         friend String operator+(const String &lhs, const String &rhs);
 
         friend String operator+(const String &lhs, const char &ch);
-
+    public:
+        const static short __SPLIT_STRING_WITH_CHAR = 0;
+        const static short __SPLIT_STRING_WITHOUT_CHAR = 1;
     public:
         enum Language {
             CHINESE,
@@ -35,7 +39,7 @@ namespace myAlgorithm {
         };
         Language locale;
     public:
-        const static int sizeMax = 128; // 128 bits char
+        const static short sizeMax = 128; // 128 bits char
     private:
         char data[sizeMax];
         int len = 0;
@@ -43,7 +47,7 @@ namespace myAlgorithm {
     public:
         String() {
             len = 0;
-            for(int i = 0;i < len;i++) data[i] = 0;
+            for (int i = 0; i < len; i++) data[i] = 0;
         }
 
         String(const String &rhs) {
@@ -98,7 +102,7 @@ namespace myAlgorithm {
             return *this;
         }
 
-        String &operator+=(const char &ch){
+        String &operator+=(const char &ch) {
             if (len + 1 > sizeMax) throw 1; //TODO: string too long
             data[len] = ch;
             len++;
@@ -127,7 +131,7 @@ namespace myAlgorithm {
             locale = (Language) To;
         }
 
-        bool operator==(const String &rhs) {
+        bool operator==(const String &rhs) const {
             if (rhs.len != len) return false;
             for (int i = 0; i < rhs.len; ++i) if (data[i] != rhs[i]) return false;
             return true;
@@ -194,11 +198,86 @@ namespace myAlgorithm {
             return len > rhs.length();
         }
 
-        void clear(){
-            for(int i = 0; i < sizeMax; ++i) data[i] = 0;
+        void clear() {
+            for (int i = 0; i < sizeMax; ++i) data[i] = 0;
             len = 0;
         }
+
+        long long toLong() const {
+            long long result = 0;
+            for (int i = 0; i < len; i++) {
+                if (data[i] < '0' || data[i] > '9') return -1;
+                result = result * 10 + data[i] - '0';
+                if (result < 0) return -1;
+            }
+            return result;
+        }
+
+        operator long long() const noexcept {
+            long long result = 0;
+            for (int i = 0; i < len; i++) {
+                if (data[i] < '0' || data[i] > '9') return -1;
+                result = result * 10 + data[i] - '0';
+                if (result < 0) return -1;
+            }
+            return result;
+        }
+
+        int toInt() const {
+            int result = 0;
+            for (int i = 0; i < len; i++) {
+                if (data[i] < '0' || data[i] > '9') return -1;
+                result = result * 10 + data[i] - '0';
+                if (result < 0) return -1;
+            }
+            return result;
+        }
+
+        operator int() const noexcept {
+            int result = 0;
+            for (int i = 0; i < len; i++) {
+                if (data[i] < '0' || data[i] > '9') return -1;
+                result = result * 10 + data[i] - '0';
+                if (result < 0) return -1;
+            }
+            return result;
+        }
+
+        void split(const char &sgn, const String &source, String &s1, String &s2, int OPTION, bool &Result) {
+            s1 = String();
+            s2 = String();
+            int Len = source.length();
+            int i = 0;
+            for (i = 0; i < Len; ++i) {
+                if (source[i] == sgn) break;
+                s1 += source[i];
+            }
+            if (i >= Len) {
+                s1 = String();
+                Result = false;
+                return;
+            }
+            for (i = i + OPTION; i < Len; ++i) s2 += source[i];
+            Result = true;
+        }
     };
+    void split(const char &sgn, const String &source, String &s1, String &s2, int OPTION, bool &Result) {
+        s1 = String();
+        s2 = String();
+        int Len = source.length();
+        int i = 0;
+        for (i = 0; i < Len; ++i) {
+            if (source[i] == sgn) break;
+            s1 += source[i];
+        }
+        if (i >= Len) {
+            s1 = String();
+            Result = false;
+            return;
+        }
+        for (i = i + OPTION; i < Len; ++i) s2 += source[i];
+        Result = true;
+    }
     String operator+(const String &lhs, const String &rhs) {
         String ret(lhs);
         ret += rhs;
