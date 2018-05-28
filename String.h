@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cstring>
 #include "CoreData.h"
 
 namespace myAlgorithm {

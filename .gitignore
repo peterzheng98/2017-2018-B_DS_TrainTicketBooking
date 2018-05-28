@@ -307,4 +307,6 @@ fabric.properties
 .idea/httpRequests
 
 # BPlusTree Cache
-records.txt
+tmp/
+*.txt
+*.dat

@@ -19,12 +19,30 @@ public:
         myAlgorithm::String firstWord;
         is >> firstWord;
         if(firstWord == "register"){
+#ifdef DEBUGMODE_PARSER
+            cout << "Line: " << __LINE__ << "register" << "\n";
+//#endif
             String arg[4];
             for (int i = 0; i < 4; ++i) is >> arg[i];
+//#ifdef DEBUGMODE_PARSER
+            cout << "Args: ";
+            for(int i = 0; i < 4; ++i)
+                cout << "[" << i + 1 << "] : [" << arg[i] << "]   "; 
+            cout << "\n";
+#endif
         }
         if(firstWord == "buy_ticket"){
+#ifdef DEBUGMODE_PARSER
+            cout << "Line: " << __LINE__ << "buy_ticket\n";
+//#endif
             String arg[4];
             for (int i = 0; i < 7; ++i) is >> arg[i];
+//#ifdef DEBUGMODE_PARSER
+            cout << "Args: ";
+            for(int i = 0; i < 7; ++i)
+                cout << "[" << i + 1 << "] : [" << arg[i] << "]   "; 
+            cout << "\n";
+#endif
         }
         if(firstWord == "add_train"){
 #ifdef DEBUGMODE_PARSER
