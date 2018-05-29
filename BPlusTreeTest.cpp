@@ -2,7 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 //#define _NO_DEBUG
 //#define _LINUX_MODE
-#define MAXNN 500
+#define MAXNN 100000
 #include "BPlusTree.hpp"
 #include <algorithm>
 #include <iostream>
@@ -40,14 +40,14 @@ struct DoubleKey {
     }
 };
 
-//BPlusTree<int, int> bpt(true);
-BPlusTree<DoubleKey, int> dkt(true);
+BPlusTree<int, BigSize> bpt(true);
+//BPlusTree<DoubleKey, int> dkt(true);
 
 int main() {
     clock_t start, end;
     cout << "START" << endl;
     start = clock();
-    for (int i = MAXNN; i >= 1; --i) {
+    /*for (int i = MAXNN; i >= 1; --i) {
         for (int j = 1; j <= MAXNN; ++j) {
             dkt.insert(DoubleKey(j, i), i);
         }
@@ -57,8 +57,17 @@ int main() {
         for (int j = 0; j < ans.size(); ++j)
             cout << ans[j] << ' ';
         cout << endl;
+    }*/
+    for (int i = 1; i <= MAXNN; ++i) {
+        if (i == 2556)
+            cout << i << endl;
+        bpt.insert(i, BigSize(i));
+        auto p = bpt.search(i);
+        if (!p.second) {
+            cout << "i" << endl;
+        }
     }
-    /*printf("After Insertion.\n");
+    printf("After Insertion.\n");
     for (int i = MAXNN; i >= 1; --i) {
         auto p = bpt.search(i);
         if (p.first.k != i || !p.second) {
@@ -69,7 +78,7 @@ int main() {
         if (p.second) {
             cout << i << endl;
         }
-    }*/
+    }
 #ifdef _NO_DEBUG
     bpt.closeFile();
     dkt.closeFile();
