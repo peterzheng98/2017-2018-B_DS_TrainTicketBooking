@@ -319,7 +319,7 @@ namespace Kernel {
             return Success;
         }
 
-        ~Insert();
+        ~Insert(){}
     };
 
     class Select : public Interface {
@@ -427,7 +427,7 @@ namespace Kernel {
             return Success;
         }
 
-        ~Select();
+        ~Select(){}
     };
 
     class Update : public Interface {
@@ -499,7 +499,7 @@ namespace Kernel {
             return Success;
         }
 
-        ~Update();
+        ~Update(){}
     };
 
     class Delete : public Interface {
@@ -553,7 +553,7 @@ namespace Kernel {
             return Success;
         }
 
-        ~Delete();
+        ~Delete(){}
     };
 
 }

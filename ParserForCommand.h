@@ -176,6 +176,9 @@ public:
         }
         return true;
     }
+    ~ParserForCommand(){
+
+    }
 };
 
 
