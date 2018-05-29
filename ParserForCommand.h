@@ -116,17 +116,13 @@ public:
 #endif
         }
         if(firstWord == "query_train"){
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "query_train\n";
-//#endif
-            String arg[1];
-            for (int i = 0; i < 1; ++i) is >> arg[i];
-//#ifdef DEBUGMODE_PARSER
-            cout << "Args: ";
-            for(int i = 0; i < 1; ++i)
-                cout << "[" << i + 1 << "] : [" << arg[i] << "]   "; 
-            cout << "\n";
-#endif
+            String p_id;
+            is >> p_id;
+            train ret = train();
+            Status rett = select.I_selectTrain(p_id, ret);
+            //TODO : Output Train
+            if(rett != Success) cout << "0\n"; else cout << "\n";
+            return true;
         }
         if(firstWord == "modify_profile"){
             myAlgorithm::String p_name, p_word, p_email;
@@ -146,17 +142,11 @@ public:
             return true;
         }
         if(firstWord == "sale_train"){
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "sale_train\n";
-//#endif
-            String arg[4];
-            for (int i = 0; i < 1; ++i) is >> arg[i];
-//#ifdef DEBUGMODE_PARSER
-            cout << "Args: ";
-            for(int i = 0; i < 1; ++i)
-                cout << "[" << i + 1 << "] : [" << arg[i] << "]   "; 
-            cout << "\n";
-#endif
+            String p_id;
+            is >> p_id;
+            Status ret = update.I_updateTrainSellingStatus(p_id);
+            if(ret == Success) cout << "1\n"; else cout << "0\n";
+            return true;
         }
         if(firstWord == "modify_train"){
 #ifdef DEBUGMODE_PARSER
@@ -169,31 +159,18 @@ public:
 #endif
         }
         if(firstWord == "delete_train"){
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "delete_train\n";
-//#endif
-            String arg[4];
-            for (int i = 0; i < 1; ++i) is >> arg[i];
-//#ifdef DEBUGMODE_PARSER
-            cout << "Args: ";
-            for(int i = 0; i < 1; ++i)
-                cout << "[" << i + 1 << "] : [" << arg[i] << "]   "; 
-            cout << "\n";
-#endif
+            String p_id;
+            is >> p_id;
+            Status ret = deleteA.I_deleteTrain(p_id);
+            if(ret == Success) cout << "1\n"; else cout << "0\n";
+            return true;
         }
         if(firstWord == "exit"){
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "exit\n";
+            cout << "BYE\n";
             return false;
-//#endif
-//            String arg[4];
-//            for (int i = 0; i < 1; ++i) is >> arg[i];
-//#ifdef DEBUGMODE_PARSER
-//            cout << "Args: ";
-//            for(int i = 0; i < 1; ++i)
-//                cout << "[" << i + 1 << "] : [" << arg[i] << "]   "; 
-//            cout << "\n";
-#endif
+        }
+        if(firstWord == "clean"){
+
         }
         return true;
     }

@@ -115,7 +115,41 @@ namespace myAlgorithm {
             is >> t1 >> ch >> t2 >> ch2 >> t3;
             return is;
         }
+
+        bool operator==(const Date &rhs) const {
+            return dataOfDate.first() == rhs.dataOfDate.first()
+                   && dataOfDate.second() == rhs.dataOfDate.second()
+                   && dataOfDate.third() == rhs.dataOfDate.third();
+        }
+
+        bool operator!=(const Date &rhs) const {
+            return dataOfDate.first() != rhs.dataOfDate.first()
+                   || dataOfDate.second() != rhs.dataOfDate.second()
+                   || dataOfDate.third() != rhs.dataOfDate.third();
+        }
+
+        Date nextDate() {
+            short yy, mm, dd;
+            yy = getYear(), mm = getMonth(), dd = getDay();
+            short Day[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+            dd++;
+            if (M_isLeapYear(yy)) Day[1] = 29;
+            if (dd > Day[mm - 1]) dd -= Day[mm - 1], mm++;
+            if (mm > 12) yy++;
+            return Date(yy, mm, dd);
+        }
     };
+
+    Date nextDate(const Date &rhs) {
+        short yy, mm, dd;
+        yy = rhs.getYear(), mm = rhs.getMonth(), dd = rhs.getDay();
+        short Day[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        dd++;
+        if (rhs.M_isLeapYear(yy)) Day[1] = 29;
+        if (dd > Day[mm - 1]) dd -= Day[mm - 1], mm++;
+        if (mm > 12) yy++;
+        return Date(yy, mm, dd);
+    }
 
     class Time {
     private:
@@ -136,34 +170,34 @@ namespace myAlgorithm {
             }
             hour += min / 60;
             min = min % 60;
-            while(hour < 0) hour += 24;
+            while (hour < 0) hour += 24;
             dataOfTime.setData(hour, min);
         }
 
         Time(int hh, int mm) : dataOfTime(Pair<short, short>(hh, mm)) {}
 
-        Time(const String& source){
+        Time(const String &source) {
             String s1, s2;
             bool Result;
             split(':', source, s1, s2, String::__SPLIT_STRING_WITHOUT_CHAR, Result);
-            if(!Result) dataOfTime = Pair<short, short>(0, 0);
+            if (!Result) dataOfTime = Pair<short, short>(0, 0);
             else {
                 int res1 = (int) s1;
                 int res2 = (int) s2;
-                if(res1 < 0 || res1 > 24 || res2 < 0 || res2 > 60) dataOfTime = Pair<short, short>(0, 0);
+                if (res1 < 0 || res1 > 24 || res2 < 0 || res2 > 60) dataOfTime = Pair<short, short>(0, 0);
                 else dataOfTime = Pair<short, short>(res1, res2);
             }
         }
 
-        Time(const String& source, int AddTime){
+        Time(const String &source, int AddTime) {
             String s1, s2;
             bool Result;
             split(':', source, s1, s2, String::__SPLIT_STRING_WITHOUT_CHAR, Result);
-            if(!Result) dataOfTime = Pair<short, short>(0, 0);
+            if (!Result) dataOfTime = Pair<short, short>(0, 0);
             else {
                 int res1 = (int) s1;
                 int res2 = (int) s2;
-                if(res1 < 0 || res1 > 24 || res2 < 0 || res2 > 60) dataOfTime = Pair<short, short>(0, 0);
+                if (res1 < 0 || res1 > 24 || res2 < 0 || res2 > 60) dataOfTime = Pair<short, short>(0, 0);
                 else dataOfTime = Pair<short, short>(res1, res2);
             }
             int min = dataOfTime.second();
@@ -175,7 +209,7 @@ namespace myAlgorithm {
             }
             hour += min / 60;
             min = min % 60;
-            while(hour < 0) hour += 24;
+            while (hour < 0) hour += 24;
             dataOfTime.setData(hour, min);
         }
     };

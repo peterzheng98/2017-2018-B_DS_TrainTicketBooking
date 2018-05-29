@@ -98,6 +98,16 @@ namespace myAlgorithm {
             _len--;
         }
 
+        bool empty() const {return _len == 0; }
+
+        void clear(){
+            for(int i = 0; i < _len; i++) _data[i].~T();
+            ::operator delete[](_data);
+            _data = (T *) ::operator new[](sizeof(T) * 10);
+            _arraylen = 10;
+            _len = 0;
+        }
+
         int size() const {
             return _len;
         }
