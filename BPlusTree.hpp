@@ -859,6 +859,13 @@ public:
                 copyRecord(begin(sib) + L / 3, begin(sib) + L, begin(sib));
                 updateChildIndex(ln.parent, old, ln.record[ln.size - 1].key);
                 insertNewIndex(ln.parent, newNode.record[newNode.size - 1].key, sib.prev, true);
+                LeafNode tmpln;
+                read(&tmpln, childPos);
+                if (tmpln.parent > 0) {
+                    ln.parent = tmpln.parent;
+                    newNode.parent = tmpln.parent;
+                    sib.parent = tmpln.parent;
+                }
                 write(&ln, childPos);
                 write(&newNode, newPos);
                 write(&sib, newNode.succ);
@@ -875,6 +882,12 @@ public:
             newNode.size = L / 2;
             updateChildIndex(ln.parent, old, ln.record[ln.size - 1].key);
             insertNewIndex(ln.parent, newNode.record[newNode.size - 1].key, ln.succ, true);
+            LeafNode tmpln;
+            read(&tmpln, childPos);
+            if (tmpln.parent > 0) {
+                ln.parent = tmpln.parent;
+                newNode.parent = tmpln.parent;
+            }
             write(&ln, childPos);
             write(&newNode, newPos);
             insert(key, value);
