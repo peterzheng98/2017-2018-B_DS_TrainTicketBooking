@@ -46,17 +46,9 @@ namespace myAlgorithm {
 //            T* tmp = _data;
             _data = (T *) ::operator new[](sizeof(T) * v._arraylen);
             _len = v._len;
-            _arraylen = _len + 1;
+            _arraylen = v._arraylen;
             for (int i = 0; i < _len; i++) new(_data + i) T(v[i]);
             //delete[] tmp;
-        }
-
-        Vector(Vector &&v) noexcept {
-            if (&v != this) {
-                this->_data = std::move(v._data);
-                this->_arraylen = std::move(v._arraylen);
-                this->_len = std::move(v._len);
-            }
         }
 
         Vector &operator=(const Vector &v) {
@@ -64,18 +56,8 @@ namespace myAlgorithm {
                 delete[] this->_data;
                 _data = (T *) ::operator new[](sizeof(T) * v._arraylen);
                 _len = v._len;
-                _arraylen = _len + 1;
+                _arraylen = v.arraylen;
                 for (int i = 0; i < _len; i++) new(_data + i) T(v[i]);
-            }
-            return *this;
-        }
-
-        Vector &operator=(Vector &&v) noexcept {
-            if (&v != this) {
-                delete[] this->_data;
-                this->_data = std::move(v._data);
-                this->_len = std::move(v._len);
-                this->_arraylen = std::move(v._arraylen);
             }
             return *this;
         }

@@ -2,7 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 //#define _NO_DEBUG
 //#define _LINUX_MODE
-#define MAXNN 100
+#define MAXNN 500
 #include "BPlusTree.hpp"
 #include <algorithm>
 #include <iostream>
@@ -53,7 +53,7 @@ int main() {
         }
     }
     for (int i = 1; i <= 10; ++i) {
-        auto ans = dkt.searchFirst(i);
+        auto ans = dkt.searchFirst(DoubleKey(i));
         for (int j = 0; j < ans.size(); ++j)
             cout << ans[j] << ' ';
         cout << endl;
