@@ -620,12 +620,95 @@ private:
         }
     }
 
-    Index *nextIndex(Index *id){
-
-    }
-
-    Record *nextRecord(Record *rc){
-
+#ifdef _NO_DEBUG
+    private:
+#else
+    public:
+#endif //_NO_DEBUG
+    std::pair<Record, bool> nextRecord(Record rc){
+        off_t pos = findKey(rc.key, true);
+        LeafNode ln;
+        read(&ln, pos);
+        int l = 0, r = ln.size - 1, mid;
+        while (l < r){
+            mid = (l + r) >> 1;
+            if (comp(ln.record[mid].key, rc.key))
+                l = mid + 1;
+            else
+                r = mid;
+        }
+        if (ln.record[l].key != rc.key)
+            return std::make_pair(Record(), false);
+        if (l != ln.size - 1)
+            return std::make_pair(ln.record[l + 1], true);
+        else{
+            Key des = ln.record[ln.size - 1].key;
+            off_t pos = ln.parent;
+            bool flag = false;
+            int layer = 1;
+            TreeNode tn;
+            read(&tn, pos);
+            int l, r, mid;
+            while (pos != core.root){
+                l = 0;
+                r = tn.size - 1;
+                while (l < r){
+                    mid = (l + r) >> 1;
+                    if (comp(tn.index[mid].key, des))
+                        l = mid + 1;
+                    else
+                        r = mid;
+                }
+                if (l != tn.size - 1){
+                    flag = true;
+                    break;
+                }
+                pos = tn.parent;
+                read(&tn, pos);
+                ++layer;
+            }
+            if (flag){
+                if (layer == 1){
+                    LeafNode chd;
+                    read(&chd, tn.index[l + 1].child);
+                    return std::make_pair(chd.record[0], true);
+                }
+                read(&tn, tn.index[l + 1].child);
+                for (int i = 1; i < layer - 1; ++i){
+                    read(&tn, tn.index[0].child);
+                }
+                LeafNode chd;
+                read(&chd, tn.index[0].child);
+                return std::make_pair(chd.record[0], true);
+            }
+            else{
+                l = 0;
+                r = tn.size - 1;
+                while (l < r){
+                    mid = (l + r) >> 1;
+                    if (comp(tn.index[mid].key, des))
+                        l = mid + 1;
+                    else
+                        r = mid;
+                }
+                if (l == tn.size - 1)
+                    return std::make_pair(Record(), false);
+                else{
+                    if (layer == 1){
+                        LeafNode chd;
+                        read(&chd, tn.index[l + 1].child);
+                        return std::make_pair(chd.record[0], true);
+                    }
+                    read(&tn, tn.index[l + 1].child);
+                    for (int i = 1; i < layer - 1; ++i){
+                        read(&tn, tn.index[0].child);
+                    }
+                    LeafNode chd;
+                    read(&chd, tn.index[0].child);
+                    return std::make_pair(chd.record[0], true);
+                }
+            }
+        }
     }
 
 public:
@@ -670,14 +753,17 @@ public:
         LeafNode ln;
         read(&ln, pos);
         Record *rc = binarySearchRecord(ln, key);
+        std::pair<Record, bool> rd;
+        rd.second = true;
         if (rc != end(ln) && rc->key.first() == key.first()){
             ans.push_back(rc->value);
-            while (rc != nullptr){
-                rc = nextRecord(rc);
-                if (rc == nullptr)
+            rd.first = *rc;
+            while (rd.second){
+                rd = nextRecord(rd.first);
+                if (!rd.second)
                     break;
-                if (rc->key.first() == key.first())
-                    ans.push_back(rc->value);
+                if (rd.first.key.first() == key.first())
+                    ans.push_back(rd.first.value);
                 else
                     break;
             }
@@ -691,14 +777,17 @@ public:
         LeafNode ln;
         read(&ln, pos);
         Record *rc = binarySearchRecord(ln, key);
+        std::pair<Record, bool> rd;
+        rd.second = true;
         if (rc != end(ln) && rc->key.first() == key.first() && rc->key.second() == key.second()){
             ans.push_back(rc->value);
-            while (rc != nullptr){
-                rc = nextRecord(rc);
-                if (rc == nullptr)
+            rd.first = *rc;
+            while (rd.second){
+                rd = nextRecord(rd.first);
+                if (!rd.second)
                     break;
-                if (rc->key.first() == key.first() && rc->key.second() == key.second())
-                    ans.push_back(rc->value);
+                if (rd.first.key.first() == key.first() && rd.first.key.second() == key.second())
+                    ans.push_back(rd.first.value);
                 else
                     break;
             }

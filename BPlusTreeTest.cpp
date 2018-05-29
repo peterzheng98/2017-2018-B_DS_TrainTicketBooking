@@ -2,7 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 //#define _NO_DEBUG
 //#define _LINUX_MODE
-#define MAXNN 1000000
+#define MAXNN 10000
 #include "BPlusTree.hpp"
 #include <algorithm>
 #include <iostream>

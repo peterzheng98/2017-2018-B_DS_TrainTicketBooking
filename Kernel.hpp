@@ -57,7 +57,7 @@ public:
         return tk_position;
     }
 
-    Pair<Date, Date> M_time() const{
+    Pair<Time, Time> M_time() const{
         return tk_time;
     }
 
@@ -73,8 +73,12 @@ public:
         return tk_trainID;
     }
 
-    float M_price() const{
+    const float *M_price() const{
         return tk_price;
+    }
+
+    const int *M_remain() const{
+        return tk_remain;
     }
 };
 
@@ -372,7 +376,7 @@ namespace Kernel {
                 return NoThisUser;
             auto vb = userTicketTree.searchFirst(Pair<int, int>(p_id, 0));
             for (int i = 0; i < vb.size(); ++i){
-                auto tikSel = ticketIdTree.search(vb[i].first);
+                auto tikSel = ticketIdTree.search(vb[i].first());
                 if (tikSel.second && tikSel.first.tk_date == p_date && tikSel.first.tk_catalog & tk_catalog){
                     ret.push_back(tikSel.first);
                     num.push_back(vb[i].second);
