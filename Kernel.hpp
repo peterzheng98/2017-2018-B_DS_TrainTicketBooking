@@ -16,11 +16,15 @@
 
 using namespace myAlgorithm;
 
-namespace Kernel{
+namespace Kernel {
     class Interface;
+
     class Insert;
+
     class Select;
+
     class Update;
+
     class Delete;
 }
 
@@ -28,10 +32,15 @@ class ticketKey;
 
 class ticket {
     friend class ticketKey;
+
     friend class Kernel::Insert;
+
     friend class Kernel::Select;
+
     friend class Kernel::Update;
+
     friend class Kernel::Delete;
+
 private:
     Pair<short, short> tk_position;
     Pair<Time, Time> tk_time;
@@ -45,73 +54,83 @@ public:
     ticket() = default;
 
     ticket(const ticket &tik)
-        : tk_position(tik.tk_position), tk_time(tik.tk_time), tk_date(tik.tk_date), 
-        tk_catalog(tik.tk_catalog), tk_ticketID(tik.tk_ticketID), tk_trainID(tk_trainID){
-        for (int i = 0; i < 5; ++i){
+            : tk_position(tik.tk_position), tk_time(tik.tk_time), tk_date(tik.tk_date),
+              tk_catalog(tik.tk_catalog), tk_ticketID(tik.tk_ticketID), tk_trainID(tk_trainID) {
+        for (int i = 0; i < 5; ++i) {
             tk_price[i] = tik.tk_price[i];
             tk_remain[i] = tik.tk_remain[i];
         }
     }
 
-    Pair<short, short> M_position() const{
+    Pair<short, short> M_position() const {
         return tk_position;
     }
 
-    Pair<Time, Time> M_time() const{
+    Pair<Time, Time> M_time() const {
         return tk_time;
     }
 
-    Date M_date() const{
+    Date M_date() const {
         return tk_date;
     }
 
-    short M_catalog() const{
+    short M_catalog() const {
         return tk_catalog;
     }
 
-    String M_trainID() const{
+    String M_trainID() const {
         return tk_trainID;
     }
 
-    const float *M_price() const{
+    const float *M_price() const {
         return tk_price;
     }
 
-    const int *M_remain() const{
+    const int *M_remain() const {
         return tk_remain;
     }
 };
 
-class ticketKey{
+class ticketKey {
 private:
     Pair<short, short> station;
     String trainID;
     Date date;
 public:
     ticketKey() = default;
+
     ticketKey(const Pair<short, short> &stt, const Date &dt)
-        : station(stt), date(dt) {}
+            : station(stt), date(dt) {}
+
     ticketKey(const Pair<short, short> &stt, const String &tid, const Date &dt)
-        : station(stt), trainID(tid), date(dt) {}
+            : station(stt), trainID(tid), date(dt) {}
+
     ticketKey(const ticket &tk)
-        : station(tk.tk_position), trainID(tk.tk_trainID) {}
-    bool operator <(const ticketKey &tk) const{
+            : station(tk.tk_position), trainID(tk.tk_trainID) {}
+
+    bool operator<(const ticketKey &tk) const {
         return station < tk.station || (station == tk.station && date < tk.date)
-            || (station == tk.station && date < tk.date && trainID < tk.trainID);
+               || (station == tk.station && date < tk.date && trainID < tk.trainID);
     }
-    Pair<short, short> first() const{
+
+    Pair<short, short> first() const {
         return station;
     }
-    Date second() const{
+
+    Date second() const {
         return date;
     }
 };
 
 class train {
     friend class Kernel::Insert;
+
     friend class Kernel::Select;
+
     friend class Kernel::Update;
+
     friend class Kernel::Delete;
+
 private:
     String t_id;
     String t_name;
@@ -126,9 +145,9 @@ public:
     train() = default;
 
     train(const train &tr)
-        : t_id(tr.t_id), t_name(tr.t_name), t_stationNum(tr.t_stationNum), t_ticketKind(tr.t_ticketKind), 
-        t_catalog(tr.t_catalog), t_onSale(tr.t_onSale){
-        for (short i = 0; i < t_stationNum; ++i){
+            : t_id(tr.t_id), t_name(tr.t_name), t_stationNum(tr.t_stationNum), t_ticketKind(tr.t_ticketKind),
+              t_catalog(tr.t_catalog), t_onSale(tr.t_onSale) {
+        for (short i = 0; i < t_stationNum; ++i) {
             t_station[i] = tr.t_station[i];
             t_time[i] = tr.t_time[i];
             for (short j = 0; j < t_ticketKind; ++j)
@@ -136,34 +155,36 @@ public:
         }
     }
 
-    String M_id() const{
+    String M_id() const {
         return t_id;
     }
 
-    String M_name() const{
+    String M_name() const {
         return t_name;
     }
 
-    const short *M_station() const{
+    const short *M_station() const {
         return t_station;
     }
 
-    short M_stationNum() const{
+    short M_stationNum() const {
         return t_stationNum;
     }
 
-    short M_catalog() const{
+    short M_catalog() const {
         return t_catalog;
     }
 
-    bool M_isOnSale() const{
+    bool M_isOnSale() const {
         return t_onSale;
     }
 };
 
 class user {
     friend class Kernel::Select;
+
     friend class Kernel::Update;
+
 private:
     int p_id;
     String p_username;
@@ -175,31 +196,31 @@ public:
     user() = default;
 
     user(int id, const String &nme, const String &pwd, const String &eml, long long phn)
-        : p_id(id), p_username(nme), p_password(pwd), p_email(eml), p_phone(phn){
+            : p_id(id), p_username(nme), p_password(pwd), p_email(eml), p_phone(phn) {
         p_userPrivilege = (id == 2018 ? Admin : User);
     }
 
-    int M_id() const{
+    int M_id() const {
         return p_id;
     }
 
-    String M_username() const{
+    String M_username() const {
         return p_username;
     }
 
-    String M_password() const{
+    String M_password() const {
         return p_password;
     }
 
-    String M_email() const{
+    String M_email() const {
         return p_email;
     }
 
-    long long M_phone() const{
+    long long M_phone() const {
         return p_phone;
     }
 
-    UserPrivilege M_privilege() const{
+    UserPrivilege M_privilege() const {
         return p_userPrivilege;
     }
 };
@@ -216,13 +237,18 @@ BPlusTree<Pair<int, int>, Pair<int, int>> userTicketTree(false, "tmp/userTicket.
 BPlusTree<String, train> trainTree(false, "tmp/train.dat");
 
 namespace Kernel {
-    class Interface { virtual ~Interface() {} };
+    class Interface {
+    public:
+        ~Interface() {}
+    };
 
     class Insert : public Interface {
     public:
-        Status I_addUser(String p_name, String p_word, String p_email, long long p_phone, int &p_id){
+        Insert() {}
+
+        Status I_addUser(String p_name, String p_word, String p_email, long long p_phone, int &p_id) {
             auto nameHasExisted = userNameTree.search(p_name);
-            if (nameHasExisted.second){
+            if (nameHasExisted.second) {
                 p_id = 0;
                 return NameHasExisted;
             }
@@ -233,7 +259,8 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_addUserBookedTicket(int p_id, int tk_num, String tk_id, Pair<short, short> tk_position, Date tk_date, int tk_kind){
+        Status I_addUserBookedTicket(int p_id, int tk_num, String tk_id, Pair<short, short> tk_position, Date tk_date,
+                                     int tk_kind) {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
@@ -255,16 +282,16 @@ namespace Kernel {
             if (i >= j || i == upTrain.t_stationNum || j == upTrain.t_stationNum)
                 return NoThisTrain;
             Vector<ticketKey> vtk;
-            for (short k = i; k < j; ++k){
+            for (short k = i; k < j; ++k) {
                 ticketKey tik(Pair<short, short>(upTrain.t_station[k], upTrain.t_station[k + 1]),
-                    tk_id, tk_date);
+                              tk_id, tk_date);
                 auto tikSel = ticketTree.search(tik);
                 if (!tikSel.second || tikSel.first.tk_remain[tk_kind] < tk_num)
                     return NoRemainTicket;
                 else
                     vtk.push_back(tik);
             }
-            for (int i = 0; i < vtk.size(); ++i){
+            for (int i = 0; i < vtk.size(); ++i) {
                 auto tikSel = ticketTree.search(vtk[i]);
                 tikSel.first.tk_remain[tk_kind] -= tk_num;
                 if (tikSel.first.tk_remain[tk_kind] == 0)
@@ -277,15 +304,16 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_addTrainTicket(const String &tk_id, int t_stationNum, float *t_priceNum){
+        Status I_addTrainTicket(const String &tk_id, int t_stationNum, float *t_priceNum) {
             auto trSel = trainTree.search(tk_id);
             if (!trSel.second)
                 return NoThisTrain;
             train upTrain = trSel.first;
             upTrain.t_station[upTrain.t_stationNum] = t_stationNum;
-            if (upTrain.t_stationNum != 0){
+            if (upTrain.t_stationNum != 0) {
                 for (short i = 0; i < upTrain.t_ticketKind; ++i)
-                    upTrain.t_price[upTrain.t_stationNum][i] = upTrain.t_price[upTrain.t_stationNum - 1][i] + t_priceNum[i];
+                    upTrain.t_price[upTrain.t_stationNum][i] =
+                            upTrain.t_price[upTrain.t_stationNum - 1][i] + t_priceNum[i];
             }
             ++upTrain.t_stationNum;
             return Success;
@@ -296,9 +324,11 @@ namespace Kernel {
 
     class Select : public Interface {
     public:
-        Status I_selectUser(int p_id, String p_word){
+        Select() {}
+
+        Status I_selectUser(int p_id, String p_word) {
             auto userSel = userIdTree.search(p_id);
-            if (!userSel.second){
+            if (!userSel.second) {
                 return NoThisUser;
             }
             if (userSel.first.M_password() != p_word)
@@ -306,7 +336,7 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_selectUser(String p_name, String p_word){
+        Status I_selectUser(String p_name, String p_word) {
             auto userNameSel = userNameTree.search(p_name);
             if (!userNameSel.second)
                 return NoThisUser;
@@ -318,21 +348,22 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_selectUser(int p_id, const String &p_name, const String &p_email, long long &p_phone){
+        Status I_selectUser(int p_id, const String &p_name, const String &p_email, long long &p_phone) {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
-            if (userSel.first.M_email() != p_email || userSel.first.M_username() != p_name || userSel.first.M_phone() != p_phone)
+            if (userSel.first.M_email() != p_email || userSel.first.M_username() != p_name ||
+                userSel.first.M_phone() != p_phone)
                 return NoThisUser;
             return Success;
         }
 
-        Status I_selectTicket(Pair<short, short> tk_position, Date tk_date, short tk_catalog, Vector<ticket> &ret){
+        Status I_selectTicket(Pair<short, short> tk_position, Date tk_date, short tk_catalog, Vector<ticket> &ret) {
             ret.clear();
             ticketKey tkKey(tk_position, tk_date);
             Vector<ticket> vt = ticketTree.searchFirstAndSecond(tkKey);
-            for (int i = 0; i < vt.size(); ++i){
-                
+            for (int i = 0; i < vt.size(); ++i) {
+
                 auto trSel = trainTree.search(vt[i].tk_trainID);
                 if (trSel.first.t_catalog & tk_catalog)
                     ret.push_back(vt[i]);
@@ -343,19 +374,19 @@ namespace Kernel {
                 return Success;
         }
 
-        Status I_selectTicketTransfer(Pair<short, short> tk_position, Date tk_date, short tk_catalog, 
-            short totStation, Vector<ticket> &ret){
+        Status I_selectTicketTransfer(Pair<short, short> tk_position, Date tk_date, short tk_catalog,
+                                      short totStation, Vector<ticket> &ret) {
             ret.clear();
             Vector<ticket> vt1, vt2;
             ticket ans1, ans2;
             int minTime;
-            for (short i = 0; i < totStation; ++i){
+            for (short i = 0; i < totStation; ++i) {
                 if (i != tk_position.first() && i != tk_position.second())
-                I_selectTicket(Pair<short, short>(tk_position.first(), i), tk_date, tk_catalog, vt1);
+                    I_selectTicket(Pair<short, short>(tk_position.first(), i), tk_date, tk_catalog, vt1);
                 I_selectTicket(Pair<short, short>(i, tk_position.second()), tk_date, tk_catalog, vt2);
-                for (int j = 0; j < vt1.size(); ++j){
-                    for (int k = 0; k < vt2.size(); ++k){
-                        if (minTime < vt2[k].tk_time.second() - vt1[j].tk_time.first()){
+                for (int j = 0; j < vt1.size(); ++j) {
+                    for (int k = 0; k < vt2.size(); ++k) {
+                        if (minTime < vt2[k].tk_time.second() - vt1[j].tk_time.first()) {
                             minTime = vt2[k].tk_time.second() - vt1[j].tk_time.first();
                             ans1 = vt1[j];
                             ans2 = vt2[k];
@@ -367,19 +398,20 @@ namespace Kernel {
                 return NoThisTrain;
             ret.push_back(ans1);
             ret.push_back(ans2);
+            return Success;
         }
 
-        Status I_selectUserBookedTicket(int p_id, Date p_date, int tk_catalog, Vector<ticket> &ret, Vector<int> &num){
+        Status I_selectUserBookedTicket(int p_id, Date p_date, int tk_catalog, Vector<ticket> &ret, Vector<int> &num) {
             ret.clear();
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
             auto vb = userTicketTree.searchFirst(Pair<int, int>(p_id, 0));
-            for (int i = 0; i < vb.size(); ++i){
+            for (int i = 0; i < vb.size(); ++i) {
                 auto tikSel = ticketIdTree.search(vb[i].first());
-                if (tikSel.second && tikSel.first.tk_date == p_date && tikSel.first.tk_catalog & tk_catalog){
+                if (tikSel.second && tikSel.first.tk_date == p_date && tikSel.first.tk_catalog & tk_catalog) {
                     ret.push_back(tikSel.first);
-                    num.push_back(vb[i].second);
+                    num.push_back(vb[i].second());
                 }
             }
             if (ret.empty())
@@ -387,7 +419,7 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_selectTrain(const String &p_id, train &ret){
+        Status I_selectTrain(const String &p_id, train &ret) {
             auto trainSel = trainTree.search(p_id);
             if (!trainSel.second)
                 return NoThisTrain;
@@ -400,7 +432,9 @@ namespace Kernel {
 
     class Update : public Interface {
     public:
-        Status I_updateUser(int p_id, const String &p_name, const String &p_email, long long &p_phone){
+        Update() {}
+
+        Status I_updateUser(int p_id, const String &p_name, const String &p_email, long long &p_phone) {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
@@ -412,7 +446,7 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_updateUserPrivilege(int p_id, int p_id2, int p_privilege){
+        Status I_updateUserPrivilege(int p_id, int p_id2, int p_privilege) {
             auto user1Sel = userIdTree.search(p_id);
             auto user2Sel = userIdTree.search(p_id2);
             if (!user1Sel.second || !user2Sel.second)
@@ -426,16 +460,16 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_updateTrainSellingStatus(const String &t_id){
+        Status I_updateTrainSellingStatus(const String &t_id) {
             auto trSel = trainTree.search(t_id);
             if (!trSel.second)
                 return NoThisTrain;
             if (trSel.first.t_onSale)
                 return TrainHasBeenOnSale;
             train tr = trSel.first;
-            for (short i = 0; i < tr.t_stationNum; ++i){
-                for (short j = i + 1; j < tr.t_stationNum; ++j){
-                    for (Date d = startDate; d != endDate; d = d.nextDate()){
+            for (short i = 0; i < tr.t_stationNum; ++i) {
+                for (short j = i + 1; j < tr.t_stationNum; ++j) {
+                    for (Date d = startDate; d != endDate; d = d.nextDate()) {
                         ticket newTik;
                         newTik.tk_position = Pair<short, short>(tr.t_station[i], tr.t_station[j]);
                         newTik.tk_time = Pair<Time, Time>(tr.t_time[i], tr.t_time[j]);
@@ -443,7 +477,7 @@ namespace Kernel {
                         newTik.tk_catalog = tr.t_catalog;
                         newTik.tk_ticketID = ticketId++;
                         newTik.tk_trainID = tr.t_id;
-                        for (short p = 0; p != 5; ++p){
+                        for (short p = 0; p != 5; ++p) {
                             newTik.tk_remain[p] = 2000;
                             newTik.tk_price[p] = tr.t_price[j][p] - tr.t_price[i][p];
                         }
@@ -455,13 +489,14 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_updateTrain(const String &t_id, const train &data){
+        Status I_updateTrain(const String &t_id, const train &data) {
             auto trainSel = trainTree.search(t_id);
             if (!trainSel.second)
                 return NoThisTrain;
             if (trainSel.first.t_onSale)
                 return TrainHasBeenOnSale;
             trainTree.update(t_id, data);
+            return Success;
         }
 
         ~Update();
@@ -469,34 +504,36 @@ namespace Kernel {
 
     class Delete : public Interface {
     public:
-        Status I_deleteUserBookedTicket(int p_id, Date p_date, const String &tk_id, Pair<int, int> tk_location, int tk_kind, int tk_num){
+        Delete() {}
+
+        Status I_deleteUserBookedTicket(int p_id, Date p_date, const String &tk_id, Pair<short, short> tk_location,
+                                        int tk_kind, int tk_num) {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
             auto tik = userTicketTree.searchFirst(Pair<int, int>(p_id, 0));
             if (tik.empty())
                 return NoRemainTicket;
-            for (int i = 0; i < tik.size(); ++i){
+            for (int i = 0; i < tik.size(); ++i) {
                 auto tikIdSel = ticketIdTree.search(tik[i].first());
                 if (!tikIdSel.second)
                     continue;
-                if (tikIdSel.first.tk_date != p_date 
-                 || tikIdSel.first.tk_position != tk_location
-                 || tikIdSel.first.tk_trainID != tk_id)
+                if (tikIdSel.first.tk_date != p_date
+                    || tikIdSel.first.tk_position != tk_location
+                    || tikIdSel.first.tk_trainID != tk_id)
                     continue;
                 if (tik[i].second() < tk_num)
                     return NoRemainTicket;
                 if (tik[i].second() == tk_num)
                     userTicketTree.erase(Pair<int, int>(p_id, tik[i].first()));
                 else
-                    userTicketTree.update(Pair<int, int>(p_id, tik[i].first()), 
+                    userTicketTree.update(Pair<int, int>(p_id, tik[i].first()),
                                           Pair<int, int>(tik[i].first(), tik[i].second() - tk_num));
                 auto tikSel = ticketTree.search(ticketKey(tikIdSel.first));
-                if (tikSel.second){
+                if (tikSel.second) {
                     tikIdSel.first.tk_remain[tk_kind] += tk_num;
                     ticketTree.update(ticketKey(tikIdSel.first), tikIdSel.first);
-                }
-                else{
+                } else {
                     ticket newTik = tikSel.first;
                     newTik.tk_remain[tk_kind] = tk_num;
                     ticketTree.insert(ticketKey(newTik), newTik);
@@ -506,7 +543,7 @@ namespace Kernel {
             return NoRemainTicket;
         }
 
-        Status I_deleteTrain(const String &p_id){
+        Status I_deleteTrain(const String &p_id) {
             auto trainSel = trainTree.search(p_id);
             if (!trainSel.second)
                 return NoThisTrain;

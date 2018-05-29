@@ -637,7 +637,7 @@ private:
             else
                 r = mid;
         }
-        if (ln.record[l].key != rc.key)
+        if (!comp(ln.record[l].key, rc.key) && !comp(rc.key, ln.record[l].key))
             return std::make_pair(Record(), false);
         if (l != ln.size - 1)
             return std::make_pair(ln.record[l + 1], true);

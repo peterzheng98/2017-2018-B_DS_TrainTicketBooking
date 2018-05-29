@@ -4,7 +4,7 @@
 using namespace std;
 
 int main(){
-    ParserForCommand parserForCommand;
+    ParserForCommand parserForCommand = ParserForCommand();
     ifstream fs("data.in");
     while(parserForCommand.Parser(fs)){
         int t;

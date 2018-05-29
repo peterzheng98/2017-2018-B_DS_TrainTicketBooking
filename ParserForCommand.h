@@ -21,6 +21,12 @@ private:
     Select select;
     Delete deleteA;
 public:
+    ParserForCommand(){
+        insert = Insert();
+        update = Update();
+        select = Select();
+        deleteA = Delete();
+    };
     int Parser(istream &is) {
         myAlgorithm::String firstWord;
         is >> firstWord;
