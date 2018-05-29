@@ -27,7 +27,7 @@ public:
         select = Select();
         deleteA = Delete();
     };
-    int Parser(istream &is) {
+    int Parser(ifstream &is) {
         myAlgorithm::String firstWord;
         is >> firstWord;
         if (firstWord == "register") {
@@ -69,12 +69,12 @@ public:
             return true;
         }
         if (firstWord == "query_profile") {
-            int p_id;
+            myAlgorithm::String p_id;
             is >> p_id;
             myAlgorithm::String p_name, p_email;
             long long p_phone;
             //TODO : BUG HERE(Require User Priviliege)
-            Status ret = select.I_selectUser(p_id, p_name, p_email, p_phone);
+            Status ret = select.I_selectUser((int)p_id, p_name, p_email, p_phone);
             if (ret == NoThisUser) cout << "0\n"; else cout << p_name << " " << p_email << " " << p_phone << " 0\n";
             return true;
         }

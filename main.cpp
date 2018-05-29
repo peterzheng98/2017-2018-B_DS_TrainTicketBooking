@@ -5,7 +5,7 @@ using namespace std;
 
 int main(){
     ParserForCommand parserForCommand = ParserForCommand();
-    ifstream fs("data.in");
+    ifstream fs("register.in");
     while(parserForCommand.Parser(fs)){
         int t;
         cout << "Press 1 and Enter To Next";

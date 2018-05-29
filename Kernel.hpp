@@ -200,6 +200,26 @@ public:
         p_userPrivilege = (id == 2018 ? Admin : User);
     }
 
+    user(const user& rhs){
+        p_id = rhs.p_id;
+        p_username = rhs.p_username;
+        p_password = rhs.p_password;
+        p_email = rhs.p_email;
+        p_phone = rhs.p_phone;
+        p_userPrivilege = rhs.p_userPrivilege;
+    }
+
+    user &operator=(const user& rhs){
+        if(this == &rhs) return *this;
+        p_id = rhs.M_id();
+        p_username = rhs.M_username();
+        p_password = rhs.M_password();
+        p_email = rhs.M_email();
+        p_phone = rhs.M_phone();
+        p_userPrivilege = rhs.M_privilege();
+        return *this;
+    }
+
     int M_id() const {
         return p_id;
     }
@@ -229,12 +249,12 @@ static int nowId = 2018;
 static int ticketId = 1;
 static Date startDate(2018, 6, 1), endDate(2018, 6, 30);
 
-BPlusTree<int, user> userIdTree(false, "tmp/user.dat");
-BPlusTree<String, int> userNameTree(false, "tmp/userName.dat");
-BPlusTree<ticketKey, ticket> ticketTree(false, "tmp/ticket.dat");
-BPlusTree<int, ticket> ticketIdTree(false, "tmp/ticketId.dat");
-BPlusTree<Pair<int, int>, Pair<int, int>> userTicketTree(false, "tmp/userTicket.dat");
-BPlusTree<String, train> trainTree(false, "tmp/train.dat");
+BPlusTree<int, user> userIdTree(true, "tmp/user.dat");
+BPlusTree<String, int> userNameTree(true, "tmp/userName.dat");
+BPlusTree<ticketKey, ticket> ticketTree(true, "tmp/ticket.dat");
+BPlusTree<int, ticket> ticketIdTree(true, "tmp/ticketId.dat");
+BPlusTree<Pair<int, int>, Pair<int, int>> userTicketTree(true, "tmp/userTicket.dat");
+BPlusTree<String, train> trainTree(true, "tmp/train.dat");
 
 namespace Kernel {
     class Interface {

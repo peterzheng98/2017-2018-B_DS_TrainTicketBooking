@@ -58,7 +58,7 @@ namespace myAlgorithm {
 
         String &operator=(const String &rhs) {
             if (this == &rhs) return *this;
-
+            clear();
             len = rhs.length();
             for (int i = 0; i < len; i++) data[i] = rhs[i];
             locale = rhs.Locale();
