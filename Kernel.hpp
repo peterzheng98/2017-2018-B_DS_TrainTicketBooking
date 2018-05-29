@@ -57,7 +57,7 @@ public:
         return tk_position;
     }
 
-    Pair<Date, Date> M_time() const{
+    Pair<Time, Time> M_time() const{
         return tk_time;
     }
 
@@ -73,8 +73,12 @@ public:
         return tk_trainID;
     }
 
-    float M_price() const{
+    const float *M_price() const{
         return tk_price;
+    }
+
+    const int *M_remain() const{
+        return tk_remain;
     }
 };
 
