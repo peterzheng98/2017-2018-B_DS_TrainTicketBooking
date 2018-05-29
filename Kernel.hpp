@@ -11,6 +11,8 @@
 #include "String.h"
 #include "Set.hpp"
 #include "BPlusTree.hpp"
+#include "DateAndTime.h"
+#include "Vector.h"
 
 using namespace myAlgorithm;
 
@@ -29,15 +31,28 @@ class ticket {
     friend class Kernel::Insert;
     friend class Kernel::Select;
     friend class Kernel::Update;
+    friend class Kernel::Delete;
 private:
     Pair<short, short> tk_position;
-    Pair<Date, Date> tk_time;
+    Pair<Time, Time> tk_time;
     Date tk_date;
     short tk_catalog;
     int tk_ticketID;
     String tk_trainID;
-    float tk_price;
+    float tk_price[5];
+    int tk_remain[5];
 public:
+    ticket() = default;
+
+    ticket(const ticket &tik)
+        : tk_position(tik.tk_position), tk_time(tik.tk_time), tk_date(tik.tk_date), 
+        tk_catalog(tik.tk_catalog), tk_ticketID(tik.tk_ticketID), tk_trainID(tk_trainID){
+        for (int i = 0; i < 5; ++i){
+            tk_price[i] = tik.tk_price[i];
+            tk_remain[i] = tik.tk_remain[i];
+        }
+    }
+
     Pair<short, short> M_position() const{
         return tk_position;
     }
@@ -67,16 +82,24 @@ class ticketKey{
 private:
     Pair<short, short> station;
     String trainID;
+    Date date;
 public:
     ticketKey() = default;
-    ticketKey(const Pair<short, short> &stt)
-        : station(stt);
-    ticketKey(const Pair<short, short> &stt, const String &tid)
-        : station(stt), trainID(tid) {}
+    ticketKey(const Pair<short, short> &stt, const Date &dt)
+        : station(stt), date(dt) {}
+    ticketKey(const Pair<short, short> &stt, const String &tid, const Date &dt)
+        : station(stt), trainID(tid), date(dt) {}
     ticketKey(const ticket &tk)
         : station(tk.tk_position), trainID(tk.tk_trainID) {}
     bool operator <(const ticketKey &tk) const{
-        return station < tk.station || (station == tk.station && trainID < tk.trainID);
+        return station < tk.station || (station == tk.station && date < tk.date)
+            || (station == tk.station && date < tk.date && trainID < tk.trainID);
+    }
+    Pair<short, short> first() const{
+        return station;
+    }
+    Date second() const{
+        return date;
     }
 };
 
@@ -84,24 +107,29 @@ class train {
     friend class Kernel::Insert;
     friend class Kernel::Select;
     friend class Kernel::Update;
+    friend class Kernel::Delete;
 private:
     String t_id;
     String t_name;
     short t_station[60];
-    short t_ticketRemain[5][60];
+    Time t_time[60];
+    float t_price[60][5];
     short t_stationNum;
-    short t_tickedKind;
+    short t_ticketKind;
     short t_catalog;
+    bool t_onSale;
 public:
     train() = default;
 
     train(const train &tr)
-        : t_id(tr.t_id), t_name(tr.t_name), t_stationNum(tr.t_stationNum), t_tickedKind(tr.t_tickedKind), t_catalog(tr.t_catalog){
-        for (int i = 0; i < t_stationNum; ++i)
+        : t_id(tr.t_id), t_name(tr.t_name), t_stationNum(tr.t_stationNum), t_ticketKind(tr.t_ticketKind), 
+        t_catalog(tr.t_catalog), t_onSale(tr.t_onSale){
+        for (short i = 0; i < t_stationNum; ++i){
             t_station[i] = tr.t_station[i];
-        for (int i = 0; i < t_tickedKind; ++i)
-            for (int j = 0; j < t_stationNum; ++j)
-                t_ticketRemain[i][j] = tr.t_ticketRemain[i][j];
+            t_time[i] = tr.t_time[i];
+            for (short j = 0; j < t_ticketKind; ++j)
+                t_price[i][j] = tr.t_price[i][j];
+        }
     }
 
     String M_id() const{
@@ -122,6 +150,10 @@ public:
 
     short M_catalog() const{
         return t_catalog;
+    }
+
+    bool M_isOnSale() const{
+        return t_onSale;
     }
 };
 
@@ -169,13 +201,14 @@ public:
 };
 
 static int nowId = 2018;
-static int ticketId = 0;
+static int ticketId = 1;
+static Date startDate(2018, 6, 1), endDate(2018, 6, 30);
 
 BPlusTree<int, user> userIdTree(false, "tmp/user.dat");
 BPlusTree<String, int> userNameTree(false, "tmp/userName.dat");
 BPlusTree<ticketKey, ticket> ticketTree(false, "tmp/ticket.dat");
 BPlusTree<int, ticket> ticketIdTree(false, "tmp/ticketId.dat");
-BPlusTree<int, int> userTicketTree(false, "tmp/userTicket.dat");
+BPlusTree<Pair<int, int>, Pair<int, int>> userTicketTree(false, "tmp/userTicket.dat");
 BPlusTree<String, train> trainTree(false, "tmp/train.dat");
 
 namespace Kernel {
@@ -200,7 +233,7 @@ namespace Kernel {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
-            ticketKey newTk(tk_position, tk_id);
+            ticketKey newTk(tk_position, tk_id, tk_date);
             auto tkSel = ticketTree.search(newTk);
             if (!tkSel.second)
                 return NoThisTrain;
@@ -217,21 +250,42 @@ namespace Kernel {
                     break;
             if (i >= j || i == upTrain.t_stationNum || j == upTrain.t_stationNum)
                 return NoThisTrain;
+            Vector<ticketKey> vtk;
             for (short k = i; k < j; ++k){
-                if (upTrain.t_ticketRemain[tk_kind][k] < tk_num)
+                ticketKey tik(Pair<short, short>(upTrain.t_station[k], upTrain.t_station[k + 1]),
+                    tk_id, tk_date);
+                auto tikSel = ticketTree.search(tik);
+                if (!tikSel.second || tikSel.first.tk_remain[tk_kind] < tk_num)
                     return NoRemainTicket;
                 else
-                    upTrain.t_ticketRemain[tk_kind][k] -= tk_num;
+                    vtk.push_back(tik);
             }
-            trainTree.update(tk_id, upTrain);
+            for (int i = 0; i < vtk.size(); ++i){
+                auto tikSel = ticketTree.search(vtk[i]);
+                tikSel.first.tk_remain[tk_kind] -= tk_num;
+                if (tikSel.first.tk_remain[tk_kind] == 0)
+                    ticketTree.erase(vtk[i]);
+                else
+                    ticketTree.update(vtk[i], tikSel.first);
+            }
             int ticketID = tkSel.first.tk_ticketID;
-            userTicketTree.insert(p_id, ticketID);
+            userTicketTree.insert(Pair<int, int>(p_id, ticketID), Pair<int, int>(ticketID, tk_num));
             return Success;
         }
 
-        Status I_addTrainTicket(int tk_id, String t_name, int t_stationNum, int t_priceNum);
-
-        
+        Status I_addTrainTicket(const String &tk_id, int t_stationNum, float *t_priceNum){
+            auto trSel = trainTree.search(tk_id);
+            if (!trSel.second)
+                return NoThisTrain;
+            train upTrain = trSel.first;
+            upTrain.t_station[upTrain.t_stationNum] = t_stationNum;
+            if (upTrain.t_stationNum != 0){
+                for (short i = 0; i < upTrain.t_ticketKind; ++i)
+                    upTrain.t_price[upTrain.t_stationNum][i] = upTrain.t_price[upTrain.t_stationNum - 1][i] + t_priceNum[i];
+            }
+            ++upTrain.t_stationNum;
+            return Success;
+        }
 
         ~Insert();
     };
@@ -271,9 +325,10 @@ namespace Kernel {
 
         Status I_selectTicket(Pair<short, short> tk_position, Date tk_date, short tk_catalog, Vector<ticket> &ret){
             ret.clear();
-            ticketKey tkKey(tk_position);
-            Vector<ticket> vt = ticketKey.searchFirst(tkKey);
+            ticketKey tkKey(tk_position, tk_date);
+            Vector<ticket> vt = ticketTree.searchFirstAndSecond(tkKey);
             for (int i = 0; i < vt.size(); ++i){
+                
                 auto trSel = trainTree.search(vt[i].tk_trainID);
                 if (trSel.first.t_catalog & tk_catalog)
                     ret.push_back(vt[i]);
@@ -289,9 +344,9 @@ namespace Kernel {
             ret.clear();
             Vector<ticket> vt1, vt2;
             ticket ans1, ans2;
-            Date minTime;
+            int minTime;
             for (short i = 0; i < totStation; ++i){
-                if (i != tk_position.first() && t != tk_position.second())
+                if (i != tk_position.first() && i != tk_position.second())
                 I_selectTicket(Pair<short, short>(tk_position.first(), i), tk_date, tk_catalog, vt1);
                 I_selectTicket(Pair<short, short>(i, tk_position.second()), tk_date, tk_catalog, vt2);
                 for (int j = 0; j < vt1.size(); ++j){
@@ -307,23 +362,28 @@ namespace Kernel {
             if (ans1.tk_ticketID == 0 || ans2.tk_ticketID == 0)
                 return NoThisTrain;
             ret.push_back(ans1);
-            ret.push_bakc(ans2);
+            ret.push_back(ans2);
         }
 
-        Status I_selectUserBookedTicket(int p_id, Date p_date, int tk_catalog, int &num, Vector<ticket> &ret){
+        Status I_selectUserBookedTicket(int p_id, Date p_date, int tk_catalog, Vector<ticket> &ret, Vector<int> &num){
+            ret.clear();
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
-            for (auto it = userSel.first.p_ticketBooked.begin(); it != userSel.first.p_ticketBooked.end(); ++it){
-                if (it->tk_date == p_date && it->tk_catalog == tk_catalog)
-                    ret.push_back(*it);
+            auto vb = userTicketTree.searchFirst(Pair<int, int>(p_id, 0));
+            for (int i = 0; i < vb.size(); ++i){
+                auto tikSel = ticketIdTree.search(vb[i].first);
+                if (tikSel.second && tikSel.first.tk_date == p_date && tikSel.first.tk_catalog & tk_catalog){
+                    ret.push_back(tikSel.first);
+                    num.push_back(vb[i].second);
+                }
             }
             if (ret.empty())
                 return NoTicketBooked;
             return Success;
         }
 
-        Status I_selectTrain(int p_id, train &ret){
+        Status I_selectTrain(const String &p_id, train &ret){
             auto trainSel = trainTree.search(p_id);
             if (!trainSel.second)
                 return NoThisTrain;
@@ -362,25 +422,42 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_updateTrainSellingStatus(int t_id);
+        Status I_updateTrainSellingStatus(const String &t_id){
+            auto trSel = trainTree.search(t_id);
+            if (!trSel.second)
+                return NoThisTrain;
+            if (trSel.first.t_onSale)
+                return TrainHasBeenOnSale;
+            train tr = trSel.first;
+            for (short i = 0; i < tr.t_stationNum; ++i){
+                for (short j = i + 1; j < tr.t_stationNum; ++j){
+                    for (Date d = startDate; d != endDate; d = d.nextDate()){
+                        ticket newTik;
+                        newTik.tk_position = Pair<short, short>(tr.t_station[i], tr.t_station[j]);
+                        newTik.tk_time = Pair<Time, Time>(tr.t_time[i], tr.t_time[j]);
+                        newTik.tk_date = d;
+                        newTik.tk_catalog = tr.t_catalog;
+                        newTik.tk_ticketID = ticketId++;
+                        newTik.tk_trainID = tr.t_id;
+                        for (short p = 0; p != 5; ++p){
+                            newTik.tk_remain[p] = 2000;
+                            newTik.tk_price[p] = tr.t_price[j][p] - tr.t_price[i][p];
+                        }
+                        ticketTree.insert(ticketKey(newTik), newTik);
+                        ticketIdTree.insert(newTik.tk_ticketID, newTik);
+                    }
+                }
+            }
+            return Success;
+        }
 
-        Status I_updateTrain(int t_id, train data){
+        Status I_updateTrain(const String &t_id, const train &data){
             auto trainSel = trainTree.search(t_id);
             if (!trainSel.second)
                 return NoThisTrain;
+            if (trainSel.first.t_onSale)
+                return TrainHasBeenOnSale;
             trainTree.update(t_id, data);
-            if (trainSel.first.M_stationFrom() == data.M_stationFrom())
-                trainFromTree.update(trainKeyFrom(trainSel.first), data);
-            else{
-                trainFromTree.erase(trainKeyFrom(trainSel.first));
-                trainFromTree.insert(trainKeyFrom(data), data);
-            }
-            if (trainSel.first.M_stationTo() == data.M_stationTo())
-                trainToTree.update(trainKeyTo(trainSel.first), data);
-            else{
-                trainToTree.erase(trainKeyTo(trainSel.first));
-                trainToTree.insert(trainKeyTo(data), data);
-            }
         }
 
         ~Update();
@@ -388,15 +465,51 @@ namespace Kernel {
 
     class Delete : public Interface {
     public:
-        Status I_deleteUserBookedTicket(int p_id, Date p_date, int tk_id, Pair<int, int> tk_location, int tk_kind);
+        Status I_deleteUserBookedTicket(int p_id, Date p_date, const String &tk_id, Pair<int, int> tk_location, int tk_kind, int tk_num){
+            auto userSel = userIdTree.search(p_id);
+            if (!userSel.second)
+                return NoThisUser;
+            auto tik = userTicketTree.searchFirst(Pair<int, int>(p_id, 0));
+            if (tik.empty())
+                return NoRemainTicket;
+            for (int i = 0; i < tik.size(); ++i){
+                auto tikIdSel = ticketIdTree.search(tik[i].first());
+                if (!tikIdSel.second)
+                    continue;
+                if (tikIdSel.first.tk_date != p_date 
+                 || tikIdSel.first.tk_position != tk_location
+                 || tikIdSel.first.tk_trainID != tk_id)
+                    continue;
+                if (tik[i].second() < tk_num)
+                    return NoRemainTicket;
+                if (tik[i].second() == tk_num)
+                    userTicketTree.erase(Pair<int, int>(p_id, tik[i].first()));
+                else
+                    userTicketTree.update(Pair<int, int>(p_id, tik[i].first()), 
+                                          Pair<int, int>(tik[i].first(), tik[i].second() - tk_num));
+                auto tikSel = ticketTree.search(ticketKey(tikIdSel.first));
+                if (tikSel.second){
+                    tikIdSel.first.tk_remain[tk_kind] += tk_num;
+                    ticketTree.update(ticketKey(tikIdSel.first), tikIdSel.first);
+                }
+                else{
+                    ticket newTik = tikSel.first;
+                    newTik.tk_remain[tk_kind] = tk_num;
+                    ticketTree.insert(ticketKey(newTik), newTik);
+                }
+                return Success;
+            }
+            return NoRemainTicket;
+        }
 
-        Status I_deleteTrain(int p_id){
+        Status I_deleteTrain(const String &p_id){
             auto trainSel = trainTree.search(p_id);
             if (!trainSel.second)
                 return NoThisTrain;
+            if (trainSel.first.t_onSale)
+                return TrainHasBeenOnSale;
             trainTree.erase(p_id);
-            trainFromTree.erase(trainKeyFrom(trainSel.first));
-            trainToTree.erase(trainKeyTo(trainSel.first));
+            return Success;
         }
 
         ~Delete();

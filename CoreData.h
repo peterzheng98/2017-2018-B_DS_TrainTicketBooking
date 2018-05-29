@@ -20,18 +20,14 @@ enum Status {
     NoRemainTicket,
     NoThisTrain,
     NoTicketBooked,
-    NoPrivilege
+    NoPrivilege,
+    TrainHasBeenOnSale
 };
 
 enum UserPrivilege {
     Admin,
     User,
     NotRegister
-};
-
-enum TicketOnSale {
-    Available,
-    Unavailable
 };
 
 namespace myAlgorithm {

@@ -9,6 +9,7 @@
 #include <fstream>
 #include <functional>
 #include <cstring>
+#include "Vector.h"
 
 namespace myAlgorithm{
 
@@ -619,6 +620,14 @@ private:
         }
     }
 
+    Index *nextIndex(Index *id){
+
+    }
+
+    Record *nextRecord(Record *rc){
+
+    }
+
 public:
     BPlusTree(bool CLEAR = false, const char *PATH = WRITE_PATH) {
         strcpy(path, PATH);
@@ -653,6 +662,48 @@ public:
             return std::make_pair(rc->value, true);
         else
             return std::make_pair(Val(), false);
+    }
+
+    Vector<Val> searchFirst(const Key &key){
+        Vector<Val> ans;
+        off_t pos = findKey(key, true);
+        LeafNode ln;
+        read(&ln, pos);
+        Record *rc = binarySearchRecord(ln, key);
+        if (rc != end(ln) && rc->key.first() == key.first()){
+            ans.push_back(rc->value);
+            while (rc != nullptr){
+                rc = nextRecord(rc);
+                if (rc == nullptr)
+                    break;
+                if (rc->key.first() == key.first())
+                    ans.push_back(rc->value);
+                else
+                    break;
+            }
+        }
+        return ans;
+    }
+    
+    Vector<Val> searchFirstAndSecond(const Key &key){
+        Vector<Val> ans;
+        off_t pos = findKey(key, true);
+        LeafNode ln;
+        read(&ln, pos);
+        Record *rc = binarySearchRecord(ln, key);
+        if (rc != end(ln) && rc->key.first() == key.first() && rc->key.second() == key.second()){
+            ans.push_back(rc->value);
+            while (rc != nullptr){
+                rc = nextRecord(rc);
+                if (rc == nullptr)
+                    break;
+                if (rc->key.first() == key.first() && rc->key.second() == key.second())
+                    ans.push_back(rc->value);
+                else
+                    break;
+            }
+        }
+        return ans;
     }
 
     void insert(const Key &key, const Val &value){
