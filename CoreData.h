@@ -159,7 +159,7 @@ namespace myAlgorithm {
             return t2;
         }
 
-        K third() const {
+        K third(){
             return t3;
         }
 

@@ -260,6 +260,26 @@ namespace myAlgorithm {
             for (i = i + OPTION; i < Len; ++i) s2 += source[i];
             Result = true;
         }
+
+        short toShort() const {
+            short result = 0;
+            for (int i = 0; i < len; i++) {
+                if (data[i] < '0' || data[i] > '9') return -1;
+                result = short(result * 10 + data[i] - '0');
+                if (result < 0) return -1;
+            }
+            return result;
+        }
+
+        operator short() const noexcept {
+            short result = 0;
+            for (int i = 0; i < len; i++) {
+                if (data[i] < '0' || data[i] > '9') return -1;
+                result = short(result * 10 + data[i] - '0');
+                if (result < 0) return -1;
+            }
+            return result;
+        }
     };
     void split(const char &sgn, const String &source, String &s1, String &s2, int OPTION, bool &Result) {
         s1 = String();

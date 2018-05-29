@@ -372,7 +372,7 @@ namespace Kernel {
                 return NoThisUser;
             auto vb = userTicketTree.searchFirst(Pair<int, int>(p_id, 0));
             for (int i = 0; i < vb.size(); ++i){
-                auto tikSel = ticketIdTree.search(vb[i].first);
+                auto tikSel = ticketIdTree.search(vb[i].first());
                 if (tikSel.second && tikSel.first.tk_date == p_date && tikSel.first.tk_catalog & tk_catalog){
                     ret.push_back(tikSel.first);
                     num.push_back(vb[i].second);
