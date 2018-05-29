@@ -169,7 +169,8 @@ public:
         }
         if (firstWord == "exit") {
             cout << "BYE\n";
-            return false;
+//            return false;
+            return true;
         }
         if (firstWord == "clean") {
 

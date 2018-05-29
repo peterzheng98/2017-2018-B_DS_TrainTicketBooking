@@ -5,11 +5,11 @@ using namespace std;
 
 int main(){
     ParserForCommand parserForCommand = ParserForCommand();
-    ifstream fs("register.in");
+    ifstream fs("test.in");
     while(parserForCommand.Parser(fs)){
         int t;
-        cout << "Press 1 and Enter To Next";
-        cin >> t;
+//        cout << "Press 1 and Enter To Next";
+//        cin >> t;
     };
-    cout << "Here!";
+//    cout << "Here!";
 }
