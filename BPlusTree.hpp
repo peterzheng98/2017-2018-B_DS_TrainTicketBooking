@@ -63,7 +63,7 @@ private:
     mutable int fileLevel = 0;
 
     struct CoreData{
-        off_t root = 0, slot = 0, pos = UNIT * 2;
+        off_t root = 0, slot = 0, pos = UNIT;
         size_t _size = 0;
         int height = 0;
     };
@@ -637,7 +637,7 @@ private:
             else
                 r = mid;
         }
-        if (!comp(ln.record[l].key, rc.key) && !comp(rc.key, ln.record[l].key))
+        if (comp(ln.record[l].key, rc.key) || comp(rc.key, ln.record[l].key))
             return std::make_pair(Record(), false);
         if (l != ln.size - 1)
             return std::make_pair(ln.record[l + 1], true);
@@ -728,11 +728,11 @@ public:
             write(&rt, core.root);
             write(&ln, rt.index[0].child);
             core.height = 2;
-            write(&core, UNIT * 2);
+            write(&core, core.pos);
         }
         else{
             openFile();
-            read(&core, UNIT * 2);
+            read(&core, UNIT);
         }
     }
 
