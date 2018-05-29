@@ -90,16 +90,28 @@ namespace myAlgorithm {
             t2 = _t2;
         }
 
-        bool operator <(const Pair<T, U> &p) const{
+        bool operator<(const Pair<T, U> &p) const {
             return t1 < p.t1 || (t1 == p.t1 && t2 < p.t2);
         }
 
-        bool operator ==(const Pair<T, U> &p) const{
+        bool operator==(const Pair<T, U> &p) const {
             return t1 == p.t1 && t2 == p.t2;
         }
 
-        bool operator!=(const Pair<T, U> &p) const{
+        bool operator!=(const Pair<T, U> &p) const {
             return t1 != p.t1 || t2 != p.t2;
+        }
+
+        bool operator<=(const Pair<T, U> &p) const {
+            return t1 <= p.t1 || (t1 == p.t1 && t2 <= p.t2);
+        }
+
+        bool operator>(const Pair<T, U> &p) const {
+            return t1 > p.t1 || (t1 == p.t1 && t2 > p.t2);
+        }
+
+        bool operator>=(const Pair<T, U> &p) const {
+            return t1 >= p.t1 || (t1 == p.t1 && t2 >= p.t2);
         }
     };
 
@@ -131,12 +143,24 @@ namespace myAlgorithm {
             return *this;
         }
 
-        T first() const {
+        T first() {
             return t1;
+        }
+
+        const T first() const {
+            return t1;
+        }
+
+        U second() {
+            return t2;
         }
 
         const U second() const {
             return t2;
+        }
+
+        K third() const {
+            return t3;
         }
 
         const K third() const {
@@ -159,6 +183,35 @@ namespace myAlgorithm {
             t1 = _t1;
             t2 = _t2;
             t3 = _t3;
+        }
+
+        bool operator<(const TriplePair<T, U, K> &p) const {
+            return p.first() < t1 || (p.second() < t2 && p.first() == t1) ||
+                   (p.third() < t3 && p.first() == t1 && p.second() == t2);
+        }
+
+        bool operator<=(const TriplePair<T, U, K> &p) const {
+            return p.first() <= t1 || (p.second() <= t2 && p.first() == t1) ||
+                   (p.third() <= t3 && p.first() == t1 && p.second() == t2);
+        }
+
+        bool operator>(const TriplePair<T, U, K> &p) const {
+            return p.first() > t1 || (p.second() > t2 && p.first() == t1) ||
+                   (p.third() > t3 && p.first() == t1 && p.second() == t2);
+        }
+
+        bool operator>=(const TriplePair<T, U, K> &p) const {
+            return p.first() >= t1 || (p.second() >= t2 && p.first() == t1) ||
+                   (p.third() >= t3 && p.first() == t1 && p.second() == t2);
+        }
+
+        bool operator==(const TriplePair<T, U, K> &p) const {
+            return p.first() == t1 && p.second() == t2 && p.third() == t3;
+        }
+
+        bool operator!=(const TriplePair<T, U, K> &p) const {
+            return p.first() != t1 || p.second() != t2 || p.third() != t3;
+
         }
     };
 

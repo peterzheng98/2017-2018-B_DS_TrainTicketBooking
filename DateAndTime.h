@@ -10,6 +10,7 @@
 
 namespace myAlgorithm {
     class Date {
+        friend std::ostream &operator<<(std::ostream &os, const Date &data) const;
     private:
         TriplePair<short, short, short> dataOfDate;
     public:
@@ -104,11 +105,6 @@ namespace myAlgorithm {
             return d1 + d2 + d3;
         }
 
-        friend std::ostream &operator<<(std::ostream &os, const Date &data) {
-            os << data.getYear() << "-" << data.getMonth() << "-" << data.getDay();
-            return os;
-        }
-
         friend std::istream &operator>>(std::istream &is, Date &data) {
             short t1, t2, t3;
             char ch, ch2;
@@ -126,6 +122,30 @@ namespace myAlgorithm {
             return dataOfDate.first() != rhs.dataOfDate.first()
                    || dataOfDate.second() != rhs.dataOfDate.second()
                    || dataOfDate.third() != rhs.dataOfDate.third();
+        }
+
+        bool operator<(const Date &rhs) const{
+            return dataOfDate.first() < rhs.getYear()
+                    || (dataOfDate.first() == rhs.getYear() && dataOfDate.second() < rhs.getMonth())
+                    || (dataOfDate.first() == rhs.getYear() && dataOfDate.second() == rhs.getMonth() && dataOfDate.third() < rhs.getDay());
+        }
+
+        bool operator<=(const Date &rhs) const{
+            return dataOfDate.first() <= rhs.getYear()
+                   || (dataOfDate.first() == rhs.getYear() && dataOfDate.second() <= rhs.getMonth())
+                   || (dataOfDate.first() == rhs.getYear() && dataOfDate.second() == rhs.getMonth() && dataOfDate.third() <= rhs.getDay());
+        }
+
+        bool operator>(const Date &rhs) const{
+            return dataOfDate.first() > rhs.getYear()
+                   || (dataOfDate.first() == rhs.getYear() && dataOfDate.second() > rhs.getMonth())
+                   || (dataOfDate.first() == rhs.getYear() && dataOfDate.second() == rhs.getMonth() && dataOfDate.third() > rhs.getDay());
+        }
+
+        bool operator>=(const Date &rhs) const{
+            return dataOfDate.first() >= rhs.getYear()
+                   || (dataOfDate.first() == rhs.getYear() && dataOfDate.second() >= rhs.getMonth())
+                   || (dataOfDate.first() == rhs.getYear() && dataOfDate.second() == rhs.getMonth() && dataOfDate.third() >= rhs.getDay());
         }
 
         Date nextDate() {
@@ -151,7 +171,17 @@ namespace myAlgorithm {
         return Date(yy, mm, dd);
     }
 
+    friend std::ostream &operator<<(std::ostream &os, const Date &data) const {
+        os << data.getYear() << "-" << data.getMonth() << "-" << data.getDay();
+        return os;
+    }
+
     class Time {
+        friend std::ostream &operator<<(std::ostream &os, const Time &rhs);
+
+        friend Time operator+(const Time &lhs, const Time &rhs) const;
+
+        friend Time operator-(const Time& lhs, const Time& rhs) const;
     private:
         Pair<short, short> dataOfTime;
     public:
@@ -212,7 +242,73 @@ namespace myAlgorithm {
             while (hour < 0) hour += 24;
             dataOfTime.setData(hour, min);
         }
+
+        int operator-(const Time &rhs) const {
+            int h2 = rhs.getHour(), m2 = rhs.getMin();
+            int h1 = dataOfTime.first(), m1 = dataOfTime.second();
+
+            if (h2 < h1) h2 += 24;
+            if (m2 < m1) h2--, m2 += 60;
+            return (h2 - h1) * 60 + (m2 - m1);
+        }
+
+        bool operator==(const Time &rhs) const {
+            return rhs.getMin() == dataOfTime.second() && rhs.getHour() == dataOfTime.first();
+        }
+
+        bool operator!=(const Time &rhs) const {
+            return rhs.getMin() != dataOfTime.second() || rhs.getHour() != dataOfTime.first();
+        }
+
+        bool operator<(const Time &rhs) const {
+            return dataOfTime.first() < rhs.getHour()
+                   || (dataOfTime.first() == rhs.getHour() && dataOfTime.second() < rhs.getMin());
+        }
+
+        bool operator<=(const Time &rhs) const {
+            return dataOfTime.first() <= rhs.getHour()
+                   || (dataOfTime.first() == rhs.getHour() && dataOfTime.second() <= rhs.getMin());
+        }
+
+        bool operator>(const Time &rhs) const {
+            return dataOfTime.first() > rhs.getHour()
+                   || (dataOfTime.first() == rhs.getHour() && dataOfTime.second() > rhs.getMin());
+        }
+
+        bool operator>=(const Time &rhs) const {
+            return dataOfTime.first() >= rhs.getHour()
+                   || (dataOfTime.first() == rhs.getHour() && dataOfTime.second() >= rhs.getMin());
+        }
+
+        int getHour() const { return dataOfTime.first(); }
+
+        int getMin() const { return dataOfTime.second(); }
+
+        int setHour(int hh) { dataOfTime.setFirst(hh); }
+
+        int setMin(int mm) { dataOfTime.setSecond(mm); }
     };
+    std::ostream &operator<<(std::ostream& os, const Time& rhs){
+        os << rhs.getHour() << ":" << rhs.getMin();
+        return os;
+    }
+
+    Time operator+(const Time &lhs, const Time &rhs) const {
+        int hh = lhs.getHour() + rhs.getHour();
+        int mm = lhs.getMin() + rhs.getMin();
+        hh = hh + mm / 60;
+        mm = mm % 60;
+        return Time(hh, mm);
+    }
+
+    Time operator-(const Time& lhs, const Time& rhs) const{
+        int hh = lhs.getHour() - rhs.getHour();
+        int mm = lhs.getMin() - rhs.getMin();
+        if(hh < 0) hh += 24;
+        if(mm < 0) mm += hh * 60;
+        hh = mm / 60, mm = mm % 60;
+        return Time(hh, mm);
+    }
 }
 
 #endif //INC_2018DATASTRUCTUREBIGWORK_DATEANDTIME_H
