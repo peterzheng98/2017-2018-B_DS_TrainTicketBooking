@@ -368,13 +368,14 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_selectUser(int p_id, const String &p_name, const String &p_email, long long &p_phone) {
+        Status I_selectUser(int p_id, const String &p_name, const String &p_email, long long &p_phone, UserPrivilege &up) {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
             if (userSel.first.M_email() != p_email || userSel.first.M_username() != p_name ||
                 userSel.first.M_phone() != p_phone)
                 return NoThisUser;
+            up = userSel.first.p_userPrivilege;
             return Success;
         }
 
@@ -454,12 +455,13 @@ namespace Kernel {
     public:
         Update() {}
 
-        Status I_updateUser(int p_id, const String &p_name, const String &p_email, long long &p_phone) {
+        Status I_updateUser(int p_id, const String &p_name, const String &p_pwd, const String &p_email, long long &p_phone) {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
             user newUser = userSel.first;
             newUser.p_username = p_name;
+            newUser.p_password = p_pwd;
             newUser.p_email = p_email;
             newUser.p_phone = p_phone;
             userIdTree.update(p_id, newUser);
