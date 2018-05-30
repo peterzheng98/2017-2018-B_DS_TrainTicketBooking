@@ -2,7 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 //#define _NO_DEBUG
 //#define _LINUX_MODE
-#define MAXNN 100000
+#define MAXNN 500000
 #include "BPlusTree.hpp"
 #include <algorithm>
 #include <iostream>
@@ -58,7 +58,7 @@ int main() {
             cout << ans[j] << ' ';
         cout << endl;
     }*/
-    for (int i = 1; i <= MAXNN; ++i) {
+    for (int i = MAXNN; i >= 1; --i) {
         if (i == 2556)
             cout << i << endl;
         bpt.insert(i, BigSize(i));
@@ -68,7 +68,7 @@ int main() {
         }
     }
     printf("After Insertion.\n");
-    for (int i = MAXNN; i >= 1; --i) {
+    for (int i = 1; i <= MAXNN; ++i) {
         auto p = bpt.search(i);
         if (p.first.k != i || !p.second) {
             cout << i << endl;
@@ -81,7 +81,7 @@ int main() {
     }
 #ifdef _NO_DEBUG
     bpt.closeFile();
-    dkt.closeFile();
+    //dkt.closeFile();
 #endif
     end = clock();
     cout << (double)(end - start) / CLOCKS_PER_SEC << endl;
