@@ -186,7 +186,7 @@ namespace myAlgorithm {
                 if (data[i] < rhs[i]) return true;
             }
 
-            return len <= rhs.length();
+            return len < rhs.length();
         }
 
         bool operator>(const String &rhs) const {
@@ -325,14 +325,14 @@ namespace myAlgorithm {
     }
 
     std::ostream &operator<<(std::ostream &os, const String &rhs) {
-        if (rhs.locale != String::ENGLISH) throw 1; //TODO: throw locale error(not English)
+//        if (rhs.locale != String::ENGLISH) throw 1; //TODO: throw locale error(not English)
         for (int i = 0; i < rhs.length(); i++)
             os << rhs.data[i];
         return os;
     }
 
     std::wostream &operator<<(std::wostream &os, const String &rhs) {
-        if (rhs.locale != String::CHINESE) throw 1; //TODO: throw locale error(not Chinese)
+//        if (rhs.locale != String::CHINESE) throw 1; //TODO: throw locale error(not Chinese)
         for (int i = 0; i < rhs.length(); i++)
             os << rhs.data[i];
         return os;

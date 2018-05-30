@@ -368,14 +368,14 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_selectUser(int p_id, const String &p_name, const String &p_email, long long &p_phone, UserPrivilege &up) {
+        Status I_selectUser(int p_id, String &p_name, String &p_email, long long &p_phone, UserPrivilege &up) {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
-            if (userSel.first.M_email() != p_email || userSel.first.M_username() != p_name ||
-                userSel.first.M_phone() != p_phone)
-                return NoThisUser;
-            up = userSel.first.p_userPrivilege;
+            p_name = userSel.first.M_username();
+            p_email = userSel.first.M_email();
+            p_phone = userSel.first.M_phone();
+            up = userSel.first.M_privilege();
             return Success;
         }
 
