@@ -40,8 +40,8 @@ private:
         Val value;
     };
 
-    static const size_t M = (4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Index));
-    static const size_t L = (4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Record));
+    static const size_t M = 10;//(4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Index));
+    static const size_t L = 10;//(4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Record));
 
     struct LeafNode{
         off_t parent = 0;
@@ -565,6 +565,13 @@ private:
                     updateLeafParentPos(begin(newNode), end(newNode), newPos);
                 updateChildIndex(tn.parent, old, tn.index[tn.size - 1].key);
                 insertNewIndex(tn.parent, newNode.index[newNode.size - 1].key, sib.prev);
+                TreeNode tmptn;
+                read(&tmptn, offset);
+                if (tmptn.parent > 0) {
+                    tn.parent = tmptn.parent;
+                    newNode.parent = tmptn.parent;
+                    sib.parent = tmptn.parent;
+                }
                 write(&tn, offset);
                 write(&newNode, newPos);
                 write(&sib, newNode.succ);
@@ -589,6 +596,12 @@ private:
             if (tn.parent != 0){
                 updateChildIndex(tn.parent, old, tn.index[tn.size - 1].key);
                 insertNewIndex(tn.parent, newNode.index[newNode.size - 1].key, tn.succ);
+                TreeNode tmptn;
+                read(&tmptn, offset);
+                if (tmptn.parent > 0) {
+                    tn.parent = tmptn.parent;
+                    newNode.parent = tmptn.parent;
+                }
                 write(&tn, offset);
                 write(&newNode, newPos);
                 if (comp(key, tn.index[tn.size - 1].key))

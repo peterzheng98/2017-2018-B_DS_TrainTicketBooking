@@ -40,7 +40,7 @@ struct DoubleKey {
     }
 };
 
-BPlusTree<int, BigSize> bpt(true);
+BPlusTree<int, int> bpt(true);
 //BPlusTree<DoubleKey, int> dkt(true);
 
 int main() {
@@ -59,18 +59,18 @@ int main() {
         cout << endl;
     }*/
     for (int i = MAXNN; i >= 1; --i) {
-        if (i == 2556)
-            cout << i << endl;
-        bpt.insert(i, BigSize(i));
+        //if (i == 281)
+            //cout << i << endl;
+        bpt.insert(i, i);
         auto p = bpt.search(i);
         if (!p.second) {
-            cout << "i" << endl;
+            cout << i << endl;
         }
     }
     printf("After Insertion.\n");
-    for (int i = 1; i <= MAXNN; ++i) {
+    for (int i = MAXNN; i >= 1; --i) {
         auto p = bpt.search(i);
-        if (p.first.k != i || !p.second) {
+        if (p.first != i || !p.second) {
             cout << i << endl;
         }
         bpt.erase(i);
