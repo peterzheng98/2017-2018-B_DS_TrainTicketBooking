@@ -559,22 +559,15 @@ private:
                 sib.size -= M / 3;
                 newNode.size += M / 3;
                 copyIndex(begin(sib) + M / 3, begin(sib) + M, begin(sib));
+                write(&tn, offset);
+                write(&newNode, newPos);
+                write(&sib, newNode.succ);
                 if (!mode)
                     updateNodeParentPos(begin(newNode), end(newNode), newPos);
                 else
                     updateLeafParentPos(begin(newNode), end(newNode), newPos);
                 updateChildIndex(tn.parent, old, tn.index[tn.size - 1].key);
                 insertNewIndex(tn.parent, newNode.index[newNode.size - 1].key, sib.prev);
-                TreeNode tmptn;
-                read(&tmptn, offset);
-                if (tmptn.parent > 0) {
-                    tn.parent = tmptn.parent;
-                    newNode.parent = tmptn.parent;
-                    sib.parent = tmptn.parent;
-                }
-                write(&tn, offset);
-                write(&newNode, newPos);
-                write(&sib, newNode.succ);
                 if (comp(key, tn.index[tn.size - 1].key))
                     insertNewIndex(newNode.prev, key, child);
                 else
@@ -594,16 +587,10 @@ private:
             else
                 updateLeafParentPos(begin(newNode), end(newNode), newPos);
             if (tn.parent != 0){
-                updateChildIndex(tn.parent, old, tn.index[tn.size - 1].key);
-                insertNewIndex(tn.parent, newNode.index[newNode.size - 1].key, tn.succ);
-                TreeNode tmptn;
-                read(&tmptn, offset);
-                if (tmptn.parent > 0) {
-                    tn.parent = tmptn.parent;
-                    newNode.parent = tmptn.parent;
-                }
                 write(&tn, offset);
                 write(&newNode, newPos);
+                updateChildIndex(tn.parent, old, tn.index[tn.size - 1].key);
+                insertNewIndex(tn.parent, newNode.index[newNode.size - 1].key, tn.succ);
                 if (comp(key, tn.index[tn.size - 1].key))
                     insertNewIndex(newNode.prev, key, child);
                 else
@@ -846,14 +833,14 @@ public:
                 }
                 ln.record[i].key = key;
                 ln.record[i].value = value;
-                if (i == ln.size) {
-                    updateChildIndex(ln.parent, ln.record[i - 1].key, key);
-                }
-                else {
-                    updateChildIndex(ln.parent, sib.record[0].key, ln.record[ln.size].key);
-                }
                 ++ln.size;
                 write(&ln, childPos);
+                if (i == ln.size - 1) {
+                    updateChildIndex(ln.parent, sib.record[0].key, key);
+                }
+                else {
+                    updateChildIndex(ln.parent, sib.record[0].key, ln.record[ln.size - 1].key);
+                }
                 ++core._size;
                 write(&core, core.pos);
             }
@@ -870,18 +857,11 @@ public:
                 sib.size -= L / 3;
                 newNode.size += L / 3;
                 copyRecord(begin(sib) + L / 3, begin(sib) + L, begin(sib));
-                updateChildIndex(ln.parent, old, ln.record[ln.size - 1].key);
-                insertNewIndex(ln.parent, newNode.record[newNode.size - 1].key, sib.prev, true);
-                LeafNode tmpln;
-                read(&tmpln, childPos);
-                if (tmpln.parent > 0) {
-                    ln.parent = tmpln.parent;
-                    newNode.parent = tmpln.parent;
-                    sib.parent = tmpln.parent;
-                }
                 write(&ln, childPos);
                 write(&newNode, newPos);
                 write(&sib, newNode.succ);
+                updateChildIndex(ln.parent, old, ln.record[ln.size - 1].key);
+                insertNewIndex(ln.parent, newNode.record[newNode.size - 1].key, sib.prev, true);
                 insert(key, value);
             }
         }
@@ -893,16 +873,10 @@ public:
             copyRecord(end(ln) - L / 2, end(ln), begin(newNode));
             ln.size -= L / 2;
             newNode.size = L / 2;
-            updateChildIndex(ln.parent, old, ln.record[ln.size - 1].key);
-            insertNewIndex(ln.parent, newNode.record[newNode.size - 1].key, ln.succ, true);
-            LeafNode tmpln;
-            read(&tmpln, childPos);
-            if (tmpln.parent > 0) {
-                ln.parent = tmpln.parent;
-                newNode.parent = tmpln.parent;
-            }
             write(&ln, childPos);
             write(&newNode, newPos);
+            updateChildIndex(ln.parent, old, ln.record[ln.size - 1].key);
+            insertNewIndex(ln.parent, newNode.record[newNode.size - 1].key, ln.succ, true);
             insert(key, value);
         }
     }

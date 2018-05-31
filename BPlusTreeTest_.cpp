@@ -29,7 +29,7 @@ struct BigSize {
 };
 
 int a[MAXN + 10];
-BPlusTree<int, BigSize> bpt(true);
+BPlusTree<int, BigSize> bpt(true, "tmp/test.datl");
 
 int main() {
 	srand(110);
@@ -39,8 +39,17 @@ int main() {
     for(int i = 1; i <= MAXN; i++)
     	a[i] = i;
     random_shuffle(a + 1, a + 1 + MAXN);
-    for(int i = 1; i <= MAXN; i++)
-    	bpt.insert(a[i], i);
+    for(int i = 1; i <= MAXN; i++) {
+        if (i == 220)
+            cout << "pause" << endl;
+        auto p = bpt.search(a[i]);
+        if (p.second)
+            cout << i << "!!!" << endl;
+        bpt.insert(a[i], i);
+        p = bpt.search(a[i]);
+        if (!p.second)
+            cout << i << "!!" << endl;
+    }
     for(int i = 1; i <= MAXN; i++)
     {
     	auto p = bpt.search(i);
@@ -63,6 +72,6 @@ int main() {
 #endif
     end = clock();
     cout << (double)(end - start) / CLOCKS_PER_SEC << endl;
-    system("PAUSE");
+//    system("PAUSE");
     return 0;
 }
