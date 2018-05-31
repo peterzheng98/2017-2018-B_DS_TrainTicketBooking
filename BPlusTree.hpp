@@ -92,6 +92,8 @@ public:
 private:
     off_t alloc(){
         off_t s = core.slot;
+        if (s == 106496)
+            system("PAUSE");
         core.slot += UNIT;
         write(&core, core.pos);
         return s;
@@ -233,6 +235,8 @@ private:
             Index *id = binarySearchKey(tn, oldKey);
             if (id == end(tn))
                 return;
+            if (id->key != oldKey)
+                system("PAUSE");
             id->key = newKey;
             write(&tn, parent);
             if (id == end(tn) - 1)
@@ -537,14 +541,14 @@ private:
                 }
                 tn.index[i].key = key;
                 tn.index[i].child = child;
-                if (i == tn.size) {
-                    updateChildIndex(tn.parent, tn.index[i - 1].key, key);
-                }
-                else {
-                    updateChildIndex(tn.parent, sib.index[0].key, tn.index[tn.size].key);
-                }
                 ++tn.size;
                 write(&tn, offset);
+                if (i == tn.size - 1) {
+                    updateChildIndex(tn.parent, sib.index[0].key, key);
+                }
+                else {
+                    updateChildIndex(tn.parent, sib.index[0].key, tn.index[tn.size - 1].key);
+                }
             }
             else{
                 TreeNode newNode;

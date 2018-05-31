@@ -20,7 +20,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\BPlusTreeTest.cpp">
+    <ClCompile Include="..\..\BPlusTreeTest_.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

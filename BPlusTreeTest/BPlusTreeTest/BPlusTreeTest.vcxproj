@@ -114,7 +114,7 @@
     <ClInclude Include="..\..\BPlusTree.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\BPlusTreeTest.cpp" />
+    <ClCompile Include="..\..\BPlusTreeTest_.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
