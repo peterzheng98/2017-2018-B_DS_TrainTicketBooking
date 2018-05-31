@@ -23,7 +23,8 @@ import java.util.*
 /**
  * A fragment representing a list of Items.
  * Activities containing this fragment MUST implement the
- * [resultFragment.OnListFragmentInteractionListener] interface.
+ * [resultFragment.OnListFrag() {
+mentInteractionListener] interface.
  */
 
 class ticketBookingResultActivity : AppCompatActivity(){
@@ -46,8 +47,7 @@ class ticketBookingResultActivity : AppCompatActivity(){
     }
 }
 /*
-class resultFragment : Fragment() {
-
+class resultFragment : Fragment
     // TODO: Customize parameters
     private var columnCount = 1
 

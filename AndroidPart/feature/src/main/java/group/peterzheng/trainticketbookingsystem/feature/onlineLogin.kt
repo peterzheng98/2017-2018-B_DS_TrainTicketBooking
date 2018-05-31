@@ -17,32 +17,32 @@ class onlineLogin : AppCompatActivity() {
         if (DataCenter.Companion.UserState.Companion.UserLoginResult != -1) {
             passName.setText(DataCenter.Companion.UserState.UserName);
             passWord.setText(DataCenter.Companion.UserState.UserWord);
-                loginResult.setText("您已登录，请直接单击登录按钮")
-            }
+            loginResult.setText("您已登录，请直接单击登录按钮")
+        }
+    }
+
+    fun initView() {
+        loginResult.visibility = TextView.INVISIBLE
+
+        clearButton.setOnClickListener {
+            passName.setText("")
+            passWord.setText("")
         }
 
-        fun initView() {
-            loginResult.visibility = TextView.INVISIBLE
-
-            clearButton.setOnClickListener {
-                passName.setText("")
-                passWord.setText("")
-            }
-
-            loginButton.setOnClickListener {
-                if (DataCenter.Companion.UserState.Companion.UserLoginResult != -1) {
-                    // Intent to next page
+        loginButton.setOnClickListener {
+            if (DataCenter.Companion.UserState.Companion.UserLoginResult != -1) {
+                // Intent to next page
+            } else {
+                var result: Boolean
+                result = DataCenter.Companion.Query.Companion.QueryUser(passName.text.toString(), passWord.text.toString());
+                loginResult.visibility = TextView.VISIBLE
+                if (result) {
+                    loginResult.setText("登录成功！")
+                    println("用户名 " + passName.text.toString() + " 密码 " + passWord.text.toString() + " 登录成功！")
                 } else {
-                    var result: Boolean
-                    result = DataCenter.Companion.Query.Companion.QueryUser(passName.text.toString(), passWord.text.toString());
-                    loginResult.visibility = TextView.VISIBLE
-                    if (result) {
-                        loginResult.setText("登录成功！")
-                        println("用户名 " + passName.text.toString() + " 密码 " + passWord.text.toString() + " 登录成功！")
-                    } else {
-                        loginResult.setText("登录失败！密码错误！")
-                        println("用户名 " + passName.text.toString() + " 密码 " + passWord.text.toString() + " 登录失败！")
-                    }
+                    loginResult.setText("登录失败！密码错误！")
+                    println("用户名 " + passName.text.toString() + " 密码 " + passWord.text.toString() + " 登录失败！")
+                }
             }
         }
 

@@ -177,7 +177,7 @@
         app:layout_constraintVertical_bias="0.7" />
 
     <Button
-        android:id="@+id/passwordCheckUser"
+        android:id="@+id/registerCheckWord"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -214,8 +214,8 @@
 
     <TextView
         android:id="@+id/registerResult"
-        android:layout_width="69dp"
-        android:layout_height="52dp"
+        android:layout_width="239dp"
+        android:layout_height="54dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
@@ -225,9 +225,9 @@
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.461"
+        app:layout_constraintHorizontal_bias="0.387"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.559" />
+        app:layout_constraintVertical_bias="0.562" />
 
 </android.support.constraint.ConstraintLayout>

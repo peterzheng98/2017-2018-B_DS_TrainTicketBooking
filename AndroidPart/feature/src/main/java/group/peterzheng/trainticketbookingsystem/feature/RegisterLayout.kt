@@ -24,9 +24,13 @@ class RegisterLayout : AppCompatActivity() {
         var flagName : Boolean = false
         var flagWord : Boolean = false
 
+        var stringName : String = ""
+        var stringWord : String = ""
+
         registerCheckUser.setOnClickListener {
             registerResult.visibility = TextView.VISIBLE
             var l : Int = registerName.text.length
+            flagName = false
             when {
                 registerName.text.toString() == "hzfengsy" -> registerResult.setText("该用户已被ban！")
                 l == 0 -> registerResult.setText("用户名不能为空！")
@@ -40,27 +44,35 @@ class RegisterLayout : AppCompatActivity() {
                             flagName = false
                             break
                         }
-                    if(flagName == true)registerResult.setText("用户名正确！")
+                    if(flagName == true){
+                        //TODO
+                        stringName = a
+                        registerResult.setText("用户名正确！")
+                    }
                 }
             }
         }
 
-        passwordCheckUser.setOnClickListener {
+        registerCheckWord.setOnClickListener {
             registerResult.visibility = TextView.VISIBLE
             var l : Int = registerWord.text.length
+            flagWord = false
             when {
                 l == 0 -> registerResult.setText("密码不能为空！")
                 l < 6 || l > 32 -> registerResult.setText("密码长度应在6到32之间！")
                 else -> {
                     flagWord = true
-                    var a : String = registerName.text.toString()
+                    var a : String = registerWord.text.toString()
                     for(i in 0..l - 1)
-                        if(!((a[i] >= 'a' && a[i] <= 'z') || (a[i] >= 'A' && a[i] <= 'Z') || (a[i] >= '0' && a[i] <= '9') || a[i] == '_') || a[i] == '!' || a[i] == '?') {
+                        if(!((a[i] >= 'a' && a[i] <= 'z') || (a[i] >= 'A' && a[i] <= 'Z') || (a[i] >= '0' && a[i] <= '9') || a[i] == '_' || a[i] == '!' || a[i] == '?')) {
                             registerResult.setText("密码只能包含大小写字母或数字或'_,!,?'！")
                             flagWord = false
                             break
                         }
-                    if(flagWord == true)registerResult.setText("密码正确！")
+                    if(flagWord == true) {
+                        stringWord  = a
+                        registerResult.setText("密码正确！")
+                    }
                 }
             }
         }
@@ -68,8 +80,10 @@ class RegisterLayout : AppCompatActivity() {
         register.setOnClickListener{
             registerResult.visibility = TextView.VISIBLE
             when {
-                flagName == false -> registerResult.setText("请先验证用户名")
-                flagWord == false -> registerResult.setText("请先验证密码")
+                stringName != registerName.text.toString() -> registerResult.setText("请重新验证用户名！")
+                stringWord != registerWord.text.toString() -> registerResult.setText("请重新验证密码！")
+                flagName == false -> registerResult.setText("请先验证用户名！")
+                flagWord == false -> registerResult.setText("请先验证密码！")
                 registerPhone.text.isEmpty() -> registerResult.setText("手机号不能为空！")
                 registerPhone.text.length != 11 -> registerResult.setText("请输入正确的手机号！")
                 registerMail.text.isEmpty() -> registerResult.setText("邮箱地址不能为空！")
@@ -82,7 +96,12 @@ class RegisterLayout : AppCompatActivity() {
                     if(cnt != 1)registerResult.setText("请输入正确的邮箱地址！")
                     else
                     {
+                        DataCenter.Companion.UserState.UserName = stringName
+                        DataCenter.Companion.UserState.UserLevel = 0
                         registerResult.setText("注册成功")
+                        var intent = Intent()
+                        intent.setClass(this, ControlPanel::class.java)
+                        startActivity(intent)
                         //TODO
                     }
                 }
