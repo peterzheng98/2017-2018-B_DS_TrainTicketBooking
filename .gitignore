@@ -1,6 +1,9 @@
 #Test Android Dictionary
 MyApplication/
 MyApplication/.idea
+# Test Data
+*.in
+
 # Compiled class file
 *.class
 
