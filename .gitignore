@@ -396,7 +396,9 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
-# BPlusTree Cache
+# Cache
 tmp/
 *.txt
 *.dat
+*.in
+*.out

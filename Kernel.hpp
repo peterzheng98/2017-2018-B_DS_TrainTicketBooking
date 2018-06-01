@@ -324,6 +324,17 @@ namespace Kernel {
             return Success;
         }
 
+        Status I_addTrain(const String &t_id, const String &t_name, int t_catalog, short t_sNum, short t_tKind){
+            train newTrain;
+            newTrain.t_id = t_id;
+            newTrain.t_name = t_name;
+            newTrain.t_catalog = t_catalog;
+            newTrain.t_ticketKind = t_tKind;
+            newTrain.t_onSale = false;
+            trainTree.insert(t_id, newTrain);
+            return Success;
+        }
+
         Status I_addTrainTicket(const String &tk_id, int t_stationNum, float *t_priceNum) {
             auto trSel = trainTree.search(tk_id);
             if (!trSel.second)
