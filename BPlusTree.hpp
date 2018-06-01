@@ -40,8 +40,8 @@ private:
         Val value;
     };
 
-    static const size_t M = 10;//(4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Index));
-    static const size_t L = 10;//(4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Record));
+    static const size_t M = (4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Index));
+    static const size_t L = (4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Record));
 
     struct LeafNode{
         off_t parent = 0;
@@ -233,8 +233,6 @@ private:
             Index *id = binarySearchKey(tn, oldKey);
             if (id == end(tn))
                 return;
-            if (id->key != oldKey)
-                system("PAUSE");
             id->key = newKey;
             write(&tn, parent);
             if (id == end(tn) - 1)
@@ -485,13 +483,19 @@ private:
         off_t parent = core.root, prt;
         if (tn.size == 0)
             return tn.index[0].child;
-        //if (core.height == 6)
-        //    system("PAUSE");
+        //if (core.height == 3)
+         //   cout << "pause" << endl;
         Index *id;
         for (int i = 1; i <= core.height - 2; ++i){
             id = binarySearchKey(tn, key);
             prt = id->child;
             read(&tn, id->child);
+            /*if (tn.succ != 0) {
+                TreeNode sib;
+                read(&sib, tn.succ);
+                if (!comp(tn.index[tn.size - 1].key, sib.index[0].key))
+                    cout << "pause" << endl;
+            }*/
             if (parent > 0 && tn.parent != parent) {
                 tn.parent = parent;
                 write(&tn, prt);
@@ -537,29 +541,41 @@ private:
             read(&sib, tn.succ);
             if (sib.size != M){
                 copyBackIndex(begin(sib), end(sib), end(sib) + 1);
-                copyIndex(end(tn) - 1, end(tn), begin(sib));
-                if (!mode)
-                    updateNodeParentPos(begin(sib), begin(sib) + 1, tn.succ);
-                else
-                    updateLeafParentPos(begin(sib), begin(sib) + 1, tn.succ);
-                ++sib.size;
-                --tn.size;
-                write(&sib, tn.succ);
-                int i;
-                for (i = tn.size; i > 0; --i) {
-                    if (!comp(key, tn.index[i - 1].key))
-                        break;
-                    tn.index[i] = tn.index[i - 1];
-                }
-                tn.index[i].key = key;
-                tn.index[i].child = child;
-                ++tn.size;
-                write(&tn, offset);
-                if (i == tn.size - 1) {
-                    updateChildIndex(tn.parent, sib.index[0].key, key);
+                if (comp(tn.index[tn.size - 1].key, key)) {
+                    sib.index[0].key = key;
+                    sib.index[0].child = child;
+                    ++sib.size;
+                    write(&sib, tn.succ);
+                    if (mode)
+                        updateLeafParentPos(end(sib) - 1, end(sib), tn.succ);
+                    else
+                        updateNodeParentPos(end(sib) - 1, end(sib), tn.succ);
                 }
                 else {
-                    updateChildIndex(tn.parent, sib.index[0].key, tn.index[tn.size - 1].key);
+                    copyIndex(end(tn) - 1, end(tn), begin(sib));
+                    if (!mode)
+                        updateNodeParentPos(begin(sib), begin(sib) + 1, tn.succ);
+                    else
+                        updateLeafParentPos(begin(sib), begin(sib) + 1, tn.succ);
+                    ++sib.size;
+                    --tn.size;
+                    write(&sib, tn.succ);
+                    int i;
+                    for (i = tn.size; i > 0; --i) {
+                        if (!comp(key, tn.index[i - 1].key))
+                            break;
+                        tn.index[i] = tn.index[i - 1];
+                    }
+                    tn.index[i].key = key;
+                    tn.index[i].child = child;
+                    ++tn.size;
+                    write(&tn, offset);
+                    if (i == tn.size - 1) {
+                        updateChildIndex(tn.parent, sib.index[0].key, key);
+                    }
+                    else {
+                        updateChildIndex(tn.parent, sib.index[0].key, tn.index[tn.size - 1].key);
+                    }
                 }
             }
             else{
