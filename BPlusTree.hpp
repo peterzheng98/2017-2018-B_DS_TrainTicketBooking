@@ -92,8 +92,6 @@ public:
 private:
     off_t alloc(){
         off_t s = core.slot;
-        if (s == 106496)
-            system("PAUSE");
         core.slot += UNIT;
         write(&core, core.pos);
         return s;
@@ -484,6 +482,7 @@ private:
     off_t findKey(const Key &key, bool mode = false) {
         TreeNode tn;
         read(&tn, core.root);
+        off_t parent = core.root, prt;
         if (tn.size == 0)
             return tn.index[0].child;
         //if (core.height == 6)
@@ -491,15 +490,28 @@ private:
         Index *id;
         for (int i = 1; i <= core.height - 2; ++i){
             id = binarySearchKey(tn, key);
+            prt = id->child;
             read(&tn, id->child);
+            if (parent > 0 && tn.parent != parent) {
+                tn.parent = parent;
+                write(&tn, prt);
+            }
+            parent = prt;
         }
         id = binarySearchKey(tn, key);
-        if (mode)
+        prt = id->child;
+        LeafNode ln;
+        read(&ln, id->child);
+        if (parent > 0 && ln.parent != parent) {
+            ln.parent = parent;
+            write(&ln, prt);
+        }
+        if (!comp(key, id->key) && !comp(id->key, key))
             return id->child;
-        if (comp(id->key, key) || comp(key, id->key))
-            return 0;
+        else if (mode)
+            return id->child;
         else
-            return id->child;
+            return 0;
     }
 
     void insertNewIndex(off_t offset, const Key &key, off_t child, bool mode = false){

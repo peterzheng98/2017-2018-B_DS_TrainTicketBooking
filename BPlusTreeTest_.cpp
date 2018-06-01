@@ -10,7 +10,7 @@
 using namespace std;
 using namespace myAlgorithm;
 
-const int MAXN = 300;
+const int MAXN = 1000;
 
 struct BigSize {
     int k = 0;
@@ -32,7 +32,7 @@ int a[MAXN + 10];
 BPlusTree<int, BigSize> bpt(true);
 
 int main() {
-	srand(110);
+	srand(101);
     clock_t start, end;
     cout << "START" << endl;
     start = clock();
@@ -40,7 +40,7 @@ int main() {
     	a[i] = i;
     random_shuffle(a + 1, a + 1 + MAXN);
     for(int i = 1; i <= MAXN; i++) {
-        if (i == 264)
+        if (i == 254)
             cout << "pause" << endl;
         auto p = bpt.search(a[i]);
         if (p.second)
@@ -72,6 +72,6 @@ int main() {
 #endif
     end = clock();
     cout << (double)(end - start) / CLOCKS_PER_SEC << endl;
-//    system("PAUSE");
+    system("PAUSE");
     return 0;
 }
