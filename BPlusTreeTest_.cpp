@@ -29,7 +29,7 @@ struct BigSize {
 };
 
 int a[MAXN + 10];
-BPlusTree<int, BigSize> bpt(true, "tmp/test.datl");
+BPlusTree<int, BigSize> bpt(true);
 
 int main() {
 	srand(110);
@@ -40,7 +40,7 @@ int main() {
     	a[i] = i;
     random_shuffle(a + 1, a + 1 + MAXN);
     for(int i = 1; i <= MAXN; i++) {
-        if (i == 220)
+        if (i == 264)
             cout << "pause" << endl;
         auto p = bpt.search(a[i]);
         if (p.second)
