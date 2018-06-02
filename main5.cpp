@@ -23,11 +23,11 @@ int main(){
 
 
     sort(result, result + i);
-    cout << "//Auto Generator v0.1\n";
-    cout << "//Total Count : " << i << "\n";
-    cout << "myAlgorithm::String InternalStation[] = {";
-    for(int j = 0; j < i - 1;j++) cout << "\"" << result[j] << "\",\n";
-    cout << "\"" << result[i - 1] << "\"}\n";
+//    cout << "//Auto Generator v0.1\n";
+//    cout << "//Total Count : " << i << "\n";
+//    cout << "myAlgorithm::String InternalStation[] = {";
+    for(int j = 0; j < i - 1;j++) cout /*< "\"" */<< result[j] /*<< "\",\n"*/ << "\n";
+    cout /*<< "\""*/ << result[i - 1] << /*"\"}\n"*/ "\n";
     fclose(stdin);
     fclose(stdout);
 }

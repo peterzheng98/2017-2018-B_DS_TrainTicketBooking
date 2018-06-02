@@ -49,6 +49,7 @@ namespace myAlgorithm {
         String() {
             len = 0;
             for (int i = 0; i < len; i++) data[i] = 0;
+            locale = ENGLISH;
         }
 
         String(const String &rhs) {
@@ -106,6 +107,7 @@ namespace myAlgorithm {
             if (len + rhs.length() > sizeMax) throw 1; //TODO: string too long
             int newLen = len + rhs.length();
             for (int i = len; i < newLen; ++i) data[i] = rhs[i - len];
+            len = newLen;
             return *this;
         }
 
