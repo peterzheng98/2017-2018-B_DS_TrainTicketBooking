@@ -180,8 +180,8 @@ public:
         }
         if (firstWord == "exit") {
             cout << "BYE\n";
-//            return false;
-            return true;
+            return false;
+//            return true;
         }
         if (firstWord == "clean") {
             cout << "1\n";
