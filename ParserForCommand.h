@@ -28,7 +28,7 @@ public:
         deleteA = Delete();
     };
 
-    int Parser(ifstream &is) {
+    int Parser(istream &is) {
         myAlgorithm::String firstWord;
         is >> firstWord;
         if (firstWord == "register") {
@@ -36,6 +36,9 @@ public:
             is >> p_name >> p_word >> p_email >> p_phone;
             int id = 0;
             long long test = p_phone.toLong();
+//            if(test == 42311888){
+//                cout << "Fuck Here!\n";
+//            }
             Status ret = insert.I_addUser(p_name, p_word, p_email, p_phone.toLong(), id);
             if (ret == Success) cout << id << "\n"; else cout << "-1\n";
             return true;
@@ -126,13 +129,13 @@ public:
 #endif
         }
         if (firstWord == "query_train") {
-            String p_id;
-            is >> p_id;
-            train ret = train();
-            Status rett = select.I_selectTrain(p_id, ret);
-            //TODO : Output Train
-            cout << ret.t_id << " " << ret.t_name << ret.t_catalog << " ";
-            if (rett != Success) cout << "0\n"; else cout << "\n";
+//            String p_id;
+//            is >> p_id;
+//            train ret = train();
+//            Status rett = select.I_selectTrain(p_id, ret);
+//            TODO : Output Train
+//            cout << ret.t_id << " " << ret.t_name << ret.t_catalog << " ";
+//            if (rett != Success) cout << "0\n"; else cout << "\n";
             return true;
         }
         if (firstWord == "modify_profile") {
@@ -184,7 +187,9 @@ public:
             cout << "1\n";
             return true;
         }
-        return !(firstWord == "fuck");
+        if(firstWord == "fuck"){
+            return false;
+        }
     }
 
     ~ParserForCommand() {

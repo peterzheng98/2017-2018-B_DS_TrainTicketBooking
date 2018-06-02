@@ -250,7 +250,7 @@ static int ticketId = 1;
 static Date startDate(2018, 6, 1), endDate(2018, 6, 30);
 
 BPlusTree<int, user> userIdTree(true, "tmp/user.dat");
-BPlusTree<String, int> userNameTree(true, "tmp/userName.dat");
+//BPlusTree<String, int> userNameTree(true, "tmp/userName.dat");
 BPlusTree<ticketKey, ticket> ticketTree(true, "tmp/ticket.dat");
 BPlusTree<int, ticket> ticketIdTree(true, "tmp/ticketId.dat");
 BPlusTree<Pair<int, int>, Pair<int, int>> userTicketTree(true, "tmp/userTicket.dat");
@@ -266,16 +266,16 @@ namespace Kernel {
     public:
         Insert() {}
 
-        Status I_addUser(String p_name, String p_word, String p_email, long long p_phone, int &p_id) {
-            auto nameHasExisted = userNameTree.search(p_name);
+        Status I_addUser(const String &p_name, const String &p_word, const String &p_email, long long p_phone, int &p_id) {
+            /*auto nameHasExisted = userNameTree.search(p_name);
             if (nameHasExisted.second) {
                 p_id = 0;
                 return NameHasExisted;
-            }
+            }*/
             user newUser(nowId, p_name, p_word, p_email, p_phone);
             p_id = nowId++;
             userIdTree.insert(p_id, newUser);
-            userNameTree.insert(p_name, p_id);
+            //userNameTree.insert(p_name, p_id);
             return Success;
         }
 
@@ -367,7 +367,7 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_selectUser(String p_name, String p_word) {
+        /*Status I_selectUser(String p_name, String p_word) {
             auto userNameSel = userNameTree.search(p_name);
             if (!userNameSel.second)
                 return NoThisUser;
@@ -377,7 +377,7 @@ namespace Kernel {
             if (userSel.first.M_password() != p_word)
                 return NoThisUser;
             return Success;
-        }
+        }*/
 
         Status I_selectUser(int p_id, String &p_name, String &p_email, long long &p_phone, UserPrivilege &up) {
             auto userSel = userIdTree.search(p_id);
