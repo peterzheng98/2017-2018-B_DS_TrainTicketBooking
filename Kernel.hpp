@@ -249,12 +249,12 @@ static int nowId = 2018;
 static int ticketId = 1;
 static Date startDate(2018, 6, 1), endDate(2018, 6, 30);
 
-BPlusTree<int, user> userIdTree(true, "tmp/user.dat");
+BPlusTree<int, user> userIdTree(false, "tmp/user.dat");
 //BPlusTree<String, int> userNameTree(true, "tmp/userName.dat");
-BPlusTree<ticketKey, ticket> ticketTree(true, "tmp/ticket.dat");
-BPlusTree<int, ticket> ticketIdTree(true, "tmp/ticketId.dat");
-BPlusTree<Pair<int, int>, Pair<int, int>> userTicketTree(true, "tmp/userTicket.dat");
-BPlusTree<String, train> trainTree(true, "tmp/train.dat");
+BPlusTree<ticketKey, ticket> ticketTree(false, "tmp/ticket.dat");
+BPlusTree<int, ticket> ticketIdTree(false, "tmp/ticketId.dat");
+BPlusTree<Pair<int, int>, Pair<int, int>> userTicketTree(false, "tmp/userTicket.dat");
+BPlusTree<String, train> trainTree(false, "tmp/train.dat");
 
 namespace Kernel {
     class Interface {
@@ -583,6 +583,15 @@ namespace Kernel {
             if (trainSel.first.t_onSale)
                 return TrainHasBeenOnSale;
             trainTree.erase(p_id);
+            return Success;
+        }
+
+        Status I_deleteAll(){
+            userIdTree.clear();
+            ticketTree.clear();
+            ticketIdTree.clear();
+            userTicketTree.clear();
+            trainTree.clear();
             return Success;
         }
 

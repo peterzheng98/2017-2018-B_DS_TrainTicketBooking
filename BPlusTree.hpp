@@ -764,7 +764,22 @@ public:
         }
         else{
             openFile();
-            read(&core, UNIT);
+            char ch = fgetc(fp);
+            if (ch == EOF){
+                TreeNode rt;
+                alloc();
+                alloc();
+                core.root = alloc();
+                LeafNode ln;
+                ln.parent = core.root;
+                rt.index[0].child = alloc();
+                write(&rt, core.root);
+                write(&ln, rt.index[0].child);
+                core.height = 2;
+                write(&core, core.pos);
+            }
+            else
+                read(&core, UNIT);
         }
     }
 
@@ -987,6 +1002,28 @@ public:
 
     bool empty(){
         return (core._size == 0);
+    }
+
+    void clear(){
+        openFile("w+");
+        closeFile();
+        core.root = 0;
+        core.slot = 0;
+        core.pos = UNIT;
+        core._size = 0;
+        core.height = 0;
+        openFile();
+        TreeNode rt;
+        alloc();
+        alloc();
+        core.root = alloc();
+        LeafNode ln;
+        ln.parent = core.root;
+        rt.index[0].child = alloc();
+        write(&rt, core.root);
+        write(&ln, rt.index[0].child);
+        core.height = 2;
+        write(&core, core.pos);
     }
 };
 
