@@ -6,6 +6,7 @@
 #ifndef INC_2018DATASTRUCTUREBIGWORK_KERNEL_HPP
 #define INC_2018DATASTRUCTUREBIGWORK_KERNEL_HPP
 
+#include <cstdio>
 #include "CoreData.h"
 #include "BigNum.hpp"
 #include "String.h"
@@ -257,6 +258,19 @@ BPlusTree<Pair<int, int>, Pair<int, int>> userTicketTree(false, "tmp/userTicket.
 BPlusTree<String, train> trainTree(false, "tmp/train.dat");
 
 namespace Kernel {
+    void _init(){
+        FILE *fp;
+        fp = fopen("tmp/id.dat", "rw+");
+        fscanf(fp, "%d%d", &nowId, &ticketId);
+        fclose(fp);
+    }
+
+    void _exit(){
+        FILE *fp = fopen("tmp/id.dat", "w+");
+        fprintf(fp, "%d\n%d\n", nowId, ticketId);
+        fclose(fp);
+    }
+
     class Interface {
     public:
         ~Interface() {}
@@ -592,6 +606,11 @@ namespace Kernel {
             ticketIdTree.clear();
             userTicketTree.clear();
             trainTree.clear();
+            FILE *fp = fopen("tmp/id.dat", "w+");
+            fprintf(fp, "2018\n1\n");
+            fclose(fp);
+            nowId = 2018;
+            ticketId = 1;
             return Success;
         }
 

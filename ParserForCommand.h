@@ -26,9 +26,10 @@ public:
         update = Update();
         select = Select();
         deleteA = Delete();
+        _init();
     };
 
-    int Parser(istream &is) {
+    int Parser(ifstream &is) {
         myAlgorithm::String firstWord;
         is >> firstWord;
         if (firstWord == "register") {
@@ -179,11 +180,13 @@ public:
             return true;
         }
         if (firstWord == "exit") {
+            _exit();
             cout << "BYE\n";
             return false;
 //            return true;
         }
         if (firstWord == "clean") {
+            deleteA.I_deleteAll();
             cout << "1\n";
             return true;
         }
