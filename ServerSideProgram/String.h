@@ -39,7 +39,7 @@ namespace myAlgorithm {
         };
         Language locale;
     public:
-        const static short sizeMax = 128; // 128 bits char
+        const static short sizeMax = 8192; // 8192 bits char
     private:
         char data[sizeMax];
         int len = 0;

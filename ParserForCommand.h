@@ -50,6 +50,8 @@ public:
             return true;
         }
         if (firstWord == "add_train") {
+
+
 #ifdef DEBUGMODE_PARSER
             cout << "Line: " << __LINE__ << "add_train\n";
 //#endif
@@ -80,7 +82,8 @@ public:
             Status ret = select.I_selectUser((int) p_id, p_name, p_email, p_phone, p_up);
             if (ret == NoThisUser) cout << "0\n";
             else
-                cout << p_name << " " << p_word << " " << p_email << " " << p_phone << " " << (p_up == Admin ? "2\n" : "1\n");
+                cout << p_name << " " << p_word << " " << p_email << " " << p_phone << " "
+                     << (p_up == Admin ? "2\n" : "1\n");
             return true;
         }
         if (firstWord == "query_ticket") {
@@ -128,6 +131,7 @@ public:
             train ret = train();
             Status rett = select.I_selectTrain(p_id, ret);
             //TODO : Output Train
+            cout << ret.t_id << " " << ret.t_name << ret.t_catalog << " ";
             if (rett != Success) cout << "0\n"; else cout << "\n";
             return true;
         }
@@ -159,9 +163,10 @@ public:
 #endif
         }
         if (firstWord == "refund_ticket") {
-#ifdef DEBUGMODE_PARSER
-            cout << __LINE__;
-#endif
+            myAlgorithm::String p_id, p_num, p_tid, p_loc1, p_loc2, p_date, p_tkk;
+            is >> p_id >> p_num >> p_tid >> p_loc1 >> p_loc2 >> p_date >> p_tkk;
+            Status ret = deleteA.I_deleteUserBookedTicket((int) p_id, (Date) p_date, p_tid,
+                                                          Pair<short, short>(p_loc1, p_loc2), (int) p_tkk, (int) p_num);
         }
         if (firstWord == "delete_train") {
             String p_id;

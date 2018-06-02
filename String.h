@@ -29,6 +29,7 @@ namespace myAlgorithm {
         friend String operator+(const String &lhs, const String &rhs);
 
         friend String operator+(const String &lhs, const char &ch);
+
     public:
         const static short __SPLIT_STRING_WITH_CHAR = 0;
         const static short __SPLIT_STRING_WITHOUT_CHAR = 1;
@@ -63,6 +64,12 @@ namespace myAlgorithm {
             for (int i = 0; i < len; i++) data[i] = rhs[i];
             locale = rhs.Locale();
             return *this;
+        }
+
+        String(const char* ch) {
+            len = strlen(ch);
+            for (int i = 0; i < len; i++) data[i] = ch[i];
+            locale = ENGLISH;
         }
 
         explicit String(const char &ch) {
@@ -281,6 +288,7 @@ namespace myAlgorithm {
             return result;
         }
     };
+
     void split(const char &sgn, const String &source, String &s1, String &s2, int OPTION, bool &Result) {
         s1 = String();
         s2 = String();
@@ -298,6 +306,7 @@ namespace myAlgorithm {
         for (i = i + OPTION; i < Len; ++i) s2 += source[i];
         Result = true;
     }
+
     String operator+(const String &lhs, const String &rhs) {
         String ret(lhs);
         ret += rhs;

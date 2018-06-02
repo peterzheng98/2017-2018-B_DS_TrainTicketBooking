@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <cstdio>
+#include <ctime>
 #include "DateAndTime.h"
 
 #define LOGFILE "listen.lyg"
@@ -13,6 +14,8 @@ typedef unsigned long long ull;
 typedef long long ll;
 typedef unsigned short us;
 const int Port = 10774;
+const int bufferSize = 8192;
+
 pthread_t timer, logger;
 Timer globalTime;
 
@@ -24,28 +27,51 @@ void *TimerThread(void *arg) {
     }
 }
 
-void Write2File(char *msg,
+void Write2File(const char *msg,
                 const myAlgorithm::Date &date,
                 const LogLevel lg,
+                const char *model = "",
                 char *filePath = LOGFILE,
-                int timer = globalTime.getTime()) {
+                ull timer = globalTime.getTime()) {
+    FILE *fp = fopen(LOGFILE, "a+");
+    struct tm *t;
+    time_t tt;
+    time(&tt);
+    t = localtime(&tt);
+    printf("\n", );
     if (lg == Debug) {
 #ifdef ___DEBUG_MODE
-
+        fprintf(fp, "[%4d-%02d-%02d %02d:%02d:%02d Run:%lld second(s)]:D/%s : %s\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min,
+           t->tm_sec, timer, model, msg);
+        fclose(fp);
+        return;
 #endif
     }
     if (lg == Warning) {
-
+        fprintf(fp, "[%4d-%02d-%02d %02d:%02d:%02d Run:%lld second%s]:W/%s : %s\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min,
+                t->tm_sec, timer, (timer > 1 ? "s" : "") , model, msg);
+        fclose(fp);
+        return;
     }
     if (lg == Error) {
-
+        fprintf(fp, "[%4d-%02d-%02d %02d:%02d:%02d Run:%lld second%s]:E/%s : %s\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min,
+                t->tm_sec, timer, (timer > 1 ? "s" : "") , model, msg);
+        fclose(fp);
+        return;
     }
     if (lg == Information) {
-
+        fprintf(fp, "[%4d-%02d-%02d %02d:%02d:%02d Run:%lld second%s]:I/%s : %s\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min,
+                t->tm_sec, timer, (timer > 1 ? "s" : "") , model, msg);
+        fclose(fp);
+        return;
     }
     if (lg == Verbose) {
-
+        fprintf(fp, "[%4d-%02d-%02d %02d:%02d:%02d Run:%lld second%s]:V/%s : %s\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min,
+                t->tm_sec, timer, (timer > 1 ? "s" : "") , model, msg);
+        fclose(fp);
+        return;
     }
+    fclose(fp);
 }
 
 void error(char *msg) {
@@ -55,10 +81,10 @@ void error(char *msg) {
 
 void dostuff(int sock) {
     int n;
-    char buffer[256];
+    char buffer[bufferSize];
 
-    bzero(buffer, 256);
-    n = read(sock, buffer, 255);
+    bzero(buffer, bufferSize);
+    n = read(sock, buffer, bufferSize - 1);
     if (n < 0) error("ERROR reading from socket");
     printf("Here is the message: %s\n", buffer);
     n = write(sock, "I got your message", 18);
@@ -79,8 +105,7 @@ int main() {
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port = htons(Port);
-    if (bind(sockfd, (struct sockaddr *) &serv_addr,
-             sizeof(serv_addr)) < 0)
+    if (bind(sockfd, (sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
         error("ERROR on binding");
     listen(sockfd, 5);
     clientlen = sizeof(client_addr);
