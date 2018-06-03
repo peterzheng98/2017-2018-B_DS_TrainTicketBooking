@@ -9,6 +9,7 @@
 #include <fstream>
 #include <functional>
 #include <cstring>
+#include <unistd.h>
 #include "Vector.h"
 
 namespace myAlgorithm{
@@ -763,8 +764,13 @@ public:
             write(&core, core.pos);
         }
         else{
+            if (access(path, 0) == -1){
+                FILE *tmpfp = fopen(path, "wb+");
+                fclose(tmpfp);
+            }
             openFile();
             char ch = fgetc(fp);
+            //if (access(path,0)==)
             if (ch == EOF){
                 TreeNode rt;
                 alloc();
@@ -1005,7 +1011,7 @@ public:
     }
 
     void clear(){
-        openFile("w+");
+        openFile("wb+");
         closeFile();
         core.root = 0;
         core.slot = 0;

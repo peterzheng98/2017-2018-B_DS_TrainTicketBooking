@@ -1,8 +1,9 @@
 //
 // Created by Peter Zheng on 2018/06/03.
 //
-
+#define  _NO_DEBUG
 #include <iostream>
+#include <fstream>
 #include <cstdio>
 #include "String.h"
 #include "Kernel.hpp"
@@ -14,6 +15,22 @@ Insert insert;
 Update update;
 Select selectA;
 Delete deleteA;
+
+void whereIsMyFile() {
+    ofstream f1("user.dat", ios::ate),
+            f2("ticket.dat", ios::ate),
+            f3("ticketId.dat", ios::ate),
+            f4("userTicket.dat", ios::ate),
+            f5("train.dat", ios::ate),
+            f6("id.dat", ios::ate);
+    f1.close();
+    f2.close();
+    f3.close();
+    f4.close();
+    f5.close();
+    f6.close();
+
+}
 
 int main() {
     insert = Insert();
@@ -139,7 +156,7 @@ int main() {
         if (firstWord == "modify_privilege") {
             myAlgorithm::String p_id1, p_id2, privilege;
             cin >> p_id1 >> p_id2 >> privilege;
-            Status ret = update.I_updateUserPrivilege((short)p_id1, (short)p_id2, (short)privilege);
+            Status ret = update.I_updateUserPrivilege((short) p_id1, (short) p_id2, (short) privilege);
             if (ret == Success) cout << "1\n"; else cout << "0\n";
 
         }
