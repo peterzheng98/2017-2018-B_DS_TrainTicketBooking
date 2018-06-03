@@ -62,19 +62,11 @@ int main() {
 
         }
         if (firstWord == "add_train") {
+            myAlgorithm::String p_tid, p_name, p_catalog, p_num_s, p_num_p;
+            cin >> p_tid >> p_name >> p_catalog >> p_num_s >> p_num_p;
+            int limit = p_num_p;
 
 
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "add_train\n";
-    //#endif
-                String arg[4];
-                for (int i = 0; i < 4; ++i) cin >> arg[i];
-    //#ifdef DEBUGMODE_PARSER
-                cout << "Args: ";
-                for (int i = 0; i < 4; ++i)
-                    cout << "[" << i + 1 << "] : [" << arg[i] << "]   ";
-                cout << "\n";
-#endif
         }
         if (firstWord == "login") {
             myAlgorithm::String p_id, p_word;
@@ -188,9 +180,7 @@ int main() {
         if (firstWord == "exit") {
             _exit();
             cout << "BYE\n";
-//            exit(0);
             break;
-//            
         }
         if (firstWord == "clean") {
             deleteA.I_deleteAll();
