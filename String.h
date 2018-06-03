@@ -330,6 +330,7 @@ namespace myAlgorithm {
         while (!isspace(ch)) {
             rhs.data[rhs.len++] = ch;
             ch = getchar();
+            if(ch == EOF) break;
         }
         is.unget();
         return is;
@@ -372,6 +373,7 @@ namespace myAlgorithm {
         while (!isspace(ch)) {
             rhs.data[rhs.len++] = ch;
             is.get(ch);
+            if(ch == EOF) break;
         }
         return is;
     }

@@ -85,7 +85,7 @@ int main() {
             Status ret = selectA.I_selectUser((int) p_id, p_name, p_email, p_phone, p_up);
             if (ret == NoThisUser) cout << "0\n";
             else
-                cout << p_name << " " << p_word << " " << p_email << " " << p_phone << " "
+                cout << p_name << p_word << " " << p_email << " " << p_phone << " "
                      << (p_up == Admin ? "2\n" : "1\n");
 
         }
@@ -141,14 +141,14 @@ int main() {
         if (firstWord == "modify_profile") {
             myAlgorithm::String p_name, p_word, p_email, p_id, p_phone;
             cin >> p_id >> p_name >> p_word >> p_email >> p_phone;
-            Status ret = update.I_updateUser((short) p_id, p_name, p_word, p_email, p_phone);
+            Status ret = update.I_updateUser((int) p_id, p_name, p_word, p_email, p_phone);
             if (ret == Success) cout << "1\n"; else cout << "0\n";
 
         }
         if (firstWord == "modify_privilege") {
             myAlgorithm::String p_id1, p_id2, privilege;
             cin >> p_id1 >> p_id2 >> privilege;
-            Status ret = update.I_updateUserPrivilege((short) p_id1, (short) p_id2, (short) privilege);
+            Status ret = update.I_updateUserPrivilege((int) p_id1, (int) p_id2, (short) privilege);
             if (ret == Success) cout << "1\n"; else cout << "0\n";
 
         }
