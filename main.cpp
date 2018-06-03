@@ -182,6 +182,7 @@ public:
         }
         if (firstWord == "clean") {
             cout << "1\n";
+            deleteA.I_deleteAll();
             return true;
         }
         if (firstWord == "fuck") {
@@ -201,7 +202,7 @@ int main() {
 //        cout << "Press 1 and Enter To Next";
 //        cin >> t;
     }
-//    cout << "Here!";
+    cout << "Here!";
 //    myAlgorithm::String string1;
 //    cin >> string1;
 //    if(string1 == "测试数据") cout << "Here!";
