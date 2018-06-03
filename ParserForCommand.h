@@ -36,11 +36,7 @@ public:
             myAlgorithm::String p_name, p_word, p_email, p_phone;
             is >> p_name >> p_word >> p_email >> p_phone;
             int id = 0;
-            long long test = p_phone.toLong();
-//            if(test == 42311888){
-//                cout << "Fuck Here!\n";
-//            }
-            Status ret = insert.I_addUser(p_name, p_word, p_email, p_phone.toLong(), id);
+            Status ret = insert.I_addUser(p_name, p_word, p_email, p_phone, id);
             if (ret == Success) cout << id << "\n"; else cout << "-1\n";
             return true;
         }
@@ -79,8 +75,7 @@ public:
         if (firstWord == "query_profile") {
             myAlgorithm::String p_id;
             is >> p_id;
-            myAlgorithm::String p_name, p_email, p_word;
-            long long p_phone;
+            myAlgorithm::String p_name, p_email, p_word, p_phone;
             UserPrivilege p_up;
             //TODO : BUG HERE(Require User Priviliege)
             Status ret = select.I_selectUser((int) p_id, p_name, p_email, p_phone, p_up);
@@ -142,8 +137,7 @@ public:
         if (firstWord == "modify_profile") {
             myAlgorithm::String p_name, p_word, p_email, p_id, p_phone;
             is >> p_id >> p_name >> p_word >> p_email >> p_phone;
-            long long pp_p = p_phone;
-            Status ret = update.I_updateUser((short) p_id, p_name, p_word, p_email, pp_p);
+            Status ret = update.I_updateUser((short) p_id, p_name, p_word, p_email, p_phone);
             if (ret == Success) cout << "1\n"; else cout << "0\n";
             return true;
         }

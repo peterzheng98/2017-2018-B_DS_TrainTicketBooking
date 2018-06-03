@@ -20,6 +20,7 @@ public:
         update = Update();
         select = Select();
         deleteA = Delete();
+        _init();
     };
 
     int Parser() {
@@ -29,11 +30,7 @@ public:
             myAlgorithm::String p_name, p_word, p_email, p_phone;
             cin >> p_name >> p_word >> p_email >> p_phone;
             int id = 0;
-            long long test = p_phone.toLong();
-//            if(test == 42311888){
-//                cout << "Fuck Here!\n";
-//            }
-            Status ret = insert.I_addUser(p_name, p_word, p_email, p_phone.toLong(), id);
+            Status ret = insert.I_addUser(p_name, p_word, p_email, p_phone, id);
             if (ret == Success) cout << id << "\n"; else cout << "-1\n";
             return true;
         }
@@ -72,18 +69,14 @@ public:
         if (firstWord == "query_profile") {
             myAlgorithm::String p_id;
             cin >> p_id;
-            myAlgorithm::String p_name, p_email, p_word;
-            long long p_phone;
+            myAlgorithm::String p_name, p_email, p_word, p_phone;
             UserPrivilege p_up;
             //TODO : BUG HERE(Require User Priviliege)
             Status ret = select.I_selectUser((int) p_id, p_name, p_email, p_phone, p_up);
             if (ret == NoThisUser) cout << "0\n";
-            else {
-                cout << p_name << p_word << " " << p_email << " ";
-                printf("%08lld", p_phone);
-                cout << " "
+            else
+                cout << p_name << " " << p_word << " " << p_email << " " << p_phone << " "
                      << (p_up == Admin ? "2\n" : "1\n");
-            }
             return true;
         }
         if (firstWord == "query_ticket") {
@@ -138,8 +131,7 @@ public:
         if (firstWord == "modify_profile") {
             myAlgorithm::String p_name, p_word, p_email, p_id, p_phone;
             cin >> p_id >> p_name >> p_word >> p_email >> p_phone;
-            long long pp_p = p_phone;
-            Status ret = update.I_updateUser((short) p_id, p_name, p_word, p_email, pp_p);
+            Status ret = update.I_updateUser((short) p_id, p_name, p_word, p_email, p_phone);
             if (ret == Success) cout << "1\n"; else cout << "0\n";
             return true;
         }
@@ -176,16 +168,17 @@ public:
             return true;
         }
         if (firstWord == "exit") {
+            _exit();
             cout << "BYE\n";
             return false;
 //            return true;
         }
         if (firstWord == "clean") {
-            cout << "1\n";
             deleteA.I_deleteAll();
+            cout << "1\n";
             return true;
         }
-        if (firstWord == "fuck") {
+        if(firstWord == "fuck"){
             return false;
         }
     }

@@ -191,12 +191,12 @@ private:
     String p_username;
     String p_password;
     String p_email;
-    long long p_phone;
+    String p_phone;
     UserPrivilege p_userPrivilege;
 public:
     user() = default;
 
-    user(int id, const String &nme, const String &pwd, const String &eml, long long phn)
+    user(int id, const String &nme, const String &pwd, const String &eml, const String &phn)
             : p_id(id), p_username(nme), p_password(pwd), p_email(eml), p_phone(phn) {
         p_userPrivilege = (id == 2018 ? Admin : User);
     }
@@ -237,7 +237,7 @@ public:
         return p_email;
     }
 
-    long long M_phone() const {
+    String M_phone() const {
         return p_phone;
     }
 
@@ -280,7 +280,7 @@ namespace Kernel {
     public:
         Insert() {}
 
-        Status I_addUser(const String &p_name, const String &p_word, const String &p_email, long long p_phone, int &p_id) {
+        Status I_addUser(const String &p_name, const String &p_word, const String &p_email, const String &p_phone, int &p_id) {
             /*auto nameHasExisted = userNameTree.search(p_name);
             if (nameHasExisted.second) {
                 p_id = 0;
@@ -393,7 +393,7 @@ namespace Kernel {
             return Success;
         }*/
 
-        Status I_selectUser(int p_id, String &p_name, String &p_email, long long &p_phone, UserPrivilege &up) {
+        Status I_selectUser(int p_id, String &p_name, String &p_email, String &p_phone, UserPrivilege &up) {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
@@ -480,7 +480,7 @@ namespace Kernel {
     public:
         Update() {}
 
-        Status I_updateUser(int p_id, const String &p_name, const String &p_pwd, const String &p_email, long long &p_phone) {
+        Status I_updateUser(int p_id, const String &p_name, const String &p_pwd, const String &p_email, const String &p_phone) {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
