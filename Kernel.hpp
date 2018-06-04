@@ -298,7 +298,7 @@ namespace Kernel {
     }
 
     inline short kind2short(const myAlgorithm::String& kind){
-        if(kind == "一等座") return 0;
+        if(kind == "一等座") return 11;
         if(kind == "二等座") return 1;
         if(kind == "动卧") return 2;
         if(kind == "商务座") return 3;
@@ -312,7 +312,7 @@ namespace Kernel {
     }
 
     inline myAlgorithm::String short2Kind(const short& sha){
-        if(sha == 0) return "一等座";
+        if(sha == 11) return "一等座";
         if(sha == 1) return "二等座";
         if(sha == 2) return "动卧";
         if(sha == 3) return "商务座";
