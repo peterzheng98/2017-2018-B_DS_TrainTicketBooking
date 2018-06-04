@@ -252,6 +252,17 @@ namespace myAlgorithm {
             return result;
         }
 
+        float toFloat() const{
+            int seg = 0, lenp = 1, flag = 0;
+            for(int i = 0; i < len; ++i){
+                if(data[i] == '.') flag = 1;
+                if(data[i] < '0' || data[i] > '9') continue;
+                if(data[i] >= '0' && data[i] <= '9') seg = seg * 10 + data[i] - '0';
+                if(flag) lenp *= 10;
+            }
+            return (float(seg)) / lenp;
+        }
+
         void split(const char &sgn, const String &source, String &s1, String &s2, int OPTION, bool &Result) {
             s1 = String();
             s2 = String();
