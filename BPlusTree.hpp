@@ -61,6 +61,7 @@ private:
 private:
     char path[1024];
     mutable FILE *fp = nullptr;
+    mutable bool isOpen = false;
 
     struct CoreData{
         off_t root = 0, slot = 0, pos = UNIT;
@@ -78,18 +79,26 @@ private:
 public:
 #endif
     void openFile(const char *mode = "rb+") const{
-        fp = fopen(path, mode);
+        if (!isOpen){
+            fp = fopen(path, mode);
+            isOpen = true;
+        }
     }
     
     void closeFile() const{
-        fclose(fp);
+        if (isOpen){
+            fclose(fp);
+            isOpen = false;
+        }
     }
 
 private:
     off_t alloc(){
         off_t s = core.slot;
         core.slot += UNIT;
+#ifndef _NO_DEBUG
         write(&core, core.pos);
+#endif
         return s;
     }
 
@@ -277,7 +286,9 @@ private:
                     core.root = tn.prev;
                     sib.parent = 0;
                     --core.height;
+#ifndef _NO_DEBUG
                     write(&core, core.pos);
+#endif
                 }
                 write(&sib, tn.prev);
             }
@@ -289,7 +300,9 @@ private:
                     core.root = tn.succ;
                     sib.parent = 0;
                     --core.height;
+#ifndef _NO_DEBUG
                     write(&core, core.pos);
+#endif
                 }
                 write(&sib, tn.succ);
             }
@@ -305,7 +318,9 @@ private:
                         core.root = offset;
                         tn.parent = 0;
                         --core.height;
+#ifndef _NO_DEBUG
                         write(&core, core.pos);
+#endif
                     }
                     write(&tn, offset);
                 }
@@ -548,7 +563,9 @@ private:
                 write(&newRoot, rootPos);
                 core.root = rootPos;
                 ++core.height;
+#ifndef _NO_DEBUG
                 write(&core, core.pos);
+#endif
                 tn.parent = newNode.parent = rootPos;
                 write(&tn, offset);
                 write(&newNode, newPos);
@@ -696,6 +713,12 @@ public:
         }
     }
 
+    ~BPlusTree(){
+        write(&core, UNIT);
+        if (fp != nullptr)
+            closeFile();
+    }
+
     std::pair<Val, bool> search(const Key &key){
         off_t pos = findKey(key, true);
         LeafNode ln;
@@ -774,7 +797,9 @@ public:
             ++ln.size;
             write(&ln, childPos);
             ++core._size;
+#ifndef _NO_DEBUG
             write(&core, core.pos);
+#endif
         }
         else if (ln.succ != 0){
             LeafNode sib;
@@ -802,7 +827,9 @@ public:
                     updateChildIndex(ln.parent, sib.record[0].key, ln.record[ln.size - 1].key);
                 }
                 ++core._size;
+#ifndef _NO_DEBUG
                 write(&core, core.pos);
+#endif
             }
             else{
                 LeafNode newNode;
@@ -859,6 +886,13 @@ public:
             --ln.size;
             if (ln.size != 0) {
                 updateChildIndex(ln.parent, ln.record[l].key, ln.record[l - 1].key);
+                if (ln.succ != 0){
+                    LeafNode sib;
+                    read(&sib, ln.succ);
+                    if (ln.size + sib.size <= L && ln.parent == sib.parent){
+                        mergeLeaf(&ln, &sib);
+                    }
+                }
             }
             else {
                 if (ln.prev != 0) {
@@ -888,7 +922,9 @@ public:
         }
         write(&ln, pos);
         --core._size;
+#ifndef _NO_DEBUG
         write(&core, core.pos);
+#endif
     }
 
     void update(const Key &key, const Val &value){

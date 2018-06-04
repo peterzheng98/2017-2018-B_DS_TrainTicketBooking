@@ -10,7 +10,7 @@
 using namespace std;
 using namespace myAlgorithm;
 
-const int MAXN = 500000;
+const int MAXN = 10000;
 
 struct BigSize {
     int k = 0;
@@ -29,7 +29,7 @@ struct BigSize {
 };
 
 int a[MAXN + 10];
-BPlusTree<int, BigSize> bpt(true);
+BPlusTree<int, BigSize> bpt(true, "tmp/cache.txt");
 
 int main() {
 	srand(time(0));
@@ -65,9 +65,6 @@ int main() {
     		}
     	}
     }
-#ifdef _NO_DEBUG
-    bpt.closeFile();
-#endif
     end = clock();
     cout << (double)(end - start) / CLOCKS_PER_SEC << endl;
     system("PAUSE");
