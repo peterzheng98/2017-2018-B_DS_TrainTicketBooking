@@ -136,7 +136,7 @@ private:
     String t_id;
     String t_name;
     short t_station[60];
-    Time t_time[60];
+    Time t_time[60][2];
     float t_price[60][5];
     short t_stationNum;
     short t_ticketKind;
@@ -151,7 +151,8 @@ public:
               t_catalog(tr.t_catalog), t_onSale(tr.t_onSale) {
         for (short i = 0; i < t_stationNum; ++i) {
             t_station[i] = tr.t_station[i];
-            t_time[i] = tr.t_time[i];
+            t_time[i][0] = tr.t_time[i][0];
+            t_time[i][1] = tr.t_time[i][1];
             for (short j = 0; j < t_ticketKind; ++j)
                 t_price[i][j] = tr.t_price[i][j];
         }
@@ -393,18 +394,21 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_addTrainTicket(const String &tk_id, int t_stationNum, float *t_priceNum) {
+        Status I_addTrainTicket(const String &tk_id, int t_stationNum, const Time &t1, const Time &t2, float *t_priceNum) {
             auto trSel = trainTree.search(tk_id);
             if (!trSel.second)
                 return NoThisTrain;
-            train upTrain = trSel.first;
+            train &upTrain = trSel.first;
             upTrain.t_station[upTrain.t_stationNum] = t_stationNum;
+            upTrain.t_time[upTrain.t_stationNum][0] = t1;
+            upTrain.t_time[upTrain.t_stationNum][1] = t2;
             if (upTrain.t_stationNum != 0) {
                 for (short i = 0; i < upTrain.t_ticketKind; ++i)
                     upTrain.t_price[upTrain.t_stationNum][i] =
                             upTrain.t_price[upTrain.t_stationNum - 1][i] + t_priceNum[i];
             }
             ++upTrain.t_stationNum;
+            trainTree.update(tk_id, trSel.first);
             return Success;
         }
 
@@ -564,7 +568,7 @@ namespace Kernel {
                     for (Date d = startDate; d != endDate; d = d.nextDate()) {
                         ticket newTik;
                         newTik.tk_position = Pair<short, short>(tr.t_station[i], tr.t_station[j]);
-                        newTik.tk_time = Pair<Time, Time>(tr.t_time[i], tr.t_time[j]);
+                        newTik.tk_time = Pair<Time, Time>(tr.t_time[i][1], tr.t_time[j][0]);
                         newTik.tk_date = d;
                         newTik.tk_catalog = tr.t_catalog;
                         newTik.tk_ticketID = ticketId++;
