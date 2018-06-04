@@ -264,6 +264,54 @@ BPlusTree<Pair<int, int>, Pair<int, int>> userTicketTree(false, "userTicket.dat"
 BPlusTree<String, train> trainTree(false, "train.dat");
 
 namespace Kernel {
+    inline short catalog2Short(const myAlgorithm::String& cat){
+        if(cat == "G") return 1;
+        if(cat == "D") return 2;
+        if(cat == "C") return 4;
+        if(cat == "K") return 8;
+        if(cat == "T") return 16;
+        if(cat == "Z") return 32;
+        if(cat == "O") return 64;
+    }
+
+    inline myAlgorithm::String short2Catalog(const short& sha){
+        if(sha == 1) return "G";
+        if(sha == 2) return "D";
+        if(sha == 4) return "C";
+        if(sha == 8) return "K";
+        if(sha == 16) return "T";
+        if(sha == 32) return "Z";
+        if(sha == 64) return "O";
+    }
+
+    inline short kind2short(const myAlgorithm::String& kind){
+        if(kind == "一等座") return 0;
+        if(kind == "二等座") return 1;
+        if(kind == "动卧") return 2;
+        if(kind == "商务座") return 3;
+        if(kind == "无座") return 4;
+        if(kind == "特等座") return 5;
+        if(kind == "硬卧") return 6;
+        if(kind == "硬座") return 7;
+        if(kind == "软卧") return 8;
+        if(kind == "软座") return 9;
+        if(kind == "高级软卧") return 10;
+    }
+
+    inline myAlgorithm::String short2Kind(const short& sha){
+        if(sha == 0) return "一等座";
+        if(sha == 1) return "二等座";
+        if(sha == 2) return "动卧";
+        if(sha == 3) return "商务座";
+        if(sha == 4) return "无座";
+        if(sha == 5) return "特等座";
+        if(sha == 6) return "硬卧";
+        if(sha == 7) return "硬座";
+        if(sha == 8) return "软卧";
+        if(sha == 9) return "软座";
+        if(sha == 10) return "高级软卧";
+    }
+
     inline int trainStation2Short(const myAlgorithm::String &station) {
         int l = 0, r = 2714, ansx = 0;
         while(l <= r) {
