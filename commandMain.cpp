@@ -64,9 +64,35 @@ int main() {
         if (firstWord == "add_train") {
             myAlgorithm::String p_tid, p_name, p_catalog, p_num_s, p_num_p;
             cin >> p_tid >> p_name >> p_catalog >> p_num_s >> p_num_p;
-            int limit = p_num_p;
-
-
+            int limit = p_num_p, limits = p_num_s;
+            short pr[5];
+            myAlgorithm:::String tk_name;
+            for (int i = 0; i < limit; ++i){
+                cin >> tk_name;
+                //TODO
+            }
+            short catalog;
+            //TODO catalog =
+            Status ret = Success, ret1 = insert.I_addTrain(p_tid, p_name, catalog, limits, limit, pr);
+            for (int i = 0; i < limits; ++i){
+                myAlgorithm::String s_name, artime, sttime, sotime, s_price;
+                float prc[5];
+                cin >> s_name >> artime >> sttime >> sotime;
+                int s_num = trainStation2Short(s_name);
+                Time tm1, tm2;
+                //TODO String->Time
+                for (int j = 0; j < limit; ++j){
+                    cin >> s_price;
+                    //TODO eliminate ¥
+                    //prc[j] = s_price.float();
+                }
+                Status ret2 = insert.I_addTrainTicket(p_tid, s_num, tm1, tm2, prc);
+                if (ret2 != Success)
+                    ret = NoThisTrain;
+            }
+            if (ret1 != Success)
+                ret = NoThisTrain;
+            if (ret == Success) cout << "1\n"; else cout << "0\n";
         }
         if (firstWord == "login") {
             myAlgorithm::String p_id, p_word;
@@ -80,8 +106,7 @@ int main() {
             myAlgorithm::String p_id;
             cin >> p_id;
             myAlgorithm::String p_name, p_email, p_word, p_phone;
-            UserPrivilege p_up;
-            //TODO : BUG HERE(Require User Priviliege)
+            UserPrivilege p_up;s
             Status ret = selectA.I_selectUser((int) p_id, p_name, p_email, p_phone, p_up);
             if (ret == NoThisUser) cout << "0\n";
             else

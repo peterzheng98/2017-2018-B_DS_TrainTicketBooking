@@ -380,7 +380,7 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_addTrain(const String &t_id, const String &t_name, int t_catalog, short t_sNum, short t_tKind,
+        Status I_addTrain(const String &t_id, const String &t_name, short t_catalog, short t_sNum, short t_tKind,
                           short *t_tname) {
             train newTrain;
             newTrain.t_id = t_id;
