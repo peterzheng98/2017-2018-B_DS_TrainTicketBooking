@@ -263,6 +263,7 @@ namespace myAlgorithm {
             return (float(seg)) / lenp;
         }
 
+
         void split(const char &sgn, const String &source, String &s1, String &s2, int OPTION, bool &Result) {
             s1 = String();
             s2 = String();
