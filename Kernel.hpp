@@ -326,16 +326,6 @@ namespace Kernel {
         return InternalData::InternalStation[idx];
     }
 
-    inline int trainTicketKind2Short(const myAlgorithm::String &tkd) {
-
-        return 1;
-    }
-
-    inline myAlgorithm::String short2trainTicketKind(const short &idx) {
-
-        return "";
-    }
-
     void _init() {
         if (access("id.dat", 0) == -1) {
             FILE *tmpfp = fopen("id.dat", "wb+");
