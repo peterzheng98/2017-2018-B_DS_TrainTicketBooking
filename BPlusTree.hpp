@@ -61,7 +61,6 @@ private:
 private:
     char path[1024];
     mutable FILE *fp = nullptr;
-    mutable int fileLevel = 0;
 
     struct CoreData{
         off_t root = 0, slot = 0, pos = UNIT;
@@ -79,15 +78,11 @@ private:
 public:
 #endif
     void openFile(const char *mode = "rb+") const{
-        if (fileLevel == 0)
-            fp = fopen(path, mode);
-        ++fileLevel;
+        fp = fopen(path, mode);
     }
     
     void closeFile() const{
-        if (fileLevel == 1)
-            fclose(fp);
-        --fileLevel;
+        fclose(fp);
     }
 
 private:
@@ -257,94 +252,6 @@ private:
             write(&tn, parent);
         }
     }
-
-    /*
-    bool getKeyFromRight(TreeNode &t, off_t offset){
-        off_t pos = t.succ;
-        TreeNode rn;
-        read(&rn, pos);
-        Index *readPos = begin(rn), *writePos = end(t);
-        if (rn.size <= M * 3 / 2)
-            return false;
-
-        TreeNode parent;
-        read(&parent, t.parent);
-        Index *keyInParent = binarySearchKey(parent, t.index[t.size - 1].key);
-        keyInParent->key = readPos->key;
-        write(&parent, t.parent);
-
-        *writePos = *readPos;
-        ++t.size;
-
-        updateParentIndex(readPos, readPos + 1, offset);
-        copyIndex(readPos + 1, end(rn), readPos);
-        --rn.size;
-        write(rn, pos);
-        return true;
-    }
-
-    bool getKeyFromLeft(TreeNode &t, off_t offset){
-        off_t pos = t.prev;
-        TreeNode rn;
-        read(&rn, pos);
-        Index *readPos = end(rn) - 1, *writePos = begin(t);
-        if (rn.size <= M * 3 / 2)
-            return false;
-
-        TreeNode parent;
-        read(&parent, t.parent);
-        Index *keyInParent = binarySearchKey(parent, rn.index[0].key);
-        writePos->key = keyInParent->key;
-        keyInParent->key = (readPos - 1)->key;
-        write(&parent, t.parent);
-
-        copyBackIndex(writePos, end(t), end(t) + 1);
-        *writePos = *readPos;
-        ++t.size;
-
-        updateParentIndex(readPos, readPos + 1, offset);
-        copyIndex(readPos + 1, end(rn), readPos);
-        --rn.size;
-        write(rn, pos);
-        return true;
-    }
-
-    bool getRecordFromRight(LeafNode &t){
-        off_t pos = t.succ;
-        LeafNode rn;
-        read(&rn, pos);
-        Record *readPos = begin(rn), *writePos = end(t);
-        if (rn.size <= L * 2 / 3)
-            return false;
-
-        updateChildIndex(t.parent, t.record[0].key, rn.record[1].key);
-        *writePos = *readPos;
-        ++t.size;
-
-        copyRecord(readPos + 1, end(rn), readPos);
-        --rn.size;
-        write(&rn, pos);
-        return true;
-    }
-
-    bool getRecordFromLeft(LeafNode &t){
-        off_t pos = t.prev;
-        LeafNode rn;
-        read(&rn, pos);
-        Record *readPos = end(rn) - 1, *writePos = begin(t);
-        if (rn.size <= L * 2 / 3)
-            return false;
-
-        updateChildIndex(rn.parent, rn.record[0].key, readPos->key);
-        copyBackRecord(writePos, end(t), end(t + 1));
-        *writePos = *readPos;
-        ++t.size;
-
-        copyRecord(readPos + 1, end(rn), readPos);
-        --rn.size;
-        write(&rn, pos);
-        return true;
-    }*/
 
     void removeIndex(off_t offset, const Key &key, bool mode = false){
         TreeNode tn;
