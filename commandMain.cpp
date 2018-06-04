@@ -3,6 +3,7 @@
 //
 #define  _NO_DEBUG
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstdio>
 #include "String.h"
@@ -11,6 +12,7 @@
 using namespace std;
 using namespace myAlgorithm;
 using namespace Kernel;
+const short TOT_STATION = 2000;
 Insert insert;
 Update update;
 Select selectA;
@@ -69,22 +71,20 @@ int main() {
             myAlgorithm:::String tk_name;
             for (int i = 0; i < limit; ++i){
                 cin >> tk_name;
-                //TODO
+                pr[i] = kind2short(tk_name);
             }
-            short catalog;
-            //TODO catalog =
+            short catalog = catalog2Short(p_catalog);
             Status ret = Success, ret1 = insert.I_addTrain(p_tid, p_name, catalog, limits, limit, pr);
             for (int i = 0; i < limits; ++i){
                 myAlgorithm::String s_name, artime, sttime, sotime, s_price;
                 float prc[5];
                 cin >> s_name >> artime >> sttime >> sotime;
                 int s_num = trainStation2Short(s_name);
-                Time tm1, tm2;
-                //TODO String->Time
+                Time tm1 = artime, tm2 = sttime;
                 for (int j = 0; j < limit; ++j){
                     cin >> s_price;
                     //TODO eliminate ¥
-                    //prc[j] = s_price.float();
+                    prc[j] = (float)s_price;
                 }
                 Status ret2 = insert.I_addTrainTicket(p_tid, s_num, tm1, tm2, prc);
                 if (ret2 != Success)
@@ -115,53 +115,109 @@ int main() {
 
         }
         if (firstWord == "query_ticket") {
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "query_ticket\n";
-    //#endif
-                String arg[4];
-                for (int i = 0; i < 4; ++i) cin >> arg[i];
-    //#ifdef DEBUGMODE_PARSER
-                cout << "Args: ";
-                for (int i = 0; i < 4; ++i)
-                    cout << "[" << i + 1 << "] : [" << arg[i] << "]   ";
-                cout << "\n";
-#endif
+            myAlgorithm::String s_st1, s_st2, s_date, s_cata;
+            cin >> s_st1 >> s_st2 >> s_date >> s_cata;
+            myAlgorithm::Vector<ticket> ans;
+            short st1 = trainStation2Short(s_st1), st2 = trainStation2Short(s_st2);
+            Date dt = s_date;
+            short cata = 0;
+            for (int i = 0; i < s_cata.size(); ++i)
+                cata |= catalog2Short(s[i]);
+            Status ret = selectA.I_selectTicket(Pair<short, short>(st1, st2), dt, cata, ans);
+            if (ret == Success && ans.size() != 0){
+                cout << ans.size() << '\n';
+                train tr;
+                for (int i = 0; i < ans.size(); ++i){
+                    selectA.I_selectTrain(ans[i].tk_trainID, tr);
+                    cout << ans[i].tk_trainID << ' ';
+                    cout << s_st1 << ans[i].tk_date << ' ' << ans[i].tk_time.first() << ' ';
+                    cout << s_st2 << ans[i].tk_date << ' ' << ans[i].tk_time.second() << ' ';
+                    for (int j = 0; j < tr.t_ticketKind; ++j){
+                        short p = tr.t_ticketName[j];
+                        cout << short2Kind(p) << ans[i].tk_remain[p] << ' ' << setiosflags(ios::fixed) << setprecision(2) << ans[i].tk_price[p] << ' ';
+                    }
+                    cout << '\n';
+                }
+            }
+            else{
+                cout << "-1\n";
+            }
         }
         if (firstWord == "query_transfer") {
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "query_transfer\n";
-    //#endif
-                String arg[4];
-                for (int i = 0; i < 4; ++i) cin >> arg[i];
-    //#ifdef DEBUGMODE_PARSER
-                cout << "Args: ";
-                for (int i = 0; i < 4; ++i)
-                    cout << "[" << i + 1 << "] : [" << arg[i] << "]   ";
-                cout << "\n";
-#endif
+            myAlgorithm::String s_st1, s_st2, s_date, s_cata;
+            cin >> s_st1 >> s_st2 >> s_date >> s_cata;
+            myAlgorithm::Vector<ticket> ans;
+            short st1 = trainStation2Short(s_st1), st2 = trainStation2Short(s_st2);
+            Date dt = s_date;
+            short cata = 0;
+            for (int i = 0; i < s_cata.size(); ++i)
+                cata |= catalog2Short(s[i]);
+            myAlgorithm::Vector<ticket> ans;
+            Status ret = selectA.I_selectTicketTransfer(Pair<short, short>(st1, st2), dt, cata, TOT_STATION, ans);
+            if (ret == Success && ans.size() != 0){
+                train tr;
+                for (int i = 0; i < ans.size(); ++i){
+                    selectA.I_selectTrain(ans[i].tk_trainID, tr);
+                    cout << ans[i].tk_trainID << ' ';
+                    cout << s_st1 << ans[i].tk_date << ' ' << ans[i].tk_time.first() << ' ';
+                    cout << s_st2 << ans[i].tk_date << ' ' << ans[i].tk_time.second() << ' ';
+                    for (int j = 0; j < tr.t_ticketKind; ++j){
+                        short p = tr.t_ticketName[j];
+                        cout << short2Kind(p) << ans[i].tk_remain[p] << ' ' << setiosflags(ios::fixed) << setprecision(2) << ans[i].tk_price[p] << ' ';
+                    }
+                    cout << '\n';
+                }
+            }
         }
         if (firstWord == "query_order") {
-#ifdef DEBUGMODE_PARSER
-            cout << "Line: " << __LINE__ << "query_order\n";
-    //#endif
-                String arg[4];
-                for (int i = 0; i < 3; ++i) cin >> arg[i];
-    //#ifdef DEBUGMODE_PARSER
-                cout << "Args: ";
-                for (int i = 0; i < 3; ++i)
-                    cout << "[" << i + 1 << "] : [" << arg[i] << "]   ";
-                cout << "\n";
-#endif
+            myAlgorithm::String p_id, t_date, t_cata;
+            cin >> t_id >> t_date >> t_cata;
+            short catalog;
+            for (int i = 0; i < t_cata.size(); ++i)
+                catalog |= catalog2Short(t_cata[i]);
+            Date dat = t_date;
+            myAlgorithm::Vector<ticket> vtk;
+            myAlgorithm::Vector<int> vtknum;
+            Status ret = select.I_selectUserBookedTicket((int)p_id, dat, catalog, vtk, vtknum);
+            if (ret == Success && vtk.size() != 0){
+                cout << "1\n";
+                myAlgorithm::String st1, st2;
+                int rem[11];
+                float prc[11];
+                train tr;
+                for (int i = 0; i < vtk.size(); ++i){
+                    selectA.I_selectTrain(vtk[i].tk_trainID, tr);
+                    cout << vtk[i].tk_trainID << ' ';
+                    st1 = short2trainStation(vtk[i].tk_position.first);
+                    st2 = short2trainStation(vtk[i].tk_position.second);
+                    cout << st1 << vtk[i].tk_date << ' ' << vtk[i].tk_time.first << ' ';
+                    cout << st2 << vtk[i].tk_date << ' ' << vtk[i].tk_time.second << ' ';
+                    for (int j = 0; j < tr.t_ticketKind; ++j){
+                        short p = tr.t_ticketName[j];
+                        cout << short2Kind(p) << vtknum[i][j] << ' ' << setiosflags(ios::fixed) << setprecision(2) << vtk[i].tk_price[p] << ' ';
+                    }
+                    cout << '\n';
+                }
+            }
+            else
+                cout << "0\n";
         }
         if (firstWord == "query_train") {
-//            String p_id;
-//            cin >> p_id;
-//            train ret = train();
-//            Status rett = selectA.I_selectTrain(p_id, ret);
-//            TODO : Output Train
-//            cout << ret.t_id << " " << ret.t_name << ret.t_catalog << " ";
-//            if (rett != Success) cout << "0\n"; else cout << "\n";
-
+            String p_id;
+            cin >> p_id;
+            train tr;
+            Status ret = selectA.I_selectTrain(p_id, tr);
+            if (ret == Success){
+                cout << tr.t_id << ' ' << tr.t_name << ' ';
+                cout << short2Catalog(tr.t_catalog) << ' ' << tr.t_stationNum << ' ' << tr.t_ticketKind;
+                for (int i = 0; i < tr.t_stationNum; ++i){
+                    cout << short2trainStation(tr.t_station[i]);
+                    cout << tr.t_time[0] << ' ' << tr.t_time[1] << ' ' << tr.t_time[1] - tr.t_time[0] << ' ';
+                    cout << "￥" << tr.t_price[i] << '\n';
+                }
+            }
+            else
+                cout << "0\n";
         }
         if (firstWord == "modify_profile") {
             myAlgorithm::String p_name, p_word, p_email, p_id, p_phone;
@@ -182,7 +238,6 @@ int main() {
             cin >> p_id;
             Status ret = update.I_updateTrainSellingStatus(p_id);
             if (ret == Success) cout << "1\n"; else cout << "0\n";
-
         }
         if (firstWord == "modify_train") {
 #ifdef DEBUGMODE_PARSER
@@ -200,7 +255,6 @@ int main() {
             cin >> p_id;
             Status ret = deleteA.I_deleteTrain(p_id);
             if (ret == Success) cout << "1\n"; else cout << "0\n";
-
         }
         if (firstWord == "exit") {
             _exit();

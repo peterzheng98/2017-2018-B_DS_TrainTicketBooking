@@ -42,22 +42,22 @@ class ticket {
 
     friend class Kernel::Delete;
 
-private:
+public:
     Pair<short, short> tk_position;
     Pair<Time, Time> tk_time;
     Date tk_date;
     short tk_catalog;
     int tk_ticketID;
     String tk_trainID;
-    float tk_price[5];
-    int tk_remain[5];
-public:
+    float tk_price[11];
+    int tk_remain[11];
+
     ticket() = default;
 
     ticket(const ticket &tik)
             : tk_position(tik.tk_position), tk_time(tik.tk_time), tk_date(tik.tk_date),
               tk_catalog(tik.tk_catalog), tk_ticketID(tik.tk_ticketID), tk_trainID(tk_trainID) {
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 11; ++i) {
             tk_price[i] = tik.tk_price[i];
             tk_remain[i] = tik.tk_remain[i];
         }
@@ -123,6 +123,19 @@ public:
     }
 };
 
+struct userTicket{
+    int ticketId;
+    int userId;
+    int ticketNum[11];
+
+    userTicket &operator =(const userTicket &utk){
+        ticketId = utk.ticketId;
+        userId = utk.userId;
+        for (int i = 0; i < 11; ++i)
+            ticketNum[i] = utk.ticketNum[i];
+    }
+}
+
 class train {
     friend class Kernel::Insert;
 
@@ -132,7 +145,7 @@ class train {
 
     friend class Kernel::Delete;
 
-private:
+public:
     String t_id;
     String t_name;
     short t_station[60];
@@ -260,18 +273,18 @@ BPlusTree<int, user> userIdTree(false, "user.dat");
 //BPlusTree<String, int> userNameTree(true, "userName.dat");
 BPlusTree<ticketKey, ticket> ticketTree(false, "ticket.dat");
 BPlusTree<int, ticket> ticketIdTree(false, "ticketId.dat");
-BPlusTree<Pair<int, int>, Pair<int, int>> userTicketTree(false, "userTicket.dat");
+BPlusTree<Pair<int, int>, userTicket> userTicketTree(false, "userTicket.dat");
 BPlusTree<String, train> trainTree(false, "train.dat");
 
 namespace Kernel {
-    inline short catalog2Short(const myAlgorithm::String& cat){
-        if(cat == "G") return 1;
-        if(cat == "D") return 2;
-        if(cat == "C") return 4;
-        if(cat == "K") return 8;
-        if(cat == "T") return 16;
-        if(cat == "Z") return 32;
-        if(cat == "O") return 64;
+    inline short catalog2Short(char cat){
+        if(cat == 'G') return 1;
+        if(cat == 'D') return 2;
+        if(cat == 'C') return 4;
+        if(cat == 'K') return 8;
+        if(cat == 'T') return 16;
+        if(cat == 'Z') return 32;
+        if(cat == 'O') return 64;
     }
 
     inline myAlgorithm::String short2Catalog(const short& sha){
@@ -361,15 +374,9 @@ namespace Kernel {
 
         Status
         I_addUser(const String &p_name, const String &p_word, const String &p_email, const String &p_phone, int &p_id) {
-            /*auto nameHasExisted = userNameTree.search(p_name);
-            if (nameHasExisted.second) {
-                p_id = 0;
-                return NameHasExisted;
-            }*/
             user newUser(nowId, p_name, p_word, p_email, p_phone);
             p_id = nowId++;
             userIdTree.insert(p_id, newUser);
-            //userNameTree.insert(p_name, p_id);
             return Success;
         }
 
@@ -388,10 +395,10 @@ namespace Kernel {
             train upTrain(trSel.first);
             short i, j;
             for (i = 0; i < upTrain.t_stationNum; ++i)
-                if (i == tk_position.first())
+                if (upTrain.t_station[i] == tk_position.first())
                     break;
             for (j = 0; j < upTrain.t_stationNum; ++j)
-                if (j == tk_position.second())
+                if (upTrain.t_station[j] == tk_position.second())
                     break;
             if (i >= j || i == upTrain.t_stationNum || j == upTrain.t_stationNum)
                 return NoThisTrain;
@@ -408,13 +415,21 @@ namespace Kernel {
             for (int i = 0; i < vtk.size(); ++i) {
                 auto tikSel = ticketTree.search(vtk[i]);
                 tikSel.first.tk_remain[tk_kind] -= tk_num;
-                if (tikSel.first.tk_remain[tk_kind] == 0)
-                    ticketTree.erase(vtk[i]);
-                else
-                    ticketTree.update(vtk[i], tikSel.first);
+                ticketTree.update(vtk[i], tikSel.first);
             }
             int ticketID = tkSel.first.tk_ticketID;
-            userTicketTree.insert(Pair<int, int>(p_id, ticketID), Pair<int, int>(ticketID, tk_num));
+            auto utt = userTicketTree.search(Pair<int, int>(p_id, ticketID));
+            if (utt.second){
+                utt.first.ticketNum[tk_kind] += tk_num;
+                userTicketTree.update(Pair<int, int>(p_id, ticketID), utt.first);
+            }
+            else{
+                userTicket utk;
+                utk.ticketId = ticketID;
+                utk.userId = p_id;
+                utk.ticketNum[tk_kind] = tk_num;
+                userTicketTree.insert(Pair<int, int>(p_id, ticketID), utk);
+            }
             return Success;
         }
 
@@ -466,18 +481,6 @@ namespace Kernel {
                 return NoThisUser;
             return Success;
         }
-
-        /*Status I_selectUser(String p_name, String p_word) {
-            auto userNameSel = userNameTree.search(p_name);
-            if (!userNameSel.second)
-                return NoThisUser;
-            auto userSel = userIdTree.search(userNameSel.first);
-            if (!userSel.second)
-                return NoThisUser;
-            if (userSel.first.M_password() != p_word)
-                return NoThisUser;
-            return Success;
-        }*/
 
         Status I_selectUser(int p_id, String &p_name, String &p_email, String &p_phone, UserPrivilege &up) {
             auto userSel = userIdTree.search(p_id);
@@ -533,17 +536,17 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_selectUserBookedTicket(int p_id, Date p_date, int tk_catalog, Vector<ticket> &ret, Vector<int> &num) {
+        Status I_selectUserBookedTicket(int p_id, Date p_date, int tk_catalog, Vector<ticket> &ret, Vector<int*> &num) {
             ret.clear();
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
             auto vb = userTicketTree.searchFirst(Pair<int, int>(p_id, 0));
             for (int i = 0; i < vb.size(); ++i) {
-                auto tikSel = ticketIdTree.search(vb[i].first());
+                auto tikSel = ticketIdTree.search(vb[i].ticketId);
                 if (tikSel.second && tikSel.first.tk_date == p_date && tikSel.first.tk_catalog & tk_catalog) {
                     ret.push_back(tikSel.first);
-                    num.push_back(vb[i].second());
+                    num.push_back(vb[i].ticketNum);
                 }
             }
             if (ret.empty())
@@ -611,9 +614,10 @@ namespace Kernel {
                         newTik.tk_catalog = tr.t_catalog;
                         newTik.tk_ticketID = ticketId++;
                         newTik.tk_trainID = tr.t_id;
-                        for (short p = 0; p != 5; ++p) {
-                            newTik.tk_remain[p] = 2000;
-                            newTik.tk_price[p] = tr.t_price[j][p] - tr.t_price[i][p];
+                        for (short p = 0; p != tr.t_ticketKind; ++p) {
+                            short q = tr.t_ticketName[p];
+                            newTik.tk_remain[q] = 2000;
+                            newTik.tk_price[q] = tr.t_price[j][p] - tr.t_price[i][p];
                         }
                         ticketTree.insert(ticketKey(newTik), newTik);
                         ticketIdTree.insert(newTik.tk_ticketID, newTik);
@@ -656,13 +660,13 @@ namespace Kernel {
                     || tikIdSel.first.tk_position != tk_location
                     || tikIdSel.first.tk_trainID != tk_id)
                     continue;
-                if (tik[i].second() < tk_num)
+                if (tik[i].ticketNum[tk_kind] < tk_num)
                     return NoRemainTicket;
-                if (tik[i].second() == tk_num)
-                    userTicketTree.erase(Pair<int, int>(p_id, tik[i].first()));
-                else
-                    userTicketTree.update(Pair<int, int>(p_id, tik[i].first()),
-                                          Pair<int, int>(tik[i].first(), tik[i].second() - tk_num));
+                else{
+                    userTicket utk = tik[i];
+                    utk.ticketNum[tk_kind] -= tk_num;
+                    userTicketTree.update(Pair<int, int>(p_id, tik[i].first()), utk);
+                }
                 auto tikSel = ticketTree.search(ticketKey(tikIdSel.first));
                 if (tikSel.second) {
                     tikIdSel.first.tk_remain[tk_kind] += tk_num;
