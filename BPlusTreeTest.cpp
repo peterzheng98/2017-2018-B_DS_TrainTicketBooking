@@ -1,14 +1,11 @@
 /* Test for BPlusTree */
 #define _CRT_SECURE_NO_WARNINGS
-//#define _NO_DEBUG
-//#define _LINUX_MODE
+
 #define MAXNN 500000
 #include "BPlusTree.hpp"
-#include <algorithm>
-#include <iostream>
-#include <map>
-#include <ctime>
 #include "Vector.h"
+#include <bits/stdc++.h>
+
 using namespace std;
 using namespace myAlgorithm;
 
@@ -28,63 +25,92 @@ struct BigSize {
     }
 };
 
-struct DoubleKey {
-    int p = 0, q = 0;
+BPlusTree<int, BigSize> bpt(true, "tmp/cache.dat");
 
-    DoubleKey(int pp = 0, int qq = 0) : p(pp), q(qq) {}
-    bool operator <(const DoubleKey &dk) const {
-        return p < dk.p || (p == dk.p && q < dk.q);
-    }
-    int first() const {
-        return p;
-    }
-};
+const int N = 1e5;
+int a[N + 10];
+clock_t start_, end_;
 
-BPlusTree<int, int> bpt(true);
-//BPlusTree<DoubleKey, int> dkt(true);
+void Test1()
+{
+	srand(time(0));
+    start_ = clock();
+	printf("Test1:");
+	for(int i = 1; i <= N; i++)
+		a[i] = i;
+	random_shuffle(a + 1, a + 1 + N);
+	for(int i = 1; i <= N; i++)
+	{
+		auto p = bpt.search(a[i]);
+		if(p.second)
+		{
+			puts("find value that doesn't exist!");
+			return;
+		}
+		bpt.insert(a[i], i);
+		p = bpt.search(a[i]);
+		if(!p.second)
+		{
+			puts("can't find value after insert it!");
+			return;
+		}
+	}
+	for(int i = 1; i <= N; i++)
+	{
+		auto p = bpt.search(i);
+		if(!p.second)
+		{
+			puts("can't find value in tree!");
+			return;
+		}
+		else
+		{
+			bpt.erase(i);
+			p = bpt.search(i);
+			if(p.second)
+			{
+				puts("find value after erase it!");
+				return;
+			}
+		}
+	}
+	printf("passed! ");
+    end_ = clock();
+    cout << (double)(end_ - start_) / CLOCKS_PER_SEC << endl;
+}
+
+void Test2()
+{
+	printf("Test2:");
+}
+
+void Test3()
+{
+}
+
+void Test4()
+{
+}
+
+void Test5()
+{
+}
+
+void Test6()
+{
+}
 
 int main() {
-    clock_t start, end;
     cout << "START" << endl;
-    start = clock();
-    /*for (int i = MAXNN; i >= 1; --i) {
-        for (int j = 1; j <= MAXNN; ++j) {
-            dkt.insert(DoubleKey(j, i), i);
-        }
-    }
-    for (int i = 1; i <= 10; ++i) {
-        auto ans = dkt.searchFirst(DoubleKey(i));
-        for (int j = 0; j < ans.size(); ++j)
-            cout << ans[j] << ' ';
-        cout << endl;
-    }*/
-    for (int i = MAXNN; i >= 1; --i) {
-        //if (i == 281)
-            //cout << i << endl;
-        bpt.insert(i, i);
-        auto p = bpt.search(i);
-        if (!p.second) {
-            cout << i << endl;
-        }
-    }
-    printf("After Insertion.\n");
-    for (int i = MAXNN; i >= 1; --i) {
-        auto p = bpt.search(i);
-        if (p.first != i || !p.second) {
-            cout << i << endl;
-        }
-        bpt.erase(i);
-        p = bpt.search(i);
-        if (p.second) {
-            cout << i << endl;
-        }
-    }
 #ifdef _NO_DEBUG
     bpt.closeFile();
     //dkt.closeFile();
 #endif
-    end = clock();
-    cout << (double)(end - start) / CLOCKS_PER_SEC << endl;
-    system("PAUSE");
+	Test1();
+	Test2();
+	Test3();
+	Test4();
+	Test5();
+	Test6();
     return 0;
 }
