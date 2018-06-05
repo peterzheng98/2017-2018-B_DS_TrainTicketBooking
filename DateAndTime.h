@@ -225,18 +225,25 @@ namespace myAlgorithm {
             dataOfTime.setData(hour, min);
         }
 
+        Time(int minute){
+            if(minute < 0) dataOfTime = Pair<short, short>(-1, -1);
+            else dataOfTime = Pair<short, short>(minute / 60, minute % 60);
+        }
         Time(int hh, int mm) : dataOfTime(Pair<short, short>(hh, mm)) {}
 
         Time(const String &source) {
-            String s1, s2;
-            bool Result;
-            split(':', source, s1, s2, String::__SPLIT_STRING_WITHOUT_CHAR, Result);
-            if (!Result) dataOfTime = Pair<short, short>(0, 0);
+            if (source == "xx:xx") dataOfTime = Pair<short, short>(-1, -1);
             else {
-                int res1 = (int) s1;
-                int res2 = (int) s2;
-                if (res1 < 0 || res1 > 24 || res2 < 0 || res2 > 60) dataOfTime = Pair<short, short>(0, 0);
-                else dataOfTime = Pair<short, short>(res1, res2);
+                String s1, s2;
+                bool Result;
+                split(':', source, s1, s2, String::__SPLIT_STRING_WITHOUT_CHAR, Result);
+                if (!Result) dataOfTime = Pair<short, short>(0, 0);
+                else {
+                    int res1 = (int) s1;
+                    int res2 = (int) s2;
+                    if (res1 < 0 || res1 > 24 || res2 < 0 || res2 > 60) dataOfTime = Pair<short, short>(0, 0);
+                    else dataOfTime = Pair<short, short>(res1, res2);
+                }
             }
         }
 
@@ -267,10 +274,11 @@ namespace myAlgorithm {
         int operator-(const Time &rhs) const {
             int h2 = rhs.getHour(), m2 = rhs.getMin();
             int h1 = dataOfTime.first(), m1 = dataOfTime.second();
-
+            if (m2 == -1 && h2 == -1) return -1;
             if (h2 < h1) h2 += 24;
             if (m2 < m1) h2--, m2 += 60;
-            return (h2 - h1) * 60 + (m2 - m1);
+            int p = (h2 - h1) * 60 + (m2 - m1);
+            return -p;
         }
 
         bool operator==(const Time &rhs) const {
@@ -311,11 +319,19 @@ namespace myAlgorithm {
     };
 
     std::ostream &operator<<(std::ostream &os, const Time &rhs) {
-        os << rhs.getHour() << ":" << rhs.getMin();
+        if(rhs.getHour() < 0 && rhs.getMin() < 0){
+            os << "xx:xx";
+            return os;
+        }
+        int hh = rhs.getHour(), mm = rhs.getMin();
+        if(hh / 10 == 0) os << "0";
+        os << rhs.getHour() << ":";
+        if(mm / 10 == 0) os << "0";
+        os << rhs.getMin();
         return os;
     }
 
-    Time operator+(const Time &lhs, const Time &rhs){
+    Time operator+(const Time &lhs, const Time &rhs) {
         int hh = lhs.getHour() + rhs.getHour();
         int mm = lhs.getMin() + rhs.getMin();
         hh = hh + mm / 60;

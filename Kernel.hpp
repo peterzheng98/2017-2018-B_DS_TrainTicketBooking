@@ -46,11 +46,11 @@ public:
     Pair<short, short> tk_position;
     Pair<Time, Time> tk_time;
     Date tk_date;
-    short tk_catalog;
-    int tk_ticketID;
+    short tk_catalog = 0;
+    int tk_ticketID = 0;
     String tk_trainID;
-    float tk_price[11];
-    int tk_remain[11];
+    float tk_price[15];
+    int tk_remain[15];
 
     ticket() = default;
 
@@ -124,14 +124,14 @@ public:
 };
 
 struct userTicket{
-    int ticketId;
-    int userId;
-    int ticketNum[11];
+    int ticketId = 0;
+    int userId = 0;
+    int ticketNum[12];
 
     userTicket &operator =(const userTicket &utk){
         ticketId = utk.ticketId;
         userId = utk.userId;
-        for (int i = 0; i < 11; ++i)
+        for (int i = 0; i < 12; ++i)
             ticketNum[i] = utk.ticketNum[i];
     }
 };
@@ -151,11 +151,11 @@ public:
     short t_station[60];
     Time t_time[60][2];
     float t_price[60][5];
-    short t_stationNum;
-    short t_ticketKind;
+    short t_stationNum = 0;
+    short t_ticketKind = 0;
     short t_ticketName[5];
-    short t_catalog;
-    bool t_onSale;
+    short t_catalog = 0;
+    bool t_onSale = false;
 public:
     train() = default;
 
@@ -204,7 +204,7 @@ class user {
     friend class Kernel::Update;
 
 private:
-    int p_id;
+    int p_id = 0;
     String p_username;
     String p_password;
     String p_email;
@@ -309,6 +309,7 @@ namespace Kernel {
         if(kind == "软卧") return 8;
         if(kind == "软座") return 9;
         if(kind == "高级软卧") return 10;
+        if(kind == "大师座") return 12;
     }
 
     inline myAlgorithm::String short2Kind(const short& sha){
@@ -323,6 +324,7 @@ namespace Kernel {
         if(sha == 8) return "软卧";
         if(sha == 9) return "软座";
         if(sha == 10) return "高级软卧";
+        if(sha == 12) return "大师座";
     }
 
     inline int trainStation2Short(const myAlgorithm::String &station) {
