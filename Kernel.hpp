@@ -134,7 +134,7 @@ struct userTicket{
         for (int i = 0; i < 11; ++i)
             ticketNum[i] = utk.ticketNum[i];
     }
-}
+};
 
 class train {
     friend class Kernel::Insert;
@@ -653,7 +653,7 @@ namespace Kernel {
             if (tik.empty())
                 return NoRemainTicket;
             for (int i = 0; i < tik.size(); ++i) {
-                auto tikIdSel = ticketIdTree.search(tik[i].first());
+                auto tikIdSel = ticketIdTree.search(tik[i].ticketId);
                 if (!tikIdSel.second)
                     continue;
                 if (tikIdSel.first.tk_date != p_date
@@ -665,7 +665,7 @@ namespace Kernel {
                 else{
                     userTicket utk = tik[i];
                     utk.ticketNum[tk_kind] -= tk_num;
-                    userTicketTree.update(Pair<int, int>(p_id, tik[i].first()), utk);
+                    userTicketTree.update(Pair<int, int>(p_id, tik[i].ticketId), utk);
                 }
                 auto tikSel = ticketTree.search(ticketKey(tikIdSel.first));
                 if (tikSel.second) {
