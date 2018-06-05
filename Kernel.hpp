@@ -560,6 +560,8 @@ namespace Kernel {
             auto trainSel = trainTree.search(p_id);
             if (!trainSel.second)
                 return NoThisTrain;
+            if (!trainSel.first.t_onSale)
+                return NoThisTrain;
             ret = trainSel.first;
             return Success;
         }
@@ -626,6 +628,8 @@ namespace Kernel {
                     }
                 }
             }
+            tr.t_onSale = true;
+            trainTree.update(t_id, tr);
             return Success;
         }
 

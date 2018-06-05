@@ -782,7 +782,34 @@ public:
         off_t childPos = findKey(key, true);
         LeafNode ln;
         read(&ln, childPos);
-        if (ln.size != L){
+        if (L <= 3){
+            if (ln.succ != 0){
+                LeafNode sib;
+                read(&sib, ln.succ);
+                LeafNode newNode;
+                createLeafNode(sib.prev, &ln, &newNode);
+                int newPos = ln.succ;
+                read(&sib, newNode.succ);
+                newNode.record[0].key = key;
+                newNode.record[0].value = value;
+                newNode.size = 1;
+                write(&ln, childPos);
+                write(&newNode, newPos);
+                insertNewIndex(ln.parent, key, ln.succ, true);
+            }
+            else{
+                LeafNode newNode;
+                createLeafNode(childPos, &ln, &newNode);
+                int newPos = ln.succ;
+                newNode.record[0].key = key;
+                newNode.record[0].value = value;
+                newNode.size = 1;
+                write(&ln, childPos);
+                write(&newNode, newPos);
+                insertNewIndex(ln.parent, key, ln.succ, true);
+            }
+        }
+        else if (ln.size != L){
             int i;
             for (i = ln.size; i > 0; --i){
                 if (!comp(key, ln.record[i - 1].key))

@@ -36,6 +36,7 @@ void whereIsMyFile() {
 }
 
 int main() {
+    freopen("2.in", "r", stdin);
     ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
@@ -317,6 +318,7 @@ int main() {
         }
 
     }
+    fclose(stdin);
     return 0;
 
 }
