@@ -52,11 +52,14 @@ public:
     float tk_price[15];
     int tk_remain[15];
 
-    ticket() = default;
+    ticket(){
+        memset(tk_price, 0, sizeof(tk_price));
+        memset(tk_remain, 0, sizeof(tk_remain));
+    }
 
     ticket(const ticket &tik)
             : tk_position(tik.tk_position), tk_time(tik.tk_time), tk_date(tik.tk_date),
-              tk_catalog(tik.tk_catalog), tk_ticketID(tik.tk_ticketID), tk_trainID(tk_trainID) {
+              tk_catalog(tik.tk_catalog), tk_ticketID(tik.tk_ticketID), tk_trainID(tik.tk_trainID) {
         for (int i = 0; i < 11; ++i) {
             tk_price[i] = tik.tk_price[i];
             tk_remain[i] = tik.tk_remain[i];
@@ -107,11 +110,11 @@ public:
             : station(stt), trainID(tid), date(dt) {}
 
     ticketKey(const ticket &tk)
-            : station(tk.tk_position), trainID(tk.tk_trainID) {}
+            : station(tk.tk_position), trainID(tk.tk_trainID), date(tk.tk_date) {}
 
     bool operator<(const ticketKey &tk) const {
         return station < tk.station || (station == tk.station && date < tk.date)
-               || (station == tk.station && date < tk.date && trainID < tk.trainID);
+               || (station == tk.station && date == tk.date && trainID < tk.trainID);
     }
 
     Pair<short, short> first() const {
@@ -128,6 +131,13 @@ struct userTicket{
     int userId = 0;
     int ticketNum[12];
 
+    userTicket(){
+        memset(ticketNum, 0, sizeof(ticketNum));
+    }
+    userTicket(const userTicket &utk) : ticketId(utk.ticketId), userId(utk.userId){
+        for (int i = 0; i < 12; ++i)
+            ticketNum[i] = utk.ticketNum[i];
+    }
     userTicket &operator =(const userTicket &utk){
         ticketId = utk.ticketId;
         userId = utk.userId;
@@ -538,7 +548,8 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_selectUserBookedTicket(int p_id, Date p_date, int tk_catalog, Vector<ticket> &ret, Vector<int*> &num) {
+        Status I_selectUserBookedTicket(int p_id, Date p_date, int tk_catalog,
+                                        Vector<ticket> &ret, Vector<int> *num) {
             ret.clear();
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
@@ -548,7 +559,8 @@ namespace Kernel {
                 auto tikSel = ticketIdTree.search(vb[i].ticketId);
                 if (tikSel.second && tikSel.first.tk_date == p_date && tikSel.first.tk_catalog & tk_catalog) {
                     ret.push_back(tikSel.first);
-                    num.push_back(vb[i].ticketNum);
+                    for (int j = 0; j < 12; ++j)
+                        num[j].push_back(vb[i].ticketNum[j]);
                 }
             }
             if (ret.empty())
