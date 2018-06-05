@@ -37,9 +37,7 @@ void whereIsMyFile() {
 
 int main() {
     freopen("2.in", "r", stdin);
-    ios::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    freopen("ans.out", "w", stdout);
     insert = Insert();
     update = Update();
     selectA = Select();
@@ -319,6 +317,7 @@ int main() {
 
     }
     fclose(stdin);
+    fclose(stdout);
     return 0;
 
 }
