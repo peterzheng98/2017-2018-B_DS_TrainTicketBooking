@@ -796,6 +796,10 @@ public:
                 write(&ln, childPos);
                 write(&newNode, newPos);
                 insertNewIndex(ln.parent, key, ln.succ, true);
+                ++core._size;
+#ifndef _NO_DEBUG
+                write(&core, core.pos);
+#endif
             }
             else{
                 LeafNode newNode;
@@ -807,6 +811,10 @@ public:
                 write(&ln, childPos);
                 write(&newNode, newPos);
                 insertNewIndex(ln.parent, key, ln.succ, true);
+                ++core._size;
+#ifndef _NO_DEBUG
+                write(&core, core.pos);
+#endif
             }
         }
         else if (ln.size != L){

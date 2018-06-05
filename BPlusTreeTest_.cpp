@@ -14,7 +14,7 @@ const int MAXN = 10000;
 
 struct BigSize {
     int k = 0;
-    int a[100];
+    int a[300];
 
     BigSize(int n = 0) : k(n) {}
 
