@@ -3,6 +3,7 @@ MyApplication/
 MyApplication/.idea
 # Test Data
 *.in
+*.out
 
 # Compiled class file
 *.class

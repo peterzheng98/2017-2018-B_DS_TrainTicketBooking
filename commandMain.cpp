@@ -36,8 +36,8 @@ void whereIsMyFile() {
 }
 
 int main() {
-    //freopen("2.in", "r", stdin);
-    //freopen("ans.out", "w", stdout);
+    freopen("1.in", "r", stdin);
+    freopen("ans.out", "w", stdout);
     insert = Insert();
     update = Update();
     selectA = Select();
@@ -335,8 +335,8 @@ int main() {
         }
 
     }
-    //fclose(stdin);
-    //fclose(stdout);
+    fclose(stdin);
+    fclose(stdout);
     return 0;
 
 }

@@ -194,8 +194,8 @@ namespace myAlgorithm {
         }
 
         bool operator<(const TriplePair<T, U, K> &p) const {
-            return p.first() < t1 || (p.second() < t2 && p.first() == t1) ||
-                   (p.third() < t3 && p.first() == t1 && p.second() == t2);
+            return t1 < p.first() || (t2 < p.second() && p.first() == t1) ||
+                   (t3 < p.third() && p.first() == t1 && p.second() == t2);
         }
 
         bool operator<=(const TriplePair<T, U, K> &p) const {
