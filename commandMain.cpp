@@ -121,55 +121,69 @@ int main() {
             cin >> s_st1 >> s_st2 >> s_date >> s_cata;
             myAlgorithm::Vector<ticket> ans;
             short st1 = trainStation2Short(s_st1), st2 = trainStation2Short(s_st2);
-            Date dt = s_date;
-            short cata = 0;
-            for (int i = 0; i < s_cata.length(); ++i)
-                cata |= catalog2Short(s_cata[i]);
-            Status ret = selectA.I_selectTicket(Pair<short, short>(st1, st2), dt, cata, ans);
-            //cout << "here1\n";
-            if (ret == Success && ans.size() != 0) {
-                cout << ans.size() << "\n";
-                train tr;
-                //cout << "here2\n";
-                for (int i = 0; i < ans.size(); ++i) {
-                    selectA.I_selectTrain(ans[i].tk_trainID, tr);
-                    cout << ans[i].tk_trainID << " ";
-                    cout << s_st1 << " " << ans[i].tk_date << " " << ans[i].tk_time.first() << " ";
-                    cout << s_st2 << " " << ans[i].tk_date << " " << ans[i].tk_time.second() << " ";
-                    for (int j = 0; j < tr.t_ticketKind; ++j) {
-                        short p = tr.t_ticketName[j];
-                        cout << short2Kind(p) << " " << ans[i].tk_remain[p] << " " << ans[i].tk_price[p] << " ";
-                    }
-                    cout << "\n";
-                }
-            } else {
+            if (st1 < 0 || st2 < 0)
                 cout << "0\n";
+            else {
+                Date dt = s_date;
+                short cata = 0;
+                for (int i = 0; i < s_cata.length(); ++i)
+                    cata |= catalog2Short(s_cata[i]);
+                Status ret = selectA.I_selectTicket(Pair<short, short>(st1, st2), dt, cata, ans);
+                if (ret == Success && ans.size() != 0) {
+                    cout << ans.size() << "\n";
+                    train tr;
+                    for (int i = 0; i < ans.size(); ++i) {
+                        selectA.I_selectTrain(ans[i].tk_trainID, tr);
+                        cout << ans[i].tk_trainID << " ";
+                        cout << s_st1 << " " << ans[i].tk_date << " " << ans[i].tk_time.first() << " ";
+                        cout << s_st2 << " " << ans[i].tk_date << " " << ans[i].tk_time.second() << " ";
+                        for (int j = 0; j < tr.t_ticketKind; ++j) {
+                            short p = tr.t_ticketName[j];
+                            cout << short2Kind(p) << " " << ans[i].tk_remain[p] << " " << ans[i].tk_price[p] << " ";
+                        }
+                        cout << "\n";
+                    }
+                } else {
+                    cout << "0\n";
+                }
             }
-            //cout << "here3\n";
         }
         if (firstWord == "query_transfer") {
             myAlgorithm::String s_st1, s_st2, s_date, s_cata;
             cin >> s_st1 >> s_st2 >> s_date >> s_cata;
             short st1 = trainStation2Short(s_st1), st2 = trainStation2Short(s_st2);
-            Date dt = s_date;
-            short cata = 0;
-            for (int i = 0; i < s_cata.length(); ++i)
-                cata |= catalog2Short(s_cata[i]);
-            myAlgorithm::Vector<ticket> ans;
-            Status ret = selectA.I_selectTicketTransfer(Pair<short, short>(st1, st2), dt, cata, TOT_STATION, ans);
-            if (ret == Success && !ans.empty()) {
-                train tr;
-                for (int i = 0; i < ans.size(); ++i) {
-                    selectA.I_selectTrain(ans[i].tk_trainID, tr);
-                    cout << ans[i].tk_trainID << " ";
-                    cout << s_st1 << " " << ans[i].tk_date << " " << ans[i].tk_time.first() << " ";
-                    cout << s_st2 << " " << ans[i].tk_date << " " << ans[i].tk_time.second() << " ";
-                    for (int j = 0; j < tr.t_ticketKind; ++j) {
-                        short p = tr.t_ticketName[j];
-                        cout << short2Kind(p) << " " << ans[i].tk_remain[p] << " " << ans[i].tk_price[p] << " ";
+            if (st1 < 0 || st2 < 0)
+                cout << "-1\n";
+            else {
+                Date dt = s_date;
+                short cata = 0;
+                for (int i = 0; i < s_cata.length(); ++i)
+                    cata |= catalog2Short(s_cata[i]);
+                myAlgorithm::Vector<ticket> ans;
+                Status ret = selectA.I_selectTicketTransfer(Pair<short, short>(st1, st2), dt, cata, TOT_STATION, ans);
+                if (ret == Success && !ans.empty()) {
+                    train tr;
+                    for (int i = 0; i < ans.size(); ++i) {
+                        selectA.I_selectTrain(ans[i].tk_trainID, tr);
+                        cout << ans[i].tk_trainID << " ";
+                        if (i == 0)
+                            cout << s_st1 << " ";
+                        else
+                            cout << short2trainStation(ans[1].tk_position.first()) << " ";
+                        cout << ans[i].tk_date << " " << ans[i].tk_time.first() << " ";
+                        if (i == 1)
+                            cout << s_st2 << " ";
+                        else
+                            cout << short2trainStation(ans[0].tk_position.second()) << " ";
+                        cout << ans[i].tk_date << " " << ans[i].tk_time.second() << " ";
+                        for (int j = 0; j < tr.t_ticketKind; ++j) {
+                            short p = tr.t_ticketName[j];
+                            cout << short2Kind(p) << " " << ans[i].tk_remain[p] << " " << ans[i].tk_price[p] << " ";
+                        }
+                        cout << "\n";
                     }
-                    cout << "\n";
-                }
+                } else
+                    cout << "-1\n";
             }
         }
         if (firstWord == "query_order") {
@@ -272,12 +286,15 @@ int main() {
                 float prc[5];
                 cin >> s_name >> artime >> sttime >> sotime;
                 int s_num = trainStation2Short(s_name);
+                if (s_num < 0)
+                    ret2 = NoThisTrain;
                 Time tm1 = artime, tm2 = sttime;
                 for (int j = 0; j < limit; ++j) {
                     cin >> s_price;
                     prc[j] = s_price.toFloat();
                 }
-                if (ret1 == Success) ret2 = insert.I_addTrainTicket(p_tid, s_num, tm1, tm2, prc);
+                if (ret1 == Success && ret2 == Success)
+                    ret2 = insert.I_addTrainTicket(p_tid, s_num, tm1, tm2, prc);
                 if (ret2 != Success)
                     ret = NoThisTrain;
             }
@@ -289,10 +306,14 @@ int main() {
             myAlgorithm::String p_id, p_num, p_tid, p_loc1, p_loc2, p_date, p_tkk;
             cin >> p_id >> p_num >> p_tid >> p_loc1 >> p_loc2 >> p_date >> p_tkk;
             short p_loc1_s = trainStation2Short(p_loc1), p_loc2_s = trainStation2Short(p_loc2);
-            Status ret = deleteA.I_deleteUserBookedTicket((int) p_id, (Date) p_date, p_tid,
-                                                          Pair<short, short>(p_loc1_s, p_loc2_s), kind2short(p_tkk),
-                                                          (int) p_num);
-            if (ret == Success) cout << "1\n"; else cout << "0\n";
+            if (p_loc1_s < 0 || p_loc2_s < 0)
+                cout << "0\n";
+            else{
+                Status ret = deleteA.I_deleteUserBookedTicket((int) p_id, (Date) p_date, p_tid,
+                                                              Pair<short, short>(p_loc1_s, p_loc2_s), kind2short(p_tkk),
+                                                              (int) p_num);
+                if (ret == Success) cout << "1\n"; else cout << "0\n";
+            }
         }
         if (firstWord == "delete_train") {
             String p_id;

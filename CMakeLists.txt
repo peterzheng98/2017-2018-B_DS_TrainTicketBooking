@@ -3,7 +3,7 @@ project(2018DataStructureBigWork)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_FLAGS "-O2 -w")
+set(CMAKE_CXX_FLAGS "-w")
 
 #add_executable(2018DataStructureBigWork main.cpp Kernel.hpp CoreData.h BigNum.hpp Exception.hpp Set.hpp Engine.cpp Engine.h String.h HashTookit.h HashTookit.cpp HashTookit.h ParserForCommand.h InternalData.h)
 #add_executable(Test main2.cpp Set.hpp)

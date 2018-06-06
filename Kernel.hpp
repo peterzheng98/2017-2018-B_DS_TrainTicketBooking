@@ -344,7 +344,10 @@ namespace Kernel {
             if(InternalData::InternalStation[mid] >= station) r = mid - 1, ansx = mid;
             else l = mid + 1;
         }
-        return ansx;
+        if (station == InternalData::InternalStation[ansx])
+            return ansx;
+        else
+            return -1;
     }
 
     inline myAlgorithm::String short2trainStation(const short &idx) {
@@ -414,20 +417,32 @@ namespace Kernel {
                     break;
             if (i >= j || i == upTrain.t_stationNum || j == upTrain.t_stationNum)
                 return NoThisTrain;
-            Vector<ticketKey> vtk;
-            for (short k = i; k < j; ++k) {
-                ticketKey tik(Pair<short, short>(upTrain.t_station[k], upTrain.t_station[k + 1]),
-                              tk_id, tk_date);
-                auto tikSel = ticketTree.search(tik);
-                if (!tikSel.second || tikSel.first.tk_remain[tk_kind] < tk_num)
-                    return NoRemainTicket;
-                else
-                    vtk.push_back(tik);
+            ticketKey tik(Pair<short, short>(upTrain.t_station[i], upTrain.t_station[j]),
+                          tk_id, tk_date);
+            auto tikSel = ticketTree.search(tik);
+            if (!tikSel.second || tikSel.first.tk_remain[tk_kind] < tk_num)
+                return NoRemainTicket;
+            for (short p = 0; p <= i; ++p) {
+                for (short q = i + 1; q < upTrain.t_stationNum; ++q) {
+                    tik = ticketKey(Pair<short, short>(upTrain.t_station[p], upTrain.t_station[q]),
+                                  tk_id, tk_date);
+                    auto tikkSel = ticketTree.search(tik);
+                    if (tikkSel.second) {
+                        tikkSel.first.tk_remain[tk_kind] -= tk_num;
+                        ticketTree.update(tik, tikkSel.first);
+                    }
+                }
             }
-            for (int i = 0; i < vtk.size(); ++i) {
-                auto tikSel = ticketTree.search(vtk[i]);
-                tikSel.first.tk_remain[tk_kind] -= tk_num;
-                ticketTree.update(vtk[i], tikSel.first);
+            for (short p = i + 1; p < j; ++p){
+                for (short q = p + 1; q < upTrain.t_stationNum; ++q){
+                    tik = ticketKey(Pair<short, short>(upTrain.t_station[p], upTrain.t_station[q]),
+                                    tk_id, tk_date);
+                    auto tikkSel = ticketTree.search(tik);
+                    if (tikkSel.second) {
+                        tikkSel.first.tk_remain[tk_kind] -= tk_num;
+                        ticketTree.update(tik, tikkSel.first);
+                    }
+                }
             }
             int ticketID = tkSel.first.tk_ticketID;
             auto utt = userTicketTree.search(Pair<int, int>(p_id, ticketID));
@@ -526,17 +541,21 @@ namespace Kernel {
             ret.clear();
             Vector<ticket> vt1, vt2;
             ticket ans1, ans2;
-            int minTime;
+            int minTime = 0;
             for (short i = 0; i < totStation; ++i) {
-                if (i != tk_position.first() && i != tk_position.second())
+                if (i != tk_position.first() && i != tk_position.second()) {
                     I_selectTicket(Pair<short, short>(tk_position.first(), i), tk_date, tk_catalog, vt1);
-                I_selectTicket(Pair<short, short>(i, tk_position.second()), tk_date, tk_catalog, vt2);
-                for (int j = 0; j < vt1.size(); ++j) {
-                    for (int k = 0; k < vt2.size(); ++k) {
-                        if (minTime < vt2[k].tk_time.second() - vt1[j].tk_time.first()) {
-                            minTime = vt2[k].tk_time.second() - vt1[j].tk_time.first();
-                            ans1 = vt1[j];
-                            ans2 = vt2[k];
+                    I_selectTicket(Pair<short, short>(i, tk_position.second()), tk_date, tk_catalog, vt2);
+                    for (int j = 0; j < vt1.size(); ++j) {
+                        for (int k = 0; k < vt2.size(); ++k) {
+                            if (vt1[j].tk_trainID == vt2[k].tk_trainID)
+                                continue;
+                            int dif = -(vt1[j].tk_time.first() - vt2[k].tk_time.second());
+                            if (minTime == 0 || minTime > dif) {
+                                minTime = -(vt1[j].tk_time.first() - vt2[k].tk_time.second());
+                                ans1 = vt1[j];
+                                ans2 = vt2[k];
+                            }
                         }
                     }
                 }
@@ -670,29 +689,53 @@ namespace Kernel {
             auto tik = userTicketTree.searchFirst(Pair<int, int>(p_id, 0));
             if (tik.empty())
                 return NoRemainTicket;
-            for (int i = 0; i < tik.size(); ++i) {
-                auto tikIdSel = ticketIdTree.search(tik[i].ticketId);
+            for (int n = 0; n < tik.size(); ++n) {
+                auto tikIdSel = ticketIdTree.search(tik[n].ticketId);
                 if (!tikIdSel.second)
                     continue;
                 if (tikIdSel.first.tk_date != p_date
                     || tikIdSel.first.tk_position != tk_location
                     || tikIdSel.first.tk_trainID != tk_id)
                     continue;
-                if (tik[i].ticketNum[tk_kind] < tk_num)
+                if (tik[n].ticketNum[tk_kind] < tk_num)
                     return NoRemainTicket;
                 else{
-                    userTicket utk = tik[i];
+                    userTicket utk = tik[n];
                     utk.ticketNum[tk_kind] -= tk_num;
-                    userTicketTree.update(Pair<int, int>(p_id, tik[i].ticketId), utk);
+                    userTicketTree.update(Pair<int, int>(p_id, tik[n].ticketId), utk);
                 }
-                auto tikSel = ticketTree.search(ticketKey(tikIdSel.first));
-                if (tikSel.second) {
-                    tikIdSel.first.tk_remain[tk_kind] += tk_num;
-                    ticketTree.update(ticketKey(tikIdSel.first), tikIdSel.first);
-                } else {
-                    ticket newTik = tikSel.first;
-                    newTik.tk_remain[tk_kind] = tk_num;
-                    ticketTree.insert(ticketKey(newTik), newTik);
+                train upTrain = trainTree.search(tikIdSel.first.tk_trainID).first;
+                short i, j;
+                for (i = 0; i < upTrain.t_stationNum; ++i)
+                    if (upTrain.t_station[i] == tikIdSel.first.tk_position.first())
+                        break;
+                for (j = 0; j < upTrain.t_stationNum; ++j)
+                    if (upTrain.t_station[j] == tikIdSel.first.tk_position.second())
+                        break;
+                if (i >= j || i == upTrain.t_stationNum || j == upTrain.t_stationNum)
+                    return NoRemainTicket;
+                ticketKey tik;
+                for (short p = 0; p <= i; ++p) {
+                    for (short q = i + 1; q < upTrain.t_stationNum; ++q) {
+                        tik = ticketKey(Pair<short, short>(upTrain.t_station[p], upTrain.t_station[q]),
+                                        tk_id, p_date);
+                        auto tikkSel = ticketTree.search(tik);
+                        if (tikkSel.second) {
+                            tikkSel.first.tk_remain[tk_kind] += tk_num;
+                            ticketTree.update(tik, tikkSel.first);
+                        }
+                    }
+                }
+                for (short p = i + 1; p < j; ++p){
+                    for (short q = p + 1; q < upTrain.t_stationNum; ++q){
+                        tik = ticketKey(Pair<short, short>(upTrain.t_station[p], upTrain.t_station[q]),
+                                        tk_id, p_date);
+                        auto tikkSel = ticketTree.search(tik);
+                        if (tikkSel.second) {
+                            tikkSel.first.tk_remain[tk_kind] += tk_num;
+                            ticketTree.update(tik, tikkSel.first);
+                        }
+                    }
                 }
                 return Success;
             }
