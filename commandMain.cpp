@@ -13,7 +13,7 @@
 using namespace std;
 using namespace myAlgorithm;
 using namespace Kernel;
-const short TOT_STATION = 2175;
+const short TOT_STATION = 2717;
 Insert insert;
 Update update;
 Select selectA;
