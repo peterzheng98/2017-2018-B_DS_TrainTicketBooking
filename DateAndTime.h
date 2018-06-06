@@ -192,7 +192,7 @@ namespace myAlgorithm {
     }
 
     std::ostream &operator<<(std::ostream &os, const Date &data) {
-        os << data.getYear() << "-" << data.getMonth() << "-" << data.getDay();
+        printf("%04d-%02d-%02d", data.getYear(), data.getMonth(), data.getDay());
         return os;
     }
 
