@@ -237,7 +237,7 @@ void Test5()
 {
 	static int flag[N__ + 10][N__ + 10][N__ + 10];
 	static int bo[N__ + 10];
-	BPlusTree<Pair<int, BigSize>, int> bpt(true, "tmp/cache.dat");
+	BPlusTree<TriplePair<int, int, BigSize>, int> bpt(true, "tmp/cache.dat");
 	srand(time(0));
     start_ = clock();
 	printf("Test5:");
@@ -251,7 +251,7 @@ void Test5()
 			random_shuffle(a + 1, a + 1 + n);
 			for(int k = 1; k <= m; k++)
 			{
-				bpt.insert(Pair<int, BigSize>(i, j), a[k]);
+				bpt.insert(TriplePair<int, int, BigSize>(i, j, k), a[k]);
 				flag[i][j][a[k]] = 1;
 			}
 		}
@@ -260,7 +260,8 @@ void Test5()
 	{
 		for(int j = 1; j <= n; j++)
 		{
-			Vector<int> v = bpt.searchFirstAndSecond(Pair<int, BigSize>(i, j));
+			Vector<int> v = bpt.searchFirstAndSecond(TriplePair<int, int, BigSize>(i, j, 0));
+			printf("%d\n", v.size());
 			if(v.size() != m)
 			{
 				puts("the number of value went wrong!");
