@@ -42,6 +42,7 @@ class ticket {
 
 public:
     short tk_position[47];
+    short tk_positionNum = 0;
     Date tk_date;
     int tk_ticketID = 0;
     String tk_trainID;
@@ -52,8 +53,8 @@ public:
     }
 
     ticket(const ticket &tik)
-            : tk_date(tik.tk_date), tk_ticketID(tik.tk_ticketID), tk_trainID(tik.tk_trainID) {
-        for (int i = 0; i < 47; ++i) {
+            : tk_positionNum(tik.tk_positionNum), tk_date(tik.tk_date), tk_ticketID(tik.tk_ticketID), tk_trainID(tik.tk_trainID) {
+        for (int i = 0; i < tk_positionNum; ++i) {
             for (int j = 0; j < 5; ++j)
                 tk_remain[i][j] = tik.tk_remain[i][j];
             tk_position[i] = tik.tk_position[i];
@@ -191,30 +192,6 @@ public:
         for (short j = 0; j < t_ticketKind; ++j)
             t_ticketName[j] = tr.t_ticketName[j];
     }
-
-    String M_id() const {
-        return t_id;
-    }
-
-    String M_name() const {
-        return t_name;
-    }
-
-    const short *M_station() const {
-        return t_station;
-    }
-
-    short M_stationNum() const {
-        return t_stationNum;
-    }
-
-    short M_catalog() const {
-        return t_catalog;
-    }
-
-    bool M_isOnSale() const {
-        return t_onSale;
-    }
 };
 
 class user {
@@ -308,7 +285,7 @@ static const int MAX_TICKET = 2000;
 BPlusTree<int, user> userIdTree(false, "user.dat");
 //BPlusTree<String, int> userNameTree(true, "userName.dat");
 BPlusTree<ticketKey, ticket> ticketTree(false, "ticket.dat");
-BPlusTree<int, ticket> ticketIdTree(false, "ticketId.dat");
+BPlusTree<int, ticketKey> ticketIdTree(false, "ticketId.dat");
 BPlusTree<userTicketKey, userTicket> userTicketTree(false, "userTicket.dat");
 BPlusTree<String, train> trainTree(false, "train.dat");
 BPlusTree<trainStationKey, String> arriveTrainTree(false, "arriveTrain.dat");
@@ -636,32 +613,35 @@ namespace Kernel {
             userTicketKey utk(p_id, 0, 0, 0);
             auto vb = userTicketTree.searchFirst(utk);
             for (int i = 0; i < vb.size(); ++i) {
-                auto tikSel = ticketIdTree.search(vb[i].ticketId);
-                if (tikSel.second && tikSel.first.tk_date == p_date){
-                    auto trSel = trainTree.search(tikSel.first.tk_trainID);
-                    if (trSel.second && trSel.first.t_catalog & tk_catalog) {
-                        Ticket tik;
-                        short p, q;
-                        for (p = 0; p < trSel.first.t_stationNum; ++p)
-                            if (trSel.first.t_station[p] == vb[i].position.first())
-                                break;
-                        for (q = 0; q < trSel.first.t_stationNum; ++q)
-                            if (trSel.first.t_station[q] == vb[i].position.second())
-                                break;
-                        if (p < q && p != trSel.first.t_stationNum && q != trSel.first.t_stationNum){
+                auto tikSel1 = ticketIdTree.search(vb[i].ticketId);
+                if (tikSel1.second) {
+                    auto tikSel = ticketTree.search(tikSel1.first);
+                    if (tikSel.second && tikSel.first.tk_date == p_date) {
+                        auto trSel = trainTree.search(tikSel.first.tk_trainID);
+                        if (trSel.second && trSel.first.t_catalog & tk_catalog) {
                             Ticket tik;
-                            tik.tk_trainID = trSel.first.t_id;
-                            tik.tk_position = vb[i].position;
-                            tik.tk_date = p_date;
-                            tik.tk_catalog = trSel.first.t_catalog;
-                            tik.tk_time = Pair<Time, Time>(trSel.first.t_time[p][1], trSel.first.t_time[q][0]);
-                            for (int j = 0; j < trSel.first.t_ticketKind; ++j) {
-                                int n = trSel.first.t_ticketName[j];
-                                tik.tk_price[n] = trSel.first.t_price[q][j] - trSel.first.t_price[p][j];
+                            short p, q;
+                            for (p = 0; p < trSel.first.t_stationNum; ++p)
+                                if (trSel.first.t_station[p] == vb[i].position.first())
+                                    break;
+                            for (q = 0; q < trSel.first.t_stationNum; ++q)
+                                if (trSel.first.t_station[q] == vb[i].position.second())
+                                    break;
+                            if (p < q && p != trSel.first.t_stationNum && q != trSel.first.t_stationNum) {
+                                Ticket tik;
+                                tik.tk_trainID = trSel.first.t_id;
+                                tik.tk_position = vb[i].position;
+                                tik.tk_date = p_date;
+                                tik.tk_catalog = trSel.first.t_catalog;
+                                tik.tk_time = Pair<Time, Time>(trSel.first.t_time[p][1], trSel.first.t_time[q][0]);
+                                for (int j = 0; j < trSel.first.t_ticketKind; ++j) {
+                                    int n = trSel.first.t_ticketName[j];
+                                    tik.tk_price[n] = trSel.first.t_price[q][j] - trSel.first.t_price[p][j];
+                                }
+                                ret.push_back(tik);
+                                for (int j = 0; j < 12; ++j)
+                                    num[j].push_back(vb[i].ticketNum[j]);
                             }
-                            ret.push_back(tik);
-                            for (int j = 0; j < 12; ++j)
-                                num[j].push_back(vb[i].ticketNum[j]);
                         }
                     }
                 }
@@ -728,14 +708,16 @@ namespace Kernel {
                 newTik.tk_date = d;
                 newTik.tk_ticketID = ticketId++;
                 newTik.tk_trainID = tr.t_id;
+                newTik.tk_positionNum = tr.t_stationNum;
                 for (short i = 0; i < tr.t_stationNum; ++i){
                     newTik.tk_position[i] = tr.t_station[i];
                     for (short p = 0; p != tr.t_ticketKind; ++p) {
                         newTik.tk_remain[i][p] = 2000;
                     }
                 }
-                ticketTree.insert(ticketKey(newTik), newTik);
-                ticketIdTree.insert(newTik.tk_ticketID, newTik);
+                ticketKey tkk(newTik);
+                ticketTree.insert(tkk, newTik);
+                ticketIdTree.insert(newTik.tk_ticketID, tkk);
             }
             for (short i = 1; i < tr.t_stationNum; ++i){
                 trainStationKey tsk1(tr.t_station[i - 1], t_id);
@@ -775,7 +757,10 @@ namespace Kernel {
             if (tik.empty())
                 return NoRemainTicket;
             for (int n = 0; n < tik.size(); ++n) {
-                auto tikIdSel = ticketIdTree.search(tik[n].ticketId);
+                auto tikIdSel1 = ticketIdTree.search(tik[n].ticketId);
+                if (!tikIdSel1.second)
+                    continue;
+                auto tikIdSel = ticketTree.search(tikIdSel1.first);
                 if (!tikIdSel.second)
                     continue;
                 if (tikIdSel.first.tk_date != p_date || tikIdSel.first.tk_trainID != tk_id)
@@ -807,7 +792,6 @@ namespace Kernel {
                 for (short p = i + 1; p <= j; ++p){
                     tikIdSel.first.tk_remain[p][k] += tk_num;
                 }
-                ticketIdTree.update(tikIdSel.first.tk_ticketID, tikIdSel.first);
                 ticketTree.update(ticketKey(tikIdSel.first), tikIdSel.first);
                 return Success;
             }
