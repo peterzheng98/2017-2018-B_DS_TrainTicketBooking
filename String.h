@@ -351,14 +351,14 @@ namespace myAlgorithm {
     std::ostream &operator<<(std::ostream &os, const String &rhs) {
 //        if (rhs.locale != String::ENGLISH) throw 1; //TODO: throw locale error(not English)
         for (int i = 0; i < rhs.length(); i++)
-            os << rhs.data[i];
+            putchar(rhs.data[i]);
         return os;
     }
 
     std::wostream &operator<<(std::wostream &os, const String &rhs) {
 //        if (rhs.locale != String::CHINESE) throw 1; //TODO: throw locale error(not Chinese)
         for (int i = 0; i < rhs.length(); i++)
-            os << rhs.data[i];
+            putchar(rhs.data[i]);
         return os;
     }
 
@@ -393,7 +393,7 @@ namespace myAlgorithm {
     std::ofstream &operator<<(std::ofstream &os, const String &rhs) {
         if (rhs.locale != String::ENGLISH) throw 1; //TODO: throw locale error(not English)
         for (int i = 0; i < rhs.length(); i++)
-            os << rhs.data[i];
+            putchar(rhs.data[i]);
         return os;
     }
 }
