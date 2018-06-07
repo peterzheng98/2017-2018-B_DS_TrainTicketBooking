@@ -291,7 +291,7 @@ struct trainStationKey{
     trainStationKey(short st, const String &s) : station(st), trainId(s) {}
 
     bool operator <(const trainStationKey &tsk) const {
-        return station < tsk.station || (station == tsk.station && trainId == tsk.trainId);
+        return station < tsk.station || (station == tsk.station && trainId < tsk.trainId);
     }
     const short &first() const{
         return station;
@@ -546,37 +546,6 @@ namespace Kernel {
 
         Status I_selectTicket(Pair<short, short> tk_position, Date tk_date, short tk_catalog, Vector<Ticket> &ret) {
             ret.clear();
-            /*ticketKey tkKey(tk_date);
-            Vector<ticket> vt = ticketTree.searchFirst(tkKey);
-            for (int i = 0; i < vt.size(); ++i) {
-                auto trSel = trainTree.search(vt[i].tk_trainID);
-                if (trSel.first.t_catalog & tk_catalog){
-                    short p, q;
-                    for (p = 0; p < trSel.first.t_stationNum; ++p)
-                        if (trSel.first.t_station[p] == tk_position.first())
-                            break;
-                    for (q = 0; q < trSel.first.t_stationNum; ++q)
-                        if (trSel.first.t_station[q] == tk_position.second())
-                            break;
-                    if (p < q && p != trSel.first.t_stationNum && q != trSel.first.t_stationNum){
-                        Ticket tik;
-                        tik.tk_trainID = trSel.first.t_id;
-                        tik.tk_position = tk_position;
-                        tik.tk_date = tk_date;
-                        tik.tk_catalog = trSel.first.t_catalog;
-                        tik.tk_time = Pair<Time, Time>(trSel.first.t_time[p][1], trSel.first.t_time[q][0]);
-                        for (int j = 0; j < trSel.first.t_ticketKind; ++j) {
-                            int n = trSel.first.t_ticketName[j];
-                            tik.tk_remain[n] = 2000;
-                            for (int k = p + 1; k <= q; ++k)
-                                if (tik.tk_remain[n] > vt[i].tk_remain[k][j])
-                                    tik.tk_remain[n] = vt[i].tk_remain[k][j];
-                            tik.tk_price[n] = trSel.first.t_price[q][j] - trSel.first.t_price[p][j];
-                        }
-                        ret.push_back(tik);
-                    }
-                }
-            }*/
             trainStationKey tsk1(tk_position.first()), tsk2(tk_position.second());
             auto vt1 = leaveTrainTree.searchFirst(tsk1);
             auto vt2 = arriveTrainTree.searchFirst(tsk2);
