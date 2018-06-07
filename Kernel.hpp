@@ -10,7 +10,6 @@
 #include "CoreData.h"
 #include "BigNum.hpp"
 #include "String.h"
-#include "Set.hpp"
 #include "BPlusTree.hpp"
 #include "DateAndTime.h"
 #include "Vector.h"
@@ -43,85 +42,68 @@ class ticket {
     friend class Kernel::Delete;
 
 public:
-    Pair<short, short> tk_position;
-    Pair<Time, Time> tk_time;
+    short tk_position[50];
     Date tk_date;
-    short tk_catalog = 0;
     int tk_ticketID = 0;
     String tk_trainID;
-    float tk_price[15];
-    int tk_remain[15];
+    short tk_remain[50][5];
 
     ticket(){
-        memset(tk_price, 0, sizeof(tk_price));
         memset(tk_remain, 0, sizeof(tk_remain));
     }
 
     ticket(const ticket &tik)
-            : tk_position(tik.tk_position), tk_time(tik.tk_time), tk_date(tik.tk_date),
-              tk_catalog(tik.tk_catalog), tk_ticketID(tik.tk_ticketID), tk_trainID(tik.tk_trainID) {
-        for (int i = 0; i < 11; ++i) {
-            tk_price[i] = tik.tk_price[i];
-            tk_remain[i] = tik.tk_remain[i];
+            : tk_date(tik.tk_date), tk_ticketID(tik.tk_ticketID), tk_trainID(tik.tk_trainID) {
+        for (int i = 0; i < 50; ++i) {
+            for (int j = 0; j < 5; ++j)
+                tk_remain[i][j] = tik.tk_remain[i][j];
+            tk_position[i] = tik.tk_position[i];
         }
     }
+};
 
-    Pair<short, short> M_position() const {
-        return tk_position;
+struct Ticket{
+    Pair<short, short> tk_position;
+    Pair<Time, Time> tk_time;
+    Date tk_date;
+    String tk_trainID;
+    short tk_catalog = 0;
+    float tk_price[12];
+    int tk_remain[12];
+
+    Ticket(){
+        memset(tk_price, 0, sizeof(tk_price));
+        memset(tk_remain, 0, sizeof(tk_price));
     }
-
-    Pair<Time, Time> M_time() const {
-        return tk_time;
-    }
-
-    Date M_date() const {
-        return tk_date;
-    }
-
-    short M_catalog() const {
-        return tk_catalog;
-    }
-
-    String M_trainID() const {
-        return tk_trainID;
-    }
-
-    const float *M_price() const {
-        return tk_price;
-    }
-
-    const int *M_remain() const {
-        return tk_remain;
+    Ticket(const Ticket &tk)
+            : tk_position(tk.tk_position), tk_time(tk.tk_time), tk_date(tk.tk_date),
+              tk_trainID(tk.tk_trainID), tk_catalog(tk.tk_catalog) {
+        for (short i = 0; i < 12; ++i){
+            tk_price[i] = tk.tk_price[i];
+            tk_remain[i] = tk.tk_remain[i];
+        }
     }
 };
 
 class ticketKey {
 private:
-    Pair<short, short> station;
     String trainID;
     Date date;
 public:
     ticketKey() = default;
 
-    ticketKey(const Pair<short, short> &stt, const Date &dt)
-            : station(stt), date(dt) {}
+    ticketKey(const Date &dt) : date(dt) {}
 
-    ticketKey(const Pair<short, short> &stt, const String &tid, const Date &dt)
-            : station(stt), trainID(tid), date(dt) {}
+    ticketKey(const String &tid, const Date &dt) : trainID(tid), date(dt) {}
 
     ticketKey(const ticket &tk)
-            : station(tk.tk_position), trainID(tk.tk_trainID), date(tk.tk_date) {}
+            : trainID(tk.tk_trainID), date(tk.tk_date) {}
 
     bool operator<(const ticketKey &tk) const {
-        return station < tk.station || (station == tk.station && date < tk.date)
-               || (station == tk.station && date == tk.date && trainID < tk.trainID);
+        return date < tk.date || (date == tk.date && trainID < tk.trainID);
     }
 
-    Pair<short, short> first() const {
-        return station;
-    }
-
-    Date second() const {
+    Date first() const {
         return date;
     }
 };
@@ -129,20 +111,48 @@ public:
 struct userTicket{
     int ticketId = 0;
     int userId = 0;
+    Pair<short, short> position;
     int ticketNum[12];
 
     userTicket(){
         memset(ticketNum, 0, sizeof(ticketNum));
     }
-    userTicket(const userTicket &utk) : ticketId(utk.ticketId), userId(utk.userId){
+    userTicket(const userTicket &utk)
+            : ticketId(utk.ticketId), userId(utk.userId), position(utk.position){
         for (int i = 0; i < 12; ++i)
             ticketNum[i] = utk.ticketNum[i];
     }
     userTicket &operator =(const userTicket &utk){
         ticketId = utk.ticketId;
         userId = utk.userId;
+        position = utk.position;
         for (int i = 0; i < 12; ++i)
             ticketNum[i] = utk.ticketNum[i];
+    }
+};
+
+struct userTicketKey{
+    int userId = 0;
+    int ticketId = 0;
+    Pair<short, short> position;
+
+    userTicketKey() = default;
+    userTicketKey(const userTicketKey &utk)
+            : ticketId(utk.ticketId), userId(utk.userId), position(utk.position) {}
+    userTicketKey(const userTicket &utt)
+            : ticketId(utt.ticketId), userId(utt.userId), position(utt.position) {}
+    userTicketKey(int x, int y, int p, int q)
+            : userId(x), ticketId(y), position(p, q) {}
+    bool operator <(const userTicketKey &utk) const{
+        return userId < utk.userId || (userId == utk.userId && position < utk.position)
+                || (userId == utk.userId && position == utk.position && ticketId < utk.ticketId);
+    }
+
+    const int &first() const{
+        return userId;
+    }
+    const Pair<short, short> &second() const{
+        return position;
     }
 };
 
@@ -278,12 +288,13 @@ static int base = 15096;
 static int mo = 204251;
 static int ticketId = 1;
 static Date startDate(2018, 6, 1), endDate(2018, 6, 30);
+static const int MAX_TICKET = 2000;
 
 BPlusTree<int, user> userIdTree(false, "user.dat");
 //BPlusTree<String, int> userNameTree(true, "userName.dat");
 BPlusTree<ticketKey, ticket> ticketTree(false, "ticket.dat");
 BPlusTree<int, ticket> ticketIdTree(false, "ticketId.dat");
-BPlusTree<Pair<int, int>, userTicket> userTicketTree(false, "userTicket.dat");
+BPlusTree<userTicketKey, userTicket> userTicketTree(false, "userTicket.dat");
 BPlusTree<String, train> trainTree(false, "train.dat");
 
 namespace Kernel {
@@ -308,7 +319,7 @@ namespace Kernel {
     }
 
     inline short kind2short(const myAlgorithm::String& kind){
-        if(kind == "一等座") return 11;
+        if(kind == "一等座") return 0;
         if(kind == "二等座") return 1;
         if(kind == "动卧") return 2;
         if(kind == "商务座") return 3;
@@ -319,11 +330,11 @@ namespace Kernel {
         if(kind == "软卧") return 8;
         if(kind == "软座") return 9;
         if(kind == "高级软卧") return 10;
-        if(kind == "大师座") return 12;
+        if(kind == "大师座") return 11;
     }
 
     inline myAlgorithm::String short2Kind(const short& sha){
-        if(sha == 11) return "一等座";
+        if(sha == 0) return "一等座";
         if(sha == 1) return "二等座";
         if(sha == 2) return "动卧";
         if(sha == 3) return "商务座";
@@ -334,7 +345,7 @@ namespace Kernel {
         if(sha == 8) return "软卧";
         if(sha == 9) return "软座";
         if(sha == 10) return "高级软卧";
-        if(sha == 12) return "大师座";
+        if(sha == 11) return "大师座";
     }
 
     inline int trainStation2Short(const myAlgorithm::String &station) {
@@ -395,16 +406,16 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_addUserBookedTicket(int p_id, int tk_num, String tk_id, Pair<short, short> tk_position, Date tk_date,
+        Status I_addUserBookedTicket(int p_id, int tk_num, String t_id, Pair<short, short> tk_position, Date tk_date,
                                      int tk_kind) {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
-            ticketKey newTk(tk_position, tk_id, tk_date);
+            ticketKey newTk(t_id, tk_date);
             auto tkSel = ticketTree.search(newTk);
             if (!tkSel.second)
                 return NoThisTrain;
-            auto trSel = trainTree.search(tk_id);
+            auto trSel = trainTree.search(t_id);
             if (!trSel.second)
                 return NoThisTrain;
             train upTrain(trSel.first);
@@ -417,45 +428,39 @@ namespace Kernel {
                     break;
             if (i >= j || i == upTrain.t_stationNum || j == upTrain.t_stationNum)
                 return NoThisTrain;
-            ticketKey tik(Pair<short, short>(upTrain.t_station[i], upTrain.t_station[j]),
-                          tk_id, tk_date);
+            ticketKey tik(t_id, tk_date);
             auto tikSel = ticketTree.search(tik);
-            if (!tikSel.second || tikSel.first.tk_remain[tk_kind] < tk_num)
+            if (!tikSel.second)
                 return NoRemainTicket;
-            for (short p = 0; p <= i; ++p) {
-                for (short q = i + 1; q < upTrain.t_stationNum; ++q) {
-                    tik = ticketKey(Pair<short, short>(upTrain.t_station[p], upTrain.t_station[q]),
-                                  tk_id, tk_date);
-                    auto tikkSel = ticketTree.search(tik);
-                    if (tikkSel.second) {
-                        tikkSel.first.tk_remain[tk_kind] -= tk_num;
-                        ticketTree.update(tik, tikkSel.first);
-                    }
-                }
-            }
-            for (short p = i + 1; p < j; ++p){
-                for (short q = p + 1; q < upTrain.t_stationNum; ++q){
-                    tik = ticketKey(Pair<short, short>(upTrain.t_station[p], upTrain.t_station[q]),
-                                    tk_id, tk_date);
-                    auto tikkSel = ticketTree.search(tik);
-                    if (tikkSel.second) {
-                        tikkSel.first.tk_remain[tk_kind] -= tk_num;
-                        ticketTree.update(tik, tikkSel.first);
-                    }
-                }
-            }
+            int k;
+            for (k = 0; k < 5; ++k)
+                if (upTrain.t_ticketName[k] == tk_kind)
+                    break;
+            if (k == 5)
+                return NoRemainTicket;
+            short minn = 2000;
+            for (int p = i + 1; p <= j; ++p)
+                if (minn > tikSel.first.tk_remain[p][k])
+                    minn = tikSel.first.tk_remain[p][k];
+            if (minn < tk_num)
+                return NoRemainTicket;
+            for (int p = i + 1; p <= j; ++p)
+                tikSel.first.tk_remain[p][k] -= tk_num;
+            ticketTree.update(tik, tikSel.first);
             int ticketID = tkSel.first.tk_ticketID;
-            auto utt = userTicketTree.search(Pair<int, int>(p_id, ticketID));
+            userTicketKey utk(p_id, ticketID, tk_position.first(), tk_position.second());
+            auto utt = userTicketTree.search(utk);
             if (utt.second){
                 utt.first.ticketNum[tk_kind] += tk_num;
-                userTicketTree.update(Pair<int, int>(p_id, ticketID), utt.first);
+                userTicketTree.update(utk, utt.first);
             }
             else{
-                userTicket utk;
-                utk.ticketId = ticketID;
-                utk.userId = p_id;
-                utk.ticketNum[tk_kind] = tk_num;
-                userTicketTree.insert(Pair<int, int>(p_id, ticketID), utk);
+                userTicket utc;
+                utc.ticketId = ticketID;
+                utc.userId = p_id;
+                utc.position = tk_position;
+                utc.ticketNum[tk_kind] = tk_num;
+                userTicketTree.insert(utk, utc);
             }
             return Success;
         }
@@ -520,15 +525,38 @@ namespace Kernel {
             return Success;
         }
 
-        Status I_selectTicket(Pair<short, short> tk_position, Date tk_date, short tk_catalog, Vector<ticket> &ret) {
+        Status I_selectTicket(Pair<short, short> tk_position, Date tk_date, short tk_catalog, Vector<Ticket> &ret) {
             ret.clear();
-            ticketKey tkKey(tk_position, tk_date);
-            Vector<ticket> vt = ticketTree.searchFirstAndSecond(tkKey);
+            ticketKey tkKey(tk_date);
+            Vector<ticket> vt = ticketTree.searchFirst(tkKey);
             for (int i = 0; i < vt.size(); ++i) {
-
                 auto trSel = trainTree.search(vt[i].tk_trainID);
-                if (trSel.first.t_catalog & tk_catalog)
-                    ret.push_back(vt[i]);
+                if (trSel.first.t_catalog & tk_catalog){
+                    short p, q;
+                    for (p = 0; p < trSel.first.t_stationNum; ++p)
+                        if (trSel.first.t_station[p] == tk_position.first())
+                            break;
+                    for (q = 0; q < trSel.first.t_stationNum; ++q)
+                        if (trSel.first.t_station[q] == tk_position.second())
+                            break;
+                    if (p < q && p != trSel.first.t_stationNum && q != trSel.first.t_stationNum){
+                        Ticket tik;
+                        tik.tk_trainID = trSel.first.t_id;
+                        tik.tk_position = tk_position;
+                        tik.tk_date = tk_date;
+                        tik.tk_catalog = trSel.first.t_catalog;
+                        tik.tk_time = Pair<Time, Time>(trSel.first.t_time[p][1], trSel.first.t_time[q][0]);
+                        for (int j = 0; j < trSel.first.t_ticketKind; ++j) {
+                            int n = trSel.first.t_ticketName[j];
+                            tik.tk_remain[n] = 2000;
+                            for (int k = p + 1; k <= q; ++k)
+                                if (tik.tk_remain[n] > vt[i].tk_remain[k][j])
+                                    tik.tk_remain[n] = vt[i].tk_remain[k][j];
+                            tik.tk_price[n] = trSel.first.t_price[q][j] - trSel.first.t_price[p][j];
+                        }
+                        ret.push_back(tik);
+                    }
+                }
             }
             if (ret.empty())
                 return NoThisTrain;
@@ -537,10 +565,10 @@ namespace Kernel {
         }
 
         Status I_selectTicketTransfer(Pair<short, short> tk_position, Date tk_date, short tk_catalog,
-                                      short totStation, Vector<ticket> &ret) {
+                                      short totStation, Vector<Ticket> &ret) {
             ret.clear();
-            Vector<ticket> vt1, vt2;
-            ticket ans1, ans2;
+            Vector<Ticket> vt1, vt2;
+            Ticket ans1, ans2;
             int minTime = 0;
             for (short i = 0; i < totStation; ++i) {
                 if (i != tk_position.first() && i != tk_position.second()) {
@@ -560,7 +588,7 @@ namespace Kernel {
                     }
                 }
             }
-            if (ans1.tk_ticketID == 0 || ans2.tk_ticketID == 0)
+            if (minTime == 0)
                 return NoThisTrain;
             ret.push_back(ans1);
             ret.push_back(ans2);
@@ -568,18 +596,42 @@ namespace Kernel {
         }
 
         Status I_selectUserBookedTicket(int p_id, Date p_date, int tk_catalog,
-                                        Vector<ticket> &ret, Vector<int> *num) {
+                                        Vector<Ticket> &ret, Vector<int> *num) {
             ret.clear();
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
-            auto vb = userTicketTree.searchFirst(Pair<int, int>(p_id, 0));
+            userTicketKey utk(p_id, 0, 0, 0);
+            auto vb = userTicketTree.searchFirst(utk);
             for (int i = 0; i < vb.size(); ++i) {
                 auto tikSel = ticketIdTree.search(vb[i].ticketId);
-                if (tikSel.second && tikSel.first.tk_date == p_date && tikSel.first.tk_catalog & tk_catalog) {
-                    ret.push_back(tikSel.first);
-                    for (int j = 0; j < 12; ++j)
-                        num[j].push_back(vb[i].ticketNum[j]);
+                if (tikSel.second && tikSel.first.tk_date == p_date){
+                    auto trSel = trainTree.search(tikSel.first.tk_trainID);
+                    if (trSel.second && trSel.first.t_catalog & tk_catalog) {
+                        Ticket tik;
+                        short p, q;
+                        for (p = 0; p < trSel.first.t_stationNum; ++p)
+                            if (trSel.first.t_station[p] == vb[i].position.first())
+                                break;
+                        for (q = 0; q < trSel.first.t_stationNum; ++q)
+                            if (trSel.first.t_station[q] == vb[i].position.second())
+                                break;
+                        if (p < q && p != trSel.first.t_stationNum && q != trSel.first.t_stationNum){
+                            Ticket tik;
+                            tik.tk_trainID = trSel.first.t_id;
+                            tik.tk_position = vb[i].position;
+                            tik.tk_date = p_date;
+                            tik.tk_catalog = trSel.first.t_catalog;
+                            tik.tk_time = Pair<Time, Time>(trSel.first.t_time[p][1], trSel.first.t_time[q][0]);
+                            for (int j = 0; j < trSel.first.t_ticketKind; ++j) {
+                                int n = trSel.first.t_ticketName[j];
+                                tik.tk_price[n] = trSel.first.t_price[q][j] - trSel.first.t_price[p][j];
+                            }
+                            ret.push_back(tik);
+                            for (int j = 0; j < 12; ++j)
+                                num[j].push_back(vb[i].ticketNum[j]);
+                        }
+                    }
                 }
             }
             if (ret.empty())
@@ -638,26 +690,20 @@ namespace Kernel {
                 return NoThisTrain;
             if (trSel.first.t_onSale)
                 return TrainHasBeenOnSale;
-            train tr = trSel.first;
-            for (short i = 0; i < tr.t_stationNum; ++i) {
-                for (short j = i + 1; j < tr.t_stationNum; ++j) {
-                    for (Date d = startDate; d != endDate; d = d.nextDate()) {
-                        ticket newTik;
-                        newTik.tk_position = Pair<short, short>(tr.t_station[i], tr.t_station[j]);
-                        newTik.tk_time = Pair<Time, Time>(tr.t_time[i][1], tr.t_time[j][0]);
-                        newTik.tk_date = d;
-                        newTik.tk_catalog = tr.t_catalog;
-                        newTik.tk_ticketID = ticketId++;
-                        newTik.tk_trainID = tr.t_id;
-                        for (short p = 0; p != tr.t_ticketKind; ++p) {
-                            short q = tr.t_ticketName[p];
-                            newTik.tk_remain[q] = 2000;
-                            newTik.tk_price[q] = tr.t_price[j][p] - tr.t_price[i][p];
-                        }
-                        ticketTree.insert(ticketKey(newTik), newTik);
-                        ticketIdTree.insert(newTik.tk_ticketID, newTik);
+            train &tr = trSel.first;
+            for (Date d = startDate; d != endDate; d = d.nextDate()) {
+                ticket newTik;
+                newTik.tk_date = d;
+                newTik.tk_ticketID = ticketId++;
+                newTik.tk_trainID = tr.t_id;
+                for (short i = 0; i < tr.t_stationNum; ++i){
+                    newTik.tk_position[i] = tr.t_station[i];
+                    for (short p = 0; p != tr.t_ticketKind; ++p) {
+                        newTik.tk_remain[i][p] = 2000;
                     }
                 }
+                ticketTree.insert(ticketKey(newTik), newTik);
+                ticketIdTree.insert(newTik.tk_ticketID, newTik);
             }
             tr.t_onSale = true;
             trainTree.update(t_id, tr);
@@ -686,57 +732,45 @@ namespace Kernel {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
-            auto tik = userTicketTree.searchFirst(Pair<int, int>(p_id, 0));
+            userTicketKey utk(p_id, 0, tk_location.first(), tk_location.second());
+            auto tik = userTicketTree.searchFirstAndSecond(utk);
             if (tik.empty())
                 return NoRemainTicket;
             for (int n = 0; n < tik.size(); ++n) {
                 auto tikIdSel = ticketIdTree.search(tik[n].ticketId);
                 if (!tikIdSel.second)
                     continue;
-                if (tikIdSel.first.tk_date != p_date
-                    || tikIdSel.first.tk_position != tk_location
-                    || tikIdSel.first.tk_trainID != tk_id)
+                if (tikIdSel.first.tk_date != p_date || tikIdSel.first.tk_trainID != tk_id)
                     continue;
                 if (tik[n].ticketNum[tk_kind] < tk_num)
                     return NoRemainTicket;
                 else{
-                    userTicket utk = tik[n];
+                    userTicket &utk = tik[n];
                     utk.ticketNum[tk_kind] -= tk_num;
-                    userTicketTree.update(Pair<int, int>(p_id, tik[n].ticketId), utk);
+                    userTicketTree.update(
+                            userTicketKey(p_id, tik[n].ticketId,
+                                          tk_location.first(), tk_location.second()),
+                            utk);
                 }
                 train upTrain = trainTree.search(tikIdSel.first.tk_trainID).first;
                 short i, j;
                 for (i = 0; i < upTrain.t_stationNum; ++i)
-                    if (upTrain.t_station[i] == tikIdSel.first.tk_position.first())
+                    if (upTrain.t_station[i] == tk_location.first())
                         break;
                 for (j = 0; j < upTrain.t_stationNum; ++j)
-                    if (upTrain.t_station[j] == tikIdSel.first.tk_position.second())
+                    if (upTrain.t_station[j] == tk_location.second())
                         break;
                 if (i >= j || i == upTrain.t_stationNum || j == upTrain.t_stationNum)
                     return NoRemainTicket;
-                ticketKey tik;
-                for (short p = 0; p <= i; ++p) {
-                    for (short q = i + 1; q < upTrain.t_stationNum; ++q) {
-                        tik = ticketKey(Pair<short, short>(upTrain.t_station[p], upTrain.t_station[q]),
-                                        tk_id, p_date);
-                        auto tikkSel = ticketTree.search(tik);
-                        if (tikkSel.second) {
-                            tikkSel.first.tk_remain[tk_kind] += tk_num;
-                            ticketTree.update(tik, tikkSel.first);
-                        }
-                    }
+                short k = 0;
+                for (k = 0; k < upTrain.t_ticketKind; ++k)
+                    if (upTrain.t_ticketName[k] == tk_kind)
+                        break;
+                for (short p = i + 1; p <= j; ++p){
+                    tikIdSel.first.tk_remain[p][k] += tk_num;
                 }
-                for (short p = i + 1; p < j; ++p){
-                    for (short q = p + 1; q < upTrain.t_stationNum; ++q){
-                        tik = ticketKey(Pair<short, short>(upTrain.t_station[p], upTrain.t_station[q]),
-                                        tk_id, p_date);
-                        auto tikkSel = ticketTree.search(tik);
-                        if (tikkSel.second) {
-                            tikkSel.first.tk_remain[tk_kind] += tk_num;
-                            ticketTree.update(tik, tikkSel.first);
-                        }
-                    }
-                }
+                ticketIdTree.update(tikIdSel.first.tk_ticketID, tikIdSel.first);
+                ticketTree.update(ticketKey(tikIdSel.first), tikIdSel.first);
                 return Success;
             }
             return NoRemainTicket;

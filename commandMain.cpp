@@ -36,8 +36,8 @@ void whereIsMyFile() {
 }
 
 int main() {
-    freopen("1.in", "r", stdin);
-    freopen("ans.out", "w", stdout);
+    //freopen("1.in", "r", stdin);
+    //freopen("ans.out", "w", stdout);
     insert = Insert();
     update = Update();
     selectA = Select();
@@ -119,7 +119,7 @@ int main() {
         if (firstWord == "query_ticket") {
             myAlgorithm::String s_st1, s_st2, s_date, s_cata;
             cin >> s_st1 >> s_st2 >> s_date >> s_cata;
-            myAlgorithm::Vector<ticket> ans;
+            myAlgorithm::Vector<Ticket> ans;
             short st1 = trainStation2Short(s_st1), st2 = trainStation2Short(s_st2);
             if (st1 < 0 || st2 < 0)
                 cout << "0\n";
@@ -159,7 +159,7 @@ int main() {
                 short cata = 0;
                 for (int i = 0; i < s_cata.length(); ++i)
                     cata |= catalog2Short(s_cata[i]);
-                myAlgorithm::Vector<ticket> ans;
+                myAlgorithm::Vector<Ticket> ans;
                 Status ret = selectA.I_selectTicketTransfer(Pair<short, short>(st1, st2), dt, cata, TOT_STATION, ans);
                 if (ret == Success && !ans.empty()) {
                     train tr;
@@ -193,7 +193,7 @@ int main() {
             for (int i = 0; i < t_cata.length(); ++i)
                 catalog |= catalog2Short(t_cata[i]);
             Date dat = t_date;
-            myAlgorithm::Vector<ticket> vtk;
+            myAlgorithm::Vector<Ticket> vtk;
             myAlgorithm::Vector<int> vtknum[12];
             Status ret = selectA.I_selectUserBookedTicket((int) p_id, dat, catalog, vtk, vtknum);
             if (ret == Success && vtk.size() != 0) {
@@ -335,8 +335,8 @@ int main() {
         }
 
     }
-    fclose(stdin);
-    fclose(stdout);
+    //fclose(stdin);
+    //fclose(stdout);
     return 0;
 
 }
