@@ -8,7 +8,6 @@
 
 #include <cstdio>
 #include "CoreData.h"
-#include "BigNum.hpp"
 #include "String.h"
 #include "BPlusTree.hpp"
 #include "DateAndTime.h"
@@ -42,11 +41,11 @@ class ticket {
     friend class Kernel::Delete;
 
 public:
-    short tk_position[50];
+    short tk_position[47];
     Date tk_date;
     int tk_ticketID = 0;
     String tk_trainID;
-    short tk_remain[50][5];
+    short tk_remain[47][5];
 
     ticket(){
         memset(tk_remain, 0, sizeof(tk_remain));
@@ -54,7 +53,7 @@ public:
 
     ticket(const ticket &tik)
             : tk_date(tik.tk_date), tk_ticketID(tik.tk_ticketID), tk_trainID(tik.tk_trainID) {
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < 47; ++i) {
             for (int j = 0; j < 5; ++j)
                 tk_remain[i][j] = tik.tk_remain[i][j];
             tk_position[i] = tik.tk_position[i];
@@ -168,9 +167,9 @@ class train {
 public:
     String t_id;
     String t_name;
-    short t_station[60];
-    Time t_time[60][2];
-    float t_price[60][5];
+    short t_station[47];
+    Time t_time[47][2];
+    float t_price[47][5];
     short t_stationNum = 0;
     short t_ticketKind = 0;
     short t_ticketName[5];
@@ -283,6 +282,22 @@ public:
     }
 };
 
+struct trainStationKey{
+    short station = 0;
+    String trainId;
+
+    trainStationKey() = default;
+    trainStationKey(short st) : station(st) {}
+    trainStationKey(short st, const String &s) : station(st), trainId(s) {}
+
+    bool operator <(const trainStationKey &tsk) const {
+        return station < tsk.station || (station == tsk.station && trainId == tsk.trainId);
+    }
+    const short &first() const{
+        return station;
+    }
+};
+
 static int nowId = 2018;
 static int base = 15096;
 static int mo = 204251;
@@ -296,6 +311,8 @@ BPlusTree<ticketKey, ticket> ticketTree(false, "ticket.dat");
 BPlusTree<int, ticket> ticketIdTree(false, "ticketId.dat");
 BPlusTree<userTicketKey, userTicket> userTicketTree(false, "userTicket.dat");
 BPlusTree<String, train> trainTree(false, "train.dat");
+BPlusTree<trainStationKey, String> arriveTrainTree(false, "arriveTrain.dat");
+BPlusTree<trainStationKey, String> leaveTrainTree(false, "leaveTrain.dat");
 
 namespace Kernel {
     inline short catalog2Short(char cat){
@@ -386,6 +403,8 @@ namespace Kernel {
         ticketIdTree.closeFile();
         userTicketTree.closeFile();
         trainTree.closeFile();
+        arriveTrainTree.closeFile();
+        leaveTrainTree.closeFile();
 #endif
     }
 
@@ -527,7 +546,7 @@ namespace Kernel {
 
         Status I_selectTicket(Pair<short, short> tk_position, Date tk_date, short tk_catalog, Vector<Ticket> &ret) {
             ret.clear();
-            ticketKey tkKey(tk_date);
+            /*ticketKey tkKey(tk_date);
             Vector<ticket> vt = ticketTree.searchFirst(tkKey);
             for (int i = 0; i < vt.size(); ++i) {
                 auto trSel = trainTree.search(vt[i].tk_trainID);
@@ -556,6 +575,50 @@ namespace Kernel {
                         }
                         ret.push_back(tik);
                     }
+                }
+            }*/
+            trainStationKey tsk1(tk_position.first()), tsk2(tk_position.second());
+            auto vt1 = leaveTrainTree.searchFirst(tsk1);
+            auto vt2 = arriveTrainTree.searchFirst(tsk2);
+            for (int i = 0, j = 0; i < vt1.size() && j < vt2.size();){
+                while (i < vt1.size() && vt1[i] < vt2[j])
+                    ++i;
+                while (i < vt1.size() && j < vt2.size() && vt2[j] < vt1[i])
+                    ++j;
+                if (i == vt1.size() || j == vt2.size())
+                    break;
+                if (vt1[i] == vt2[j]){
+                    myAlgorithm::String vt = vt1[i];
+                    auto trSel = trainTree.search(vt);
+                    if (trSel.first.t_catalog & tk_catalog){
+                        auto tk = ticketTree.search(ticketKey(vt, tk_date));
+                        short p, q;
+                        for (p = 0; p < trSel.first.t_stationNum; ++p)
+                            if (trSel.first.t_station[p] == tk_position.first())
+                                break;
+                        for (q = 0; q < trSel.first.t_stationNum; ++q)
+                            if (trSel.first.t_station[q] == tk_position.second())
+                                break;
+                        if (p < q && p != trSel.first.t_stationNum && q != trSel.first.t_stationNum){
+                            Ticket tik;
+                            tik.tk_trainID = trSel.first.t_id;
+                            tik.tk_position = tk_position;
+                            tik.tk_date = tk_date;
+                            tik.tk_catalog = trSel.first.t_catalog;
+                            tik.tk_time = Pair<Time, Time>(trSel.first.t_time[p][1], trSel.first.t_time[q][0]);
+                            for (int j = 0; j < trSel.first.t_ticketKind; ++j) {
+                                int n = trSel.first.t_ticketName[j];
+                                tik.tk_remain[n] = 2000;
+                                for (int k = p + 1; k <= q; ++k)
+                                    if (tik.tk_remain[n] > tk.first.tk_remain[k][j])
+                                        tik.tk_remain[n] = tk.first.tk_remain[k][j];
+                                tik.tk_price[n] = trSel.first.t_price[q][j] - trSel.first.t_price[p][j];
+                            }
+                            ret.push_back(tik);
+                        }
+                    }
+                    ++i;
+                    ++j;
                 }
             }
             if (ret.empty())
@@ -691,7 +754,7 @@ namespace Kernel {
             if (trSel.first.t_onSale)
                 return TrainHasBeenOnSale;
             train &tr = trSel.first;
-            for (Date d = startDate; d != endDate; d = d.nextDate()) {
+            for (Date d = startDate; d <= endDate; d.nextDate(1)) {
                 ticket newTik;
                 newTik.tk_date = d;
                 newTik.tk_ticketID = ticketId++;
@@ -704,6 +767,12 @@ namespace Kernel {
                 }
                 ticketTree.insert(ticketKey(newTik), newTik);
                 ticketIdTree.insert(newTik.tk_ticketID, newTik);
+            }
+            for (short i = 1; i < tr.t_stationNum; ++i){
+                trainStationKey tsk1(tr.t_station[i - 1], t_id);
+                trainStationKey tsk2(tr.t_station[i], t_id);
+                leaveTrainTree.insert(tsk1, t_id);
+                arriveTrainTree.insert(tsk2, t_id);
             }
             tr.t_onSale = true;
             trainTree.update(t_id, tr);
@@ -792,6 +861,8 @@ namespace Kernel {
             ticketIdTree.clear();
             userTicketTree.clear();
             trainTree.clear();
+            arriveTrainTree.clear();
+            leaveTrainTree.clear();
             FILE *fp = fopen("id.dat", "w+");
             fprintf(fp, "2018\n1\n");
             fclose(fp);
