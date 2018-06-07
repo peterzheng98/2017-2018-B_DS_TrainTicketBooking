@@ -55,6 +55,8 @@ public:
 
     ticket(const ticket &tik)
             : tk_positionNum(tik.tk_positionNum), tk_date(tik.tk_date), tk_ticketID(tik.tk_ticketID), tk_trainID(tik.tk_trainID) {
+        memset(tk_position, 0, sizeof(tk_position));
+        memset(tk_remain, 0, sizeof(tk_remain));
         for (int i = 0; i < tk_positionNum; ++i) {
             for (int j = 0; j < 5; ++j)
                 tk_remain[i][j] = tik.tk_remain[i][j];
@@ -135,7 +137,7 @@ struct userTicket{
 struct userTicketKey{
     int userId = 0;
     int ticketId = 0;
-    Pair<short, short> position;
+    Pair<short, short> position = Pair<short, short>(0, 0);
 
     userTicketKey() = default;
     userTicketKey(const userTicketKey &utk)
@@ -181,12 +183,17 @@ public:
     train() {
         memset(t_station, 0, sizeof(t_station));
         memset(t_price, 0, sizeof(t_price));
+        memset(t_time, 0, sizeof(t_time));
         memset(t_ticketName, 0, sizeof(t_ticketName));
     }
 
     train(const train &tr)
             : t_id(tr.t_id), t_name(tr.t_name), t_stationNum(tr.t_stationNum), t_ticketKind(tr.t_ticketKind),
               t_catalog(tr.t_catalog), t_onSale(tr.t_onSale) {
+        memset(t_station, 0, sizeof(t_station));
+        memset(t_price, 0, sizeof(t_price))
+        memset(t_time, 0, sizeof(t_time));
+        memset(t_ticketName, 0, sizeof(t_ticketName));
         for (short i = 0; i < t_stationNum; ++i) {
             t_station[i] = tr.t_station[i];
             t_time[i][0] = tr.t_time[i][0];
@@ -210,7 +217,7 @@ private:
     String p_password;
     String p_email;
     String p_phone;
-    UserPrivilege p_userPrivilege;
+    UserPrivilege p_userPrivilege = User;
 public:
     user() = default;
 
@@ -228,39 +235,15 @@ public:
         p_userPrivilege = rhs.p_userPrivilege;
     }
 
-    user &operator=(const user &rhs) {
+    user &operator =(const user &rhs) {
         if (this == &rhs) return *this;
-        p_id = rhs.M_id();
-        p_username = rhs.M_username();
-        p_password = rhs.M_password();
-        p_email = rhs.M_email();
-        p_phone = rhs.M_phone();
-        p_userPrivilege = rhs.M_privilege();
+        p_id = rhs.p_id;
+        p_username = rhs.p_username;
+        p_password = rhs.p_password;
+        p_email = rhs.p_email;
+        p_phone = rhs.p_phone;
+        p_userPrivilege = rhs.p_userPrivilege;
         return *this;
-    }
-
-    int M_id() const {
-        return p_id;
-    }
-
-    String M_username() const {
-        return p_username;
-    }
-
-    String M_password() const {
-        return p_password;
-    }
-
-    String M_email() const {
-        return p_email;
-    }
-
-    String M_phone() const {
-        return p_phone;
-    }
-
-    UserPrivilege M_privilege() const {
-        return p_userPrivilege;
     }
 };
 
