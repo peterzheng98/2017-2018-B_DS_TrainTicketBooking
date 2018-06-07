@@ -140,7 +140,7 @@ int main() {
                         for (int j = 0; j < tr.t_ticketKind; ++j) {
                             short p = tr.t_ticketName[j];
                             cout << short2Kind(p) << " " << ans[i].tk_remain[p] << " "
-                                 << setiosflags(ios::fixed) << setprecision(2) << ans[i].tk_price[p] << " ";
+                                 << setiosflags(ios::fixed) << setprecision(6) << ans[i].tk_price[p] << " ";
                         }
                         cout << "\n";
                     }
@@ -180,7 +180,7 @@ int main() {
                         for (int j = 0; j < tr.t_ticketKind; ++j) {
                             short p = tr.t_ticketName[j];
                             cout << short2Kind(p) << " " << ans[i].tk_remain[p] << " "
-                                 << setiosflags(ios::fixed) << setprecision(2) << ans[i].tk_price[p] << " ";
+                                 << setiosflags(ios::fixed) << setprecision(6) << ans[i].tk_price[p] << " ";
                         }
                         cout << "\n";
                     }
@@ -212,7 +212,7 @@ int main() {
                     for (int j = 0; j < tr.t_ticketKind; ++j) {
                         short p = tr.t_ticketName[j];
                         cout << short2Kind(p) << " " << vtknum[p][i] << " "
-                             << setiosflags(ios::fixed) << setprecision(2) << vtk[i].tk_price[p] << " ";
+                             << setiosflags(ios::fixed) << setprecision(6) << vtk[i].tk_price[p] << " ";
                     }
                     cout << '\n';
                 }
@@ -239,9 +239,9 @@ int main() {
                         cout << Time(tr.t_time[i][1] - tr.t_time[i][0]) << " ";
                     for (int j = 0; j < tr.t_ticketKind; ++j) {
                         if (i == 0)
-                            cout << "￥" << setiosflags(ios::fixed) << setprecision(2) << tr.t_price[i][j] << " ";
+                            cout << "￥" << setiosflags(ios::fixed) << setprecision(6) << tr.t_price[i][j] << " ";
                         else
-                            cout << "￥" << setiosflags(ios::fixed) << setprecision(2) << tr.t_price[i][j] - tr.t_price[i - 1][j] << " ";
+                            cout << "￥" << setiosflags(ios::fixed) << setprecision(6) << tr.t_price[i][j] - tr.t_price[i - 1][j] << " ";
                     }
                     cout << "\n";
                 }

@@ -49,6 +49,7 @@ public:
     short tk_remain[47][5];
 
     ticket(){
+        memset(tk_position, 0, sizeof(tk_position));
         memset(tk_remain, 0, sizeof(tk_remain));
     }
 
@@ -177,7 +178,11 @@ public:
     short t_catalog = 0;
     bool t_onSale = false;
 public:
-    train() = default;
+    train() {
+        memset(t_station, 0, sizeof(t_station));
+        memset(t_price, 0, sizeof(t_price));
+        memset(t_ticketName, 0, sizeof(t_ticketName));
+    }
 
     train(const train &tr)
             : t_id(tr.t_id), t_name(tr.t_name), t_stationNum(tr.t_stationNum), t_ticketKind(tr.t_ticketKind),
