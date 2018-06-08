@@ -260,7 +260,7 @@ namespace myAlgorithm {
                 if(data[i] >= '0' && data[i] <= '9') seg = seg * 10 + data[i] - '0';
                 if(flag) lenp *= 10;
             }
-            return (float(seg)) / lenp;
+            return (float(seg + 1e-10)) / lenp;
         }
 
 
