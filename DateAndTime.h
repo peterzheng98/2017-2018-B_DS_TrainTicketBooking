@@ -148,10 +148,7 @@ namespace myAlgorithm {
         }
 
         bool operator<=(const Date &rhs) const {
-            return dataOfDate.first() <= rhs.getYear()
-                   || (dataOfDate.first() == rhs.getYear() && dataOfDate.second() <= rhs.getMonth())
-                   || (dataOfDate.first() == rhs.getYear() && dataOfDate.second() == rhs.getMonth() &&
-                       dataOfDate.third() <= rhs.getDay());
+            return operator<(rhs) || operator==(rhs);
         }
 
         bool operator>(const Date &rhs) const {
@@ -162,10 +159,7 @@ namespace myAlgorithm {
         }
 
         bool operator>=(const Date &rhs) const {
-            return dataOfDate.first() >= rhs.getYear()
-                   || (dataOfDate.first() == rhs.getYear() && dataOfDate.second() >= rhs.getMonth())
-                   || (dataOfDate.first() == rhs.getYear() && dataOfDate.second() == rhs.getMonth() &&
-                       dataOfDate.third() >= rhs.getDay());
+            return operator>(rhs) || operator==(rhs);
         }
 
         Date nextDate() {
@@ -177,6 +171,16 @@ namespace myAlgorithm {
             if (dd > Day[mm - 1]) dd -= Day[mm - 1], mm++;
             if (mm > 12) yy++;
             return Date(yy, mm, dd);
+        }
+
+        void nextDate(int ttt){
+            short yy = dataOfDate.first(), mm = dataOfDate.second(), dd = dataOfDate.third();
+            short Day[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+            dd++;
+            if (M_isLeapYear(yy)) Day[1] = 29;
+            if (dd > Day[mm - 1]) dd -= Day[mm - 1], mm++;
+            if (mm > 12) yy++;
+            dataOfDate.setData(yy, mm, dd);
         }
     };
 

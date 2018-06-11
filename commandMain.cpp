@@ -36,8 +36,8 @@ void whereIsMyFile() {
 }
 
 int main() {
-    freopen("1.in", "r", stdin);
-    freopen("ans.out", "w", stdout);
+    //freopen("1.in", "r", stdin);
+    //freopen("ans.out", "w", stdout);
     insert = Insert();
     update = Update();
     selectA = Select();
@@ -57,7 +57,7 @@ int main() {
             if (ret == Success) cout << id << "\n"; else cout << "-1\n";
 
         }
-        if (firstWord == "buy_ticket") {
+        else if (firstWord == "buy_ticket") {
             myAlgorithm::String p_id, p_num, p_train_id, p_loc1, p_loc2, p_data, p_ticketK;
             cin >> p_id >> p_num >> p_train_id >> p_loc1 >> p_loc2 >> p_data >> p_ticketK;
             short p_loc1_s = trainStation2Short(p_loc1), p_loc2_s = trainStation2Short(p_loc2);
@@ -66,7 +66,7 @@ int main() {
                     Pair<short, short>(p_loc1_s, p_loc2_s), Date(p_data), p_tick_s);
             if (ret == Success) cout << "1\n"; else cout << "0\n";
         }
-        if (firstWord == "add_train") {
+        else if (firstWord == "add_train") {
             myAlgorithm::String p_tid, p_name, p_catalog, p_num_s, p_num_p;
             cin >> p_tid >> p_name >> p_catalog >> p_num_s >> p_num_p;
             int limit = p_num_p, limits = p_num_s;
@@ -96,7 +96,7 @@ int main() {
                 ret = NoThisTrain;
             if (ret == Success) cout << "1\n"; else cout << "0\n";
         }
-        if (firstWord == "login") {
+        else if (firstWord == "login") {
             myAlgorithm::String p_id, p_word;
             cin >> p_id >> p_word;
             int ppp = p_id;
@@ -104,7 +104,7 @@ int main() {
             if (ret == Success) cout << "1\n"; else cout << "0\n";
 
         }
-        if (firstWord == "query_profile") {
+        else if (firstWord == "query_profile") {
             myAlgorithm::String p_id;
             cin >> p_id;
             myAlgorithm::String p_name, p_email, p_word, p_phone;
@@ -116,10 +116,10 @@ int main() {
                      << (p_up == Admin ? "2\n" : "1\n");
 
         }
-        if (firstWord == "query_ticket") {
+        else if (firstWord == "query_ticket") {
             myAlgorithm::String s_st1, s_st2, s_date, s_cata;
             cin >> s_st1 >> s_st2 >> s_date >> s_cata;
-            myAlgorithm::Vector<ticket> ans;
+            myAlgorithm::Vector<Ticket> ans;
             short st1 = trainStation2Short(s_st1), st2 = trainStation2Short(s_st2);
             if (st1 < 0 || st2 < 0)
                 cout << "0\n";
@@ -139,7 +139,8 @@ int main() {
                         cout << s_st2 << " " << ans[i].tk_date << " " << ans[i].tk_time.second() << " ";
                         for (int j = 0; j < tr.t_ticketKind; ++j) {
                             short p = tr.t_ticketName[j];
-                            cout << short2Kind(p) << " " << ans[i].tk_remain[p] << " " << ans[i].tk_price[p] << " ";
+                            cout << short2Kind(p) << " " << ans[i].tk_remain[p] << " "
+                                 << setiosflags(ios::fixed) << setprecision(6) << ans[i].tk_price[p] << " ";
                         }
                         cout << "\n";
                     }
@@ -148,7 +149,7 @@ int main() {
                 }
             }
         }
-        if (firstWord == "query_transfer") {
+        else if (firstWord == "query_transfer") {
             myAlgorithm::String s_st1, s_st2, s_date, s_cata;
             cin >> s_st1 >> s_st2 >> s_date >> s_cata;
             short st1 = trainStation2Short(s_st1), st2 = trainStation2Short(s_st2);
@@ -159,7 +160,7 @@ int main() {
                 short cata = 0;
                 for (int i = 0; i < s_cata.length(); ++i)
                     cata |= catalog2Short(s_cata[i]);
-                myAlgorithm::Vector<ticket> ans;
+                myAlgorithm::Vector<Ticket> ans;
                 Status ret = selectA.I_selectTicketTransfer(Pair<short, short>(st1, st2), dt, cata, TOT_STATION, ans);
                 if (ret == Success && !ans.empty()) {
                     train tr;
@@ -178,7 +179,8 @@ int main() {
                         cout << ans[i].tk_date << " " << ans[i].tk_time.second() << " ";
                         for (int j = 0; j < tr.t_ticketKind; ++j) {
                             short p = tr.t_ticketName[j];
-                            cout << short2Kind(p) << " " << ans[i].tk_remain[p] << " " << ans[i].tk_price[p] << " ";
+                            cout << short2Kind(p) << " " << ans[i].tk_remain[p] << " "
+                                 << setiosflags(ios::fixed) << setprecision(6) << ans[i].tk_price[p] << " ";
                         }
                         cout << "\n";
                     }
@@ -186,14 +188,14 @@ int main() {
                     cout << "-1\n";
             }
         }
-        if (firstWord == "query_order") {
+        else if (firstWord == "query_order") {
             myAlgorithm::String p_id, t_date, t_cata;
             cin >> p_id >> t_date >> t_cata;
             short catalog = 0;
             for (int i = 0; i < t_cata.length(); ++i)
                 catalog |= catalog2Short(t_cata[i]);
             Date dat = t_date;
-            myAlgorithm::Vector<ticket> vtk;
+            myAlgorithm::Vector<Ticket> vtk;
             myAlgorithm::Vector<int> vtknum[12];
             Status ret = selectA.I_selectUserBookedTicket((int) p_id, dat, catalog, vtk, vtknum);
             if (ret == Success && vtk.size() != 0) {
@@ -209,14 +211,15 @@ int main() {
                     cout << st2 << " " << vtk[i].tk_date << " " << vtk[i].tk_time.second() << " ";
                     for (int j = 0; j < tr.t_ticketKind; ++j) {
                         short p = tr.t_ticketName[j];
-                        cout << short2Kind(p) << " " << vtknum[p][i] << " " << vtk[i].tk_price[p] << " ";
+                        cout << short2Kind(p) << " " << vtknum[p][i] << " "
+                             << setiosflags(ios::fixed) << setprecision(6) << vtk[i].tk_price[p] << " ";
                     }
                     cout << '\n';
                 }
             } else
                 cout << "0\n";
         }
-        if (firstWord == "query_train") {
+        else if (firstWord == "query_train") {
             String p_id;
             cin >> p_id;
             train tr;
@@ -236,36 +239,36 @@ int main() {
                         cout << Time(tr.t_time[i][1] - tr.t_time[i][0]) << " ";
                     for (int j = 0; j < tr.t_ticketKind; ++j) {
                         if (i == 0)
-                            cout << "￥" << tr.t_price[i][j] << " ";
+                            cout << "￥" << setiosflags(ios::fixed) << setprecision(6) << tr.t_price[i][j] << " ";
                         else
-                            cout << "￥" << tr.t_price[i][j] - tr.t_price[i - 1][j] << " ";
+                            cout << "￥" << setiosflags(ios::fixed) << setprecision(6) << tr.t_price[i][j] - tr.t_price[i - 1][j] << " ";
                     }
                     cout << "\n";
                 }
             } else
                 cout << "0\n";
         }
-        if (firstWord == "modify_profile") {
+        else if (firstWord == "modify_profile") {
             myAlgorithm::String p_name, p_word, p_email, p_id, p_phone;
             cin >> p_id >> p_name >> p_word >> p_email >> p_phone;
             Status ret = update.I_updateUser((int) p_id, p_name, p_word, p_email, p_phone);
             if (ret == Success) cout << "1\n"; else cout << "0\n";
 
         }
-        if (firstWord == "modify_privilege") {
+        else if (firstWord == "modify_privilege") {
             myAlgorithm::String p_id1, p_id2, privilege;
             cin >> p_id1 >> p_id2 >> privilege;
             Status ret = update.I_updateUserPrivilege((int) p_id1, (int) p_id2, (short) privilege);
             if (ret == Success) cout << "1\n"; else cout << "0\n";
 
         }
-        if (firstWord == "sale_train") {
+        else if (firstWord == "sale_train") {
             String p_id;
             cin >> p_id;
             Status ret = update.I_updateTrainSellingStatus(p_id);
             if (ret == Success) cout << "1\n"; else cout << "0\n";
         }
-        if (firstWord == "modify_train") {
+        else if (firstWord == "modify_train") {
             train tr;
             myAlgorithm::String p_tid, p_name, p_catalog, p_num_s, p_num_p;
             cin >> p_tid >> p_name >> p_catalog >> p_num_s >> p_num_p;
@@ -302,7 +305,7 @@ int main() {
                 ret = NoThisTrain;
             if (ret == Success) cout << "1\n"; else cout << "0\n";
         }
-        if (firstWord == "refund_ticket") {
+        else if (firstWord == "refund_ticket") {
             myAlgorithm::String p_id, p_num, p_tid, p_loc1, p_loc2, p_date, p_tkk;
             cin >> p_id >> p_num >> p_tid >> p_loc1 >> p_loc2 >> p_date >> p_tkk;
             short p_loc1_s = trainStation2Short(p_loc1), p_loc2_s = trainStation2Short(p_loc2);
@@ -315,28 +318,28 @@ int main() {
                 if (ret == Success) cout << "1\n"; else cout << "0\n";
             }
         }
-        if (firstWord == "delete_train") {
+        else if (firstWord == "delete_train") {
             String p_id;
             cin >> p_id;
             Status ret = deleteA.I_deleteTrain(p_id);
             if (ret == Success) cout << "1\n"; else cout << "0\n";
         }
-        if (firstWord == "exit") {
+        else if (firstWord == "exit") {
             _exit();
             cout << "BYE\n";
             break;
         }
-        if (firstWord == "clean") {
+        else if (firstWord == "clean") {
             deleteA.I_deleteAll();
             cout << "1\n";
         }
-        if (firstWord == "fuck") {
+        else if (firstWord == "fuck") {
             cout << "SLASH\n";
         }
 
     }
-    fclose(stdin);
-    fclose(stdout);
+    //fclose(stdin);
+    //fclose(stdout);
     return 0;
 
 }
