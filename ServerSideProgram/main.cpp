@@ -1,127 +1,101 @@
-#include <unistd.h>
-#include <pthread.h>
-#include "Timer.h"
-#include "CoreData.h"
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
 #include <cstdio>
-#include <ctime>
-#include "DateAndTime.h"
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <cstring>
+#include <cstdlib>
+#include <fcntl.h>
+#include <sys/shm.h>
+#include <iostream>
+#include <thread>
+#include <vector>
 
-#define LOGFILE "listen.lyg"
-typedef unsigned long long ull;
-typedef long long ll;
-typedef unsigned short us;
-const int Port = 10774;
-const int bufferSize = 8192;
+#define PORT 10774
+#define IPAddr "101.132.131.164"
 
-pthread_t timer, logger;
-Timer globalTime;
 
-void *TimerThread(void *arg) {
-    pthread_detach(pthread_self());
-    while (1) {
-        globalTime++;
+int s;
+sockaddr_in serverAddr;
+socklen_t socklen;
+std::vector<int> connVector;
+int globalTimer = 0;
+void Connect(){
+    while(true){
+        int conn = accept(s, (sockaddr*) &serverAddr, &socklen);
+        connVector.push_back(conn);
+        printf("Connection : %d\n", conn);
+    }
+}
+
+void receiveData(){
+    timeval timeval1;
+    timeval1.tv_sec = 2;
+    timeval1.tv_usec = 0;
+    while(true){
+        int sizeC = connVector.size();
+        for(int i = 0; i < sizeC; ++i){
+            fd_set fdSet;
+            FD_ZERO(&fdSet);
+            int maxFd = 0;
+            int returnVal = 0;
+            FD_SET(connVector[i], &fdSet);
+            if(maxFd < connVector[i]) maxFd = connVector[i];
+            returnVal = select(maxFd + 1, &fdSet, nullptr, nullptr, &timeval1);
+            if(returnVal == -1) printf("Selection Error!\n");
+            else if(returnVal == 0) printf("No Message!\n");
+            else {
+                char buffer[1024];
+                memset(buffer, 0, sizeof(buffer));
+                int length = recv(connVector[i], buffer, sizeof(buffer), 0);
+                printf("Receiced Data [%s]\n", buffer);
+            }
+        }
         sleep(1);
     }
 }
 
-void Write2File(const char *msg,
-                const myAlgorithm::Date &date,
-                const LogLevel lg,
-                const char *model = "",
-                char *filePath = LOGFILE,
-                ull timer = globalTime.getTime()) {
-    FILE *fp = fopen(LOGFILE, "a+");
-    struct tm *t;
-    time_t tt;
-    time(&tt);
-    t = localtime(&tt);
-    printf("\n", );
-    if (lg == Debug) {
-#ifdef ___DEBUG_MODE
-        fprintf(fp, "[%4d-%02d-%02d %02d:%02d:%02d Run:%lld second(s)]:D/%s : %s\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min,
-           t->tm_sec, timer, model, msg);
-        fclose(fp);
-        return;
-#endif
+void sendMessage(){
+    while(true){
+        char buffer[1024];
+        //Get Data
+        fgets(buffer, sizeof(buffer), stdin);
+        printf("Sending Data : [%s]\n", buffer);
+        int sizeC = connVector.size();
+        for(int i = 0; i < sizeC; ++i)
+            send(connVector[i], buffer, sizeof(buffer), 0);
     }
-    if (lg == Warning) {
-        fprintf(fp, "[%4d-%02d-%02d %02d:%02d:%02d Run:%lld second%s]:W/%s : %s\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min,
-                t->tm_sec, timer, (timer > 1 ? "s" : "") , model, msg);
-        fclose(fp);
-        return;
-    }
-    if (lg == Error) {
-        fprintf(fp, "[%4d-%02d-%02d %02d:%02d:%02d Run:%lld second%s]:E/%s : %s\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min,
-                t->tm_sec, timer, (timer > 1 ? "s" : "") , model, msg);
-        fclose(fp);
-        return;
-    }
-    if (lg == Information) {
-        fprintf(fp, "[%4d-%02d-%02d %02d:%02d:%02d Run:%lld second%s]:I/%s : %s\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min,
-                t->tm_sec, timer, (timer > 1 ? "s" : "") , model, msg);
-        fclose(fp);
-        return;
-    }
-    if (lg == Verbose) {
-        fprintf(fp, "[%4d-%02d-%02d %02d:%02d:%02d Run:%lld second%s]:V/%s : %s\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min,
-                t->tm_sec, timer, (timer > 1 ? "s" : "") , model, msg);
-        fclose(fp);
-        return;
-    }
-    fclose(fp);
 }
 
-void error(char *msg) {
-    perror(msg);
-    Write2File(msg, myAlgorithm::Date(2018, 6, 1), Error);
-}
+void Timer(){ while(true){ globalTimer++;sleep(1); } }
 
-void dostuff(int sock) {
-    int n;
-    char buffer[bufferSize];
-
-    bzero(buffer, bufferSize);
-    n = read(sock, buffer, bufferSize - 1);
-    if (n < 0) error("ERROR reading from socket");
-    printf("Here is the message: %s\n", buffer);
-    n = write(sock, "I got your message", 18);
-    if (n < 0) error("ERROR writing to socket");
-}
-
-int main() {
-    int err = pthread_create(&timer, nullptr, TimerThread, nullptr);
-    if (err != 0) {} // TODO : Thread Create Failed.
-    int sockfd, newsockfd, clientlen, n;
-    char buffer[256];
-    sockaddr_in serv_addr, client_addr;
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) {
-        //TODO : Error Opening Socket.
+int main(){
+    s = socket(AF_INET, SOCK_STREAM, 0);
+    memset(&serverAddr, 0, sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(PORT);
+    serverAddr.sin_addr.s_addr = inet_addr(IPAddr);
+    int result = bind(s, (sockaddr*)&serverAddr, sizeof(serverAddr));
+    if(result == -1){
+        printf("Bind Error");
+        perror("Bind");
+        exit(1);
     }
-    bzero((char *) &serv_addr, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons(Port);
-    if (bind(sockfd, (sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-        error("ERROR on binding");
-    listen(sockfd, 5);
-    clientlen = sizeof(client_addr);
-    while (true) {
-        newsockfd = accept(sockfd, (sockaddr *) &client_addr, (socklen_t *) &clientlen);
-        if (newsockfd < 0)
-            error("ERROR on accept");
-        int pid = fork();
-        if (pid < 0) error("ERROR on Fork");
-        if (pid == 0) {
-            close(sockfd);
-            dostuff(newsockfd);
-            exit(0);
-        } else close(newsockfd);
+    if(listen(s, 20) == -1){
+        printf("Listen Error");
+        perror("Listen");
+        exit(1);
     }
-    close(sockfd);
-    return 0;
-}
 
+    socklen = sizeof(serverAddr);
+
+    std::thread connect_thread(Connect), timer_thread(Timer), sendMess_thread(sendMessage), reveive_thread(receiveData);
+    connect_thread.detach();
+    timer_thread.detach();
+    sendMess_thread.detach();
+    reveive_thread.detach();
+    while(true){
+
+    }
+}
