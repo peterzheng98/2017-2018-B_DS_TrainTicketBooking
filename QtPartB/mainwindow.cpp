@@ -6,10 +6,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->socket = new QTcpSocket(this);
+    /*this->socket = new QTcpSocket(this);
     this->socket->connectToHost("127.0.0.1", 100, QTcpSocket::ReadWrite);
 
-    connect(this->socket, SIGNAL(connected()), this, SLOT(connected()));
+    connect(this->socket, SIGNAL(connected()), this, SLOT(connected()));*/
     ui->userFrame->setVisible(false);
 
     ui->tab1_nologin->setVisible(true);
@@ -49,8 +49,8 @@ void MainWindow::on_login_frame_login_clicked()
 {
     QString loginid = ui->login_frame_id->text();
     QString password = ui->login_frame_word->text();
-    this -> Write((QString)"login" + (QString)" " + loginid + (QString)" " + password);
-    this -> Read();
+    //this -> Write((QString)"login" + (QString)" " + loginid + (QString)" " + password);
+    //this -> Read();
     int len = loginid.length();
     bool goodDigits = true;
     for(int i = 0; i < len;i++) if(loginid[i] < '0' || loginid[i] > '9') {
@@ -134,9 +134,8 @@ void MainWindow::on_tab5_nologin_frame_register_clicked()
         if(flag)
         {
             //TODO
-            this->Write((QString)"register" + (QString)" " + registerName + (QString)" " +
-                        registerPassword + (QString)" " + registerEmail + (QString)" " + registerPhone);
-            this->Read();
+            //this->Write((QString)"register" + (QString)" " + registerName + (QString)" " + registerPassword + (QString)" " + registerEmail + (QString)" " + registerPhone);
+            //this->Read();
             ui->loginFrame->setVisible(false);
             ui->userFrame->setVisible(true);
             ui->user_frame_auth->setText("您的权限级别为：");

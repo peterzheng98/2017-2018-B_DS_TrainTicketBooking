@@ -165,6 +165,9 @@
         <height>91</height>
        </rect>
       </property>
+      <property name="styleSheet">
+       <string notr="true">QFrame{border: 0px;}</string>
+      </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
@@ -193,6 +196,9 @@
         <width>571</width>
         <height>251</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QFrame{border: 0px;}</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -1046,7 +1052,7 @@
      <x>0</x>
      <y>0</y>
      <width>589</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

@@ -13,7 +13,7 @@
 #include <vector>
 
 #define PORT 10774
-#define IPAddr "101.132.131.164"
+#define IPAddr "0.0.0.0"
 
 
 int s;
@@ -21,6 +21,8 @@ sockaddr_in serverAddr;
 socklen_t socklen;
 std::vector<int> connVector;
 int globalTimer = 0;
+
+
 void Connect(){
     while(true){
         int conn = accept(s, (sockaddr*) &serverAddr, &socklen);
@@ -30,6 +32,8 @@ void Connect(){
 }
 
 void receiveData(){
+    FILE *fp;
+    bool flag = false;
     timeval timeval1;
     timeval1.tv_sec = 2;
     timeval1.tv_usec = 0;
@@ -44,12 +48,33 @@ void receiveData(){
             if(maxFd < connVector[i]) maxFd = connVector[i];
             returnVal = select(maxFd + 1, &fdSet, nullptr, nullptr, &timeval1);
             if(returnVal == -1) printf("Selection Error!\n");
-            else if(returnVal == 0) printf("No Message!\n");
+            else if(returnVal == 0) {
+                printf("No Message!\n");
+                if(flag){
+                    fclose(fp);
+                    flag = false;
+                    system("./code < in.in > out.out");
+                    printf("SYSTEM EXECUTED:INPUT WAITING\n");
+                    int t;
+                    scanf("%d", &t);
+                    fp = fopen("in.in", "w+");
+                    FILE *out = fopen("out.out", "r+");
+                    char buffer[1024];
+                    //Get Data
+                    fscanf(out, "%s", buffer);
+                    printf("Sending Data : [%s]\n", buffer);
+                    int sizeC = connVector.size();
+                    for(int i = 0; i < sizeC; ++i)
+                        send(connVector[i], buffer, sizeof(buffer), 0);
+                }
+            }
             else {
                 char buffer[1024];
                 memset(buffer, 0, sizeof(buffer));
                 int length = recv(connVector[i], buffer, sizeof(buffer), 0);
-                printf("Receiced Data [%s]\n", buffer);
+                printf("Received Data [%s]\n", buffer);
+                fprintf(fp, "%s", buffer);
+                flag = true;
             }
         }
         sleep(1);

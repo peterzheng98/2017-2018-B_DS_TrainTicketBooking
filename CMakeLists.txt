@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS "-w")
 #add_executable(TestParser main.cpp ParserForCommand.h String.h DateAndTime.h CoreData.h Kernel.hpp BPlusTree.hpp)
 #add_executable(TestBSTree UpdateTest.cpp BPlusTree.hpp)
 #add_executable(Loxy2Internal main5.cpp loxy2Internal.h)
-add_executable(CommandParser commandMain.cpp InternalData.h Kernel.hpp String.h CoreData.h)
+#add_executable(CommandParser commandMain.cpp InternalData.h Kernel.hpp String.h CoreData.h)
 #add_executable(Fucker commandMain.cpp Kernel.hpp)
 #
 #add_executable(TestS main6.cpp String.h Vector.h)

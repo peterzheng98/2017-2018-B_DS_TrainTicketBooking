@@ -1,8 +1,8 @@
 import socket
 
-s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-s.connect(('101.132.131.164',10774))
+s.connect(('59.78.22.153', 10774))
 
 print(s.recv(1024).decode())
 
@@ -10,6 +10,6 @@ for data in ['register name name name name','query_profile 2018','add_train 1 1 
     s.send(data.encode())
     print(s.recv(1024).decode())
 
-#s.send(b'exit')
+s.send(b'exit')
 s.close()
 
