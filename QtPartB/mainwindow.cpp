@@ -7,7 +7,7 @@
 #include <QTextCodec>
 #include <QStringListModel>
 #include <QStandardItemModel>
-
+#include <QString>
 #include <QComboBox>
 
 struct UserInfo{
@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(socket, &QTcpSocket::readyRead, this, &MainWindow::socket_Read_Data);
     QObject::connect(socket, &QTcpSocket::disconnected, this, &MainWindow::socket_Disconnected);
 
+    ui->radioButton->setChecked(true);
     ui->userFrame->setVisible(false);
 
     ui->tab1_nologin->setVisible(true);
@@ -52,15 +53,16 @@ void MainWindow::socket_Read_Data()
     buffer = socket->readAll();
     if(!buffer.isEmpty())
     {
-        ui->tmpText->setText(buffer);
+        QString str = ui->tmpText->toPlainText();
+        str += buffer;
+        ui->tmpText->setText(str);
     }
+    qDebug() << buffer.length();
 }
 
 void MainWindow::socket_Disconnected()
 {
     socket->close();
-    socket->disconnectFromHost();
-    socket->waitForDisconnected();
 }
 
 void MainWindow::work(QString str)
@@ -84,16 +86,9 @@ QString MainWindow::get(QString str)
     }
     qDebug() << "Connect successfully!";
     work(str);
-    QByteArray buffer;
-    socket->waitForReadyRead();
-    buffer = socket->readAll();
-    if(!buffer.isEmpty())
-    {
-        ui->tmpText->setText(buffer);
-    }
-    qDebug() << buffer;
+    ui->tmpText->setText("");
+    while(socket->waitForReadyRead());
     socket->close();
-
     return ui->tmpText->toPlainText();
 }
 
@@ -451,4 +446,271 @@ void MainWindow::on_tab4_logined_frame_modifyprivilege_clicked()
     {
         QMessageBox::information(NULL, "提升权限成功", "提升权限成功！", QMessageBox::Yes, QMessageBox::Yes);
     }
+}
+
+QStringList id;
+QList<QStringList> seatKind, seatRest, seatCost;
+
+void MainWindow::on_tab4_logined_frame_search_clicked()
+{
+    QString tmp = "", catalog = "";
+    int f1 = ui->radioButton->isChecked();
+    int f2 = ui->radioButton_2->isChecked();
+    int f3 = ui->radioButton_3->isChecked();
+    if(f1)catalog = "CDGKOTZ";
+    if(f2)catalog = "GD";
+    if(f3)catalog = "CKOTZ";
+    qDebug() << catalog;
+    QString ttmp = ui->tab1_logined_frame_date->text();
+    int lentmp = ttmp.length();
+    for(int i = 0; i < lentmp; i++)
+        if(ttmp[i] == '/')ttmp[i] = '-';
+
+    if(ui->tab4_logined_frame_transfer->isChecked())
+    {
+        tmp = get((QString)"query_transfer " + ui->tab1_logined_frame_loc1->text() + (QString)" " +
+                   ui->tab1_logined_frame_loc2->text() + (QString)" " + ttmp + (QString)" " + catalog);
+    }
+    else
+    {
+        tmp = get((QString)"query_ticket " + ui->tab1_logined_frame_loc1->text() + (QString)" " +
+                   ui->tab1_logined_frame_loc2->text() + (QString)" " + ttmp + (QString)" " + catalog);
+    }
+    ui->tab2_ticketShowing->clear();
+    ui->tab2_ticketShowing->setRowCount(0);
+    ui->tab2_ticketShowing->setColumnCount(6);//只设置列数，行数动态中增加
+    ui->tab2_ticketShowing->setHorizontalHeaderLabels(QStringList()<<"始发站"<<"始发日期"<<"始发时间"
+                                                      << "终点站" << "到达日期" << "到达时间");
+    ui->tab2_ticketShowing->setSelectionBehavior(QAbstractItemView::SelectRows);//整行选中的方式
+    ui->tab2_ticketShowing->setEditTriggers(QAbstractItemView::NoEditTriggers);//禁止修改
+    ui->tab2_ticketShowing->setSelectionMode(QAbstractItemView::SingleSelection);//可以选中单个
+
+    int len = tmp.length();
+    int i = 0;
+    QString str = "";
+    for(; i < len; i++)
+    {
+        if(tmp[i] == '\n')break;
+        str += tmp[i];
+    }
+
+    id.clear();
+    seatKind.clear();
+    seatRest.clear();
+    seatCost.clear();
+
+    int cnt = str.toInt();
+    for(int k = 0; k < cnt; k++)
+    {
+        int RowCont = ui->tab2_ticketShowing->rowCount();
+        ui->tab2_ticketShowing->insertRow(RowCont);
+        while(!((tmp[i] <= '9' && tmp[i] >= '0') || (tmp[i] <= 'z' && tmp[i] >= 'a') || (tmp[i] <= 'Z' && tmp[i] >= 'A')))i++;
+        str = "";
+        for(; i < len; i++)
+        {
+            if(tmp[i] == ' ')break;
+            str += tmp[i];
+        }
+        qDebug() << str;
+        id.push_back(str);
+        for(int l = 0; l < 6; l++)
+        {
+            str = "";
+            for(i++; i < len; i++)
+            {
+                if(tmp[i] == ' ')break;
+                str += tmp[i];
+            }
+            ui->tab2_ticketShowing->setItem(RowCont, l, new QTableWidgetItem(str));
+        }
+        QStringList nowSeatKind, nowSeatRest, nowSeatCost;
+        nowSeatKind.clear();
+        nowSeatRest.clear();
+        nowSeatCost.clear();
+        int cnt = 0;
+        for(int j = i + 1; j < len && tmp[j] != '\n'; j++)
+            if(tmp[j] == ' ' && tmp[j - 1] != ' ')cnt++;
+        qDebug() << cnt;
+        for(int j = 0; j < cnt / 3; j++)
+        {
+            str = "";
+            for(i++ ; i < len; i++)
+            {
+                if(tmp[i] == '\n' || tmp[i] == ' ')break;
+                else str += tmp[i];
+            }
+            nowSeatKind.push_back(str);
+            str = "";
+            for(i++; i < len; i++)
+            {
+                if(tmp[i] == '\n' || tmp[i] == ' ')break;
+                else str += tmp[i];
+            }
+            nowSeatRest.push_back(str);
+            str = "";
+            for(i++; i < len; i++)
+            {
+                if(tmp[i] == '\n' || tmp[i] == ' ')break;
+                else str += tmp[i];
+            }
+            nowSeatCost.push_back(str);
+            qDebug() << str;
+        }
+        seatKind.push_back(nowSeatKind);
+        seatRest.push_back(nowSeatRest);
+        seatCost.push_back(nowSeatCost);
+    }
+    ui->tabWidget->setCurrentIndex(2);
+}
+
+void MainWindow::on_tab2_ticketShowing_clicked(const QModelIndex &index)
+{
+    int now = ui->tab2_ticketShowing->currentRow();
+    ui->tab2_chosen->setText(id[now]);
+    qDebug() << id[now];
+    ui->tab2_cata->clear();
+    ui->tab2_cata->addItems(seatKind[now]);
+}
+
+void MainWindow::on_tab2_cata_currentIndexChanged(int index)
+{
+    if(index >= 0)
+    {
+        qDebug() << index << " " << ui->tab2_ticketShowing->currentRow() << " " << seatCost[ui->tab2_ticketShowing->currentRow()].size();
+        ui->tab2_price->setText((QString)"票价 " + seatCost[ui->tab2_ticketShowing->currentRow()][index]);
+        ui->tab2_remain->setText((QString)"余票 " + seatRest[ui->tab2_ticketShowing->currentRow()][index]);
+    }
+}
+
+QStringList idHistory;
+QList<QStringList> seatKindHistory, seatRestHistory, seatCostHistory;
+
+void MainWindow::on_tab3_logined_frame_search_clicked()
+{
+    QString catalog = "CDGKOTZ";
+    QString ttmp = ui->tab3_logined_frame_date->text();
+    int lentmp = ttmp.length();
+    for(int i = 0; i < lentmp; i++)
+        if(ttmp[i] == '/')ttmp[i] = '-';
+    QString tmp = get((QString)"query_order " + userInfo.id + (QString)" " +
+                  ttmp + (QString)" " + catalog);
+    ui->tab3_ticketHistory->clear();
+    ui->tab3_ticketHistory->setRowCount(0);
+    qDebug() << ui->tab3_ticketHistory->rowCount() << "!!!????";
+    ui->tab3_ticketHistory->setColumnCount(9);//只设置列数，行数动态中增加
+    ui->tab3_ticketHistory->setHorizontalHeaderLabels(QStringList()<<"始发站"<<"始发日期"<<"始发时间"
+                                                      << "终点站" << "到达日期" << "到达时间" << "座位类型"
+                                                      << "购票数量" << "票价");
+    ui->tab3_ticketHistory->setSelectionBehavior(QAbstractItemView::SelectRows);//整行选中的方式
+    ui->tab3_ticketHistory->setEditTriggers(QAbstractItemView::NoEditTriggers);//禁止修改
+    ui->tab3_ticketHistory->setSelectionMode(QAbstractItemView::SingleSelection);//可以选中单个
+
+    int len = tmp.length();
+    int i = 0;
+    QString str = "";
+    for(; i < len; i++)
+    {
+        if(tmp[i] == '\n')break;
+        str += tmp[i];
+    }
+
+    idHistory.clear();
+    seatKindHistory.clear();
+    seatRestHistory.clear();
+    seatCostHistory.clear();
+
+    int cnt = str.toInt();
+    for(int k = 0; k < cnt; k++)
+    {
+        int RowCont = ui->tab3_ticketHistory->rowCount();
+        ui->tab3_ticketHistory->insertRow(RowCont);
+        str = "";
+        while(!((tmp[i] <= '9' && tmp[i] >= '0') || (tmp[i] <= 'z' && tmp[i] >= 'a') || (tmp[i] <= 'Z' && tmp[i] >= 'A')))i++;
+        for(; i < len; i++)
+        {
+            if(tmp[i] == ' ')break;
+            str += tmp[i];
+        }
+        qDebug() << str;
+        idHistory.push_back(str);
+        for(int l = 0; l < 6; l++)
+        {
+            str = "";
+            for(i++; i < len; i++)
+            {
+                if(tmp[i] == ' ')break;
+                str += tmp[i];
+            }
+            ui->tab3_ticketHistory->setItem(RowCont, l, new QTableWidgetItem(str));
+        }
+        QStringList nowSeatKind, nowSeatRest, nowSeatCost;
+        nowSeatKind.clear();
+        nowSeatRest.clear();
+        nowSeatCost.clear();
+        int tot = 0;
+        for(int j = i + 1; j < len && tmp[j] != '\n'; j++)
+            if(tmp[j] == ' ' && tmp[j - 1] != ' ')tot++;
+        qDebug() << tot;
+        for(int j = 0; j < tot / 3; j++)
+        {
+            if(j > 0)
+            {
+                RowCont = ui->tab3_ticketHistory->rowCount();
+                ui->tab3_ticketHistory->insertRow(RowCont);
+            }
+            str = "";
+            for(i++ ; i < len; i++)
+            {
+                if(tmp[i] == '\n' || tmp[i] == ' ')break;
+                else str += tmp[i];
+            }
+            ui->tab3_ticketHistory->setItem(RowCont, 6, new QTableWidgetItem(str));
+            nowSeatKind.push_back(str);
+            str = "";
+            for(i++; i < len; i++)
+            {
+                if(tmp[i] == '\n' || tmp[i] == ' ')break;
+                else str += tmp[i];
+            }
+            ui->tab3_ticketHistory->setItem(RowCont, 7, new QTableWidgetItem(str));
+            nowSeatRest.push_back(str);
+            str = "";
+            for(i++; i < len; i++)
+            {
+                if(tmp[i] == '\n' || tmp[i] == ' ')break;
+                else str += tmp[i];
+            }
+            ui->tab3_ticketHistory->setItem(RowCont, 8, new QTableWidgetItem(str));
+            nowSeatCost.push_back(str);
+            qDebug() << str;
+        }
+        seatKindHistory.push_back(nowSeatKind);
+        seatRestHistory.push_back(nowSeatRest);
+        seatCostHistory.push_back(nowSeatCost);
+    }
+}
+
+void MainWindow::on_pushButton_8_clicked()
+{
+    int nowx = ui->tab2_ticketShowing->currentRow(), nowy = ui->tab2_cata->currentIndex();
+    if(nowy == -1)
+    {
+        QMessageBox::critical(NULL, "订票错误", "请单击要订的票！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    qDebug() << nowx << " !! ?? " << nowy;
+    if(!(ui->tab2_ticketCount->text()).length())
+    {
+        QMessageBox::critical(NULL, "订票错误", "订票数量不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    QString nowdate = ui->tab2_ticketShowing->item(nowx, 1)->text();
+    QString tmp = get((QString)"buy_ticket " + userInfo.id + (QString)" " + ui->tab2_ticketCount->text() +
+                      (QString)" " + id[nowx] + (QString)" " +
+                      ui->tab1_logined_frame_loc1->text() + (QString)" " + ui->tab1_logined_frame_loc2->text() +
+                      (QString)" " + nowdate + (QString)" " + ui->tab2_cata->currentText());
+    if(tmp == "")return;
+    int nowRest = seatRest[nowx][nowy].toInt() - (ui->tab2_ticketCount->text()).toInt();
+    seatRest[nowx][nowy] = QString::number(nowRest);
+    ui->tab2_remain->setText((QString)"余票 " + seatRest[nowx][nowy]);
 }

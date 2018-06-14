@@ -150,7 +150,7 @@
      <string notr="true"/>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -390,7 +390,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QPushButton" name="pushButton_5">
+      <widget class="QPushButton" name="tab4_logined_frame_search">
        <property name="geometry">
         <rect>
          <x>170</x>
@@ -403,7 +403,7 @@
         <string>查询</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="loc1">
+      <widget class="QLineEdit" name="tab1_logined_frame_loc1">
        <property name="geometry">
         <rect>
          <x>100</x>
@@ -412,8 +412,11 @@
          <height>21</height>
         </rect>
        </property>
+       <property name="text">
+        <string>上海南</string>
+       </property>
       </widget>
-      <widget class="QLineEdit" name="loc2">
+      <widget class="QLineEdit" name="tab1_logined_frame_loc2">
        <property name="geometry">
         <rect>
          <x>100</x>
@@ -422,8 +425,11 @@
          <height>21</height>
         </rect>
        </property>
+       <property name="text">
+        <string>金山卫</string>
+       </property>
       </widget>
-      <widget class="QDateEdit" name="dateEdit">
+      <widget class="QDateEdit" name="tab1_logined_frame_date">
        <property name="geometry">
         <rect>
          <x>100</x>
@@ -431,6 +437,13 @@
          <width>110</width>
          <height>24</height>
         </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2018</year>
+         <month>6</month>
+         <day>1</day>
+        </date>
        </property>
       </widget>
       <widget class="QLabel" name="label_18">
@@ -497,7 +510,7 @@
        <property name="title">
         <string>车次类型</string>
        </property>
-       <widget class="QRadioButton" name="radioButton_3">
+       <widget class="QRadioButton" name="radioButton">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -510,7 +523,7 @@
          <string>全部</string>
         </property>
        </widget>
-       <widget class="QRadioButton" name="radioButton">
+       <widget class="QRadioButton" name="radioButton_2">
         <property name="geometry">
          <rect>
           <x>120</x>
@@ -523,7 +536,7 @@
          <string>高铁/动车</string>
         </property>
        </widget>
-       <widget class="QRadioButton" name="radioButton_2">
+       <widget class="QRadioButton" name="radioButton_3">
         <property name="geometry">
          <rect>
           <x>240</x>
@@ -537,7 +550,7 @@
         </property>
        </widget>
       </widget>
-      <widget class="QCheckBox" name="checkBox">
+      <widget class="QCheckBox" name="tab4_logined_frame_transfer">
        <property name="geometry">
         <rect>
          <x>40</x>
@@ -567,7 +580,7 @@
          <rect>
           <x>10</x>
           <y>40</y>
-          <width>41</width>
+          <width>51</width>
           <height>16</height>
          </rect>
         </property>
@@ -578,7 +591,7 @@
        <widget class="QLineEdit" name="addTrainBox_tid">
         <property name="geometry">
          <rect>
-          <x>60</x>
+          <x>90</x>
           <y>40</y>
           <width>113</width>
           <height>21</height>
@@ -588,7 +601,7 @@
        <widget class="QLineEdit" name="addTrainBox_tname">
         <property name="geometry">
          <rect>
-          <x>60</x>
+          <x>90</x>
           <y>70</y>
           <width>113</width>
           <height>21</height>
@@ -598,7 +611,7 @@
        <widget class="QComboBox" name="addTrainBox_cata">
         <property name="geometry">
          <rect>
-          <x>60</x>
+          <x>90</x>
           <y>100</y>
           <width>104</width>
           <height>26</height>
@@ -634,9 +647,9 @@
        <widget class="QLabel" name="label_33">
         <property name="geometry">
          <rect>
-          <x>180</x>
+          <x>230</x>
           <y>40</y>
-          <width>60</width>
+          <width>51</width>
           <height>16</height>
          </rect>
         </property>
@@ -647,7 +660,7 @@
        <widget class="QSpinBox" name="addTrainBox_stat_num">
         <property name="geometry">
          <rect>
-          <x>230</x>
+          <x>290</x>
           <y>40</y>
           <width>48</width>
           <height>24</height>
@@ -663,7 +676,7 @@
        <widget class="QSpinBox" name="addTrainBox_price_num">
         <property name="geometry">
          <rect>
-          <x>230</x>
+          <x>290</x>
           <y>70</y>
           <width>48</width>
           <height>24</height>
@@ -679,9 +692,9 @@
        <widget class="QLabel" name="label_34">
         <property name="geometry">
          <rect>
-          <x>180</x>
+          <x>230</x>
           <y>70</y>
-          <width>41</width>
+          <width>51</width>
           <height>16</height>
          </rect>
         </property>
@@ -795,25 +808,12 @@
         <string>您已选定：</string>
        </property>
       </widget>
-      <widget class="QLabel" name="tab2_chosen">
-       <property name="geometry">
-        <rect>
-         <x>80</x>
-         <y>230</y>
-         <width>60</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_27">
        <property name="geometry">
         <rect>
          <x>10</x>
          <y>260</y>
-         <width>60</width>
+         <width>71</width>
          <height>16</height>
         </rect>
        </property>
@@ -850,7 +850,7 @@
       <widget class="QComboBox" name="tab2_cata">
        <property name="geometry">
         <rect>
-         <x>80</x>
+         <x>90</x>
          <y>260</y>
          <width>191</width>
          <height>26</height>
@@ -897,6 +897,32 @@
        </property>
        <property name="text">
         <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="tab2_chosen">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>230</y>
+         <width>201</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="tab2_ticketCount">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>300</y>
+         <width>113</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="inputMask">
+        <string>000000</string>
        </property>
       </widget>
      </widget>
@@ -955,7 +981,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="tab3_logined_frame_search">
        <property name="geometry">
         <rect>
          <x>50</x>
@@ -991,7 +1017,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QDateEdit" name="dateEdit_2">
+      <widget class="QDateEdit" name="tab3_logined_frame_date">
        <property name="geometry">
         <rect>
          <x>100</x>
@@ -1041,11 +1067,11 @@
         <string>发车日期</string>
        </property>
       </widget>
-      <widget class="QTableWidget" name="tableWidget">
+      <widget class="QTableWidget" name="tab3_ticketHistory">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>140</y>
+         <x>0</x>
+         <y>150</y>
          <width>551</width>
          <height>231</height>
         </rect>
@@ -1270,6 +1296,9 @@
          <height>21</height>
         </rect>
        </property>
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
       </widget>
       <widget class="QLineEdit" name="tab4_logined_frame_userword_2">
        <property name="geometry">
@@ -1280,6 +1309,9 @@
          <height>21</height>
         </rect>
        </property>
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
       </widget>
       <widget class="QLineEdit" name="tab4_logined_frame_userphone">
        <property name="geometry">
@@ -1289,6 +1321,9 @@
          <width>113</width>
          <height>21</height>
         </rect>
+       </property>
+       <property name="inputMask">
+        <string>00000000000</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="tab4_logined_frame_usermail">
@@ -1335,6 +1370,9 @@
          <width>113</width>
          <height>21</height>
         </rect>
+       </property>
+       <property name="inputMask">
+        <string>0000000</string>
        </property>
       </widget>
      </widget>
@@ -1409,10 +1447,10 @@
       <widget class="QTextEdit" name="tmpText">
        <property name="geometry">
         <rect>
-         <x>360</x>
-         <y>60</y>
-         <width>104</width>
-         <height>87</height>
+         <x>40</x>
+         <y>20</y>
+         <width>511</width>
+         <height>301</height>
         </rect>
        </property>
       </widget>
@@ -1481,7 +1519,7 @@
      <x>0</x>
      <y>0</y>
      <width>589</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

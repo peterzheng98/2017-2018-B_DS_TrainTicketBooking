@@ -55,6 +55,16 @@ private slots:
 
     void work(QString str);
 
+    void on_tab4_logined_frame_search_clicked();
+
+    void on_tab2_ticketShowing_clicked(const QModelIndex &index);
+
+    void on_tab2_cata_currentIndexChanged(int index);
+
+    void on_tab3_logined_frame_search_clicked();
+
+    void on_pushButton_8_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket *socket;
