@@ -6,6 +6,7 @@
 #ifndef INC_2018DATASTRUCTUREBIGWORK_KERNEL_HPP
 #define INC_2018DATASTRUCTUREBIGWORK_KERNEL_HPP
 
+#include <stdint.h>
 #include <cstdio>
 #include "CoreData.h"
 #include "String.h"
@@ -191,7 +192,7 @@ public:
             : t_id(tr.t_id), t_name(tr.t_name), t_stationNum(tr.t_stationNum), t_ticketKind(tr.t_ticketKind),
               t_catalog(tr.t_catalog), t_onSale(tr.t_onSale) {
         memset(t_station, 0, sizeof(t_station));
-        memset(t_price, 0, sizeof(t_price))
+        memset(t_price, 0, sizeof(t_price));
         memset(t_time, 0, sizeof(t_time));
         memset(t_ticketName, 0, sizeof(t_ticketName));
         for (short i = 0; i < t_stationNum; ++i) {
@@ -493,7 +494,7 @@ namespace Kernel {
             if (!userSel.second) {
                 return NoThisUser;
             }
-            if (userSel.first.M_password() != p_word)
+            if (userSel.first.p_password != p_word)
                 return NoThisUser;
             return Success;
         }
@@ -502,10 +503,10 @@ namespace Kernel {
             auto userSel = userIdTree.search(p_id);
             if (!userSel.second)
                 return NoThisUser;
-            p_name = userSel.first.M_username();
-            p_email = userSel.first.M_email();
-            p_phone = userSel.first.M_phone();
-            up = userSel.first.M_privilege();
+            p_name = userSel.first.p_username;
+            p_email = userSel.first.p_email;
+            p_phone = userSel.first.p_phone;
+            up = userSel.first.p_userPrivilege;
             return Success;
         }
 

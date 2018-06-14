@@ -1,0 +1,194 @@
+
+% !Mode:: "TeX:UTF-8"
+%===Head===
+\documentclass[12pt,a4paper,UTF8]{report}
+\usepackage{ctex}
+\usepackage{CJK}
+\usepackage{ulem}
+\usepackage{amsmath,amscd,amsbsy,amssymb,latexsym,url,bm,amsthm}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{appendix}
+
+\usepackage{epsfig,graphicx,subfigure,wrapfig}
+\usepackage{enumitem}
+\usepackage{wrapfig}
+\usepackage{mathrsfs, euscript}
+\usepackage[usenames]{xcolor}
+\usepackage{hyperref}
+\usepackage{epstopdf}
+\usepackage{float}
+\usepackage{comment}
+\usepackage{listings}
+\usepackage{xcolor}
+%\usepackage{eso-pic}
+\usepackage{graphicx, fancyhdr}
+%\usepackage{tocloft}
+\usepackage[top=1cm, bottom=1cm, left=2cm, right=2cm]{geometry}
+%\usepackage{geometry}
+
+\usepackage{url}
+\makeatletter
+\def\UrlAlphabet{%
+      \do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j%
+      \do\k\do\l\do\m\do\n\do\o\do\p\do\q\do\r\do\s\do\t%
+      \do\u\do\v\do\w\do\x\do\y\do\z\do\A\do\B\do\C\do\D%
+      \do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N%
+      \do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X%
+      \do\Y\do\Z}
+\def\UrlDigits{\do\1\do\2\do\3\do\4\do\5\do\6\do\7\do\8\do\9\do\0}
+\g@addto@macro{\UrlBreaks}{\UrlOrds}
+\g@addto@macro{\UrlBreaks}{\UrlAlphabet}
+\g@addto@macro{\UrlBreaks}{\UrlDigits}
+\makeatother
+
+\lstset{
+    basicstyle = \small,
+    numbers=left,
+    numberstyle= \tiny,
+    keywordstyle= \color{ blue!70},
+    commentstyle= \color{red!50!green!50!blue!50},
+    frame=shadowbox, % 阴影效果
+    rulesepcolor= \color{ red!20!green!20!blue!20} ,
+    escapeinside=``, % 英文分号中可写入中文
+    xleftmargin=2em,xrightmargin=2em, aboveskip=1em,
+    framexleftmargin=2em
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{exercise}{Exercise}[section]
+\newtheorem*{solution}{Solution}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+\newcommand{\postscript}[2]
+ {\setlength{\epsfxsize}{#2\hsize}
+  \centerline{\epsfbox{#1}}}
+
+\newsavebox{\mygraphic}
+    \sbox{\mygraphic}{%
+        \includegraphics[height = 50mm, width = 55mm]{ACM_LOGO_WM.png}
+}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[C]{\setlength{\unitlength}{1in}
+              \begin{picture}(0, 0)
+              \put(2, -2){\usebox{\mygraphic}}
+              \end{picture}
+}
+\fancypagestyle{plain}{%
+    \fancyhead{}%
+    \fancyhead[C]{\setlength{\unitlength}{1in}
+              \begin{picture}(0, 0)
+              \put(2, -2){\usebox{\mygraphic}}
+              \end{picture}}
+}
+
+\renewcommand{\baselinestretch}{1.0}
+
+\setlength{\oddsidemargin}{-0.365in}
+\setlength{\evensidemargin}{-0.365in}
+\setlength{\topmargin}{-0.3in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\textheight}{10.1in}
+\setlength{\textwidth}{7in}
+\makeatletter \renewenvironment{proof}[1][Proof] {\par\pushQED{\qed}\normalfont\topsep6\p@\@plus6\p@\relax\trivlist\item[\hskip\labelsep\bfseries#1\@addpunct{.}]\ignorespaces}{\popQED\endtrivlist\@endpefalse} \makeatother
+\makeatletter
+\renewenvironment{solution}[1][Solution] {\par\pushQED{\qed}\normalfont\topsep6\p@\@plus6\p@\relax\trivlist\item[\hskip\labelsep\bfseries#1\@addpunct{.}]\ignorespaces}{\popQED\endtrivlist\@endpefalse} \makeatother
+
+%------------------------------------------------------------------------
+%字体设置
+\newcommand{\song}{\CJKfamily{zhsong}}
+\newcommand{\kai}{\CJKfamily{zhkai}}
+\newcommand{\hei}{\CJKfamily{zhhei}}
+\newcommand{\fs}{\CJKfamily{zhfs}}
+
+%------------------------------------------------------------------------
+%字号设置
+\newcommand{\chuhao}{\fontsize{42pt}{\baselineskip}\selectfont}
+\newcommand{\xiaochuhao}{\fontsize{36pt}{\baselineskip}\selectfont}
+\newcommand{\yihao}{\fontsize{28pt}{\baselineskip}\selectfont}
+\newcommand{\xiaoyihao}{\fontsize{24pt}{\baselineskip}\selectfont}
+\newcommand{\erhao}{\fontsize{21pt}{\baselineskip}\selectfont}
+\newcommand{\xiaoerhao}{\fontsize{17.28pt}{\baselineskip}\selectfont}
+\newcommand{\sanhao}{\fontsize{15.75pt}{\baselineskip}\selectfont}
+\newcommand{\sihao}{\fontsize{14pt}{\baselineskip}\selectfont}
+\newcommand{\xiaosihao}{\fontsize{12pt}{\baselineskip}\selectfont}
+\newcommand{\wuhao}{\fontsize{10.5pt}{\baselineskip}\selectfont}
+\newcommand{\xiaowuhao}{\fontsize{9pt}{\baselineskip}\selectfont}
+\newcommand{\liuhao}{\fontsize{7.875pt}{\baselineskip}\selectfont}
+\newcommand{\qihao}{\fontsize{5.25pt}{\baselineskip}\selectfont}
+
+\begin{document}
+\begin{titlepage} % Suppresses headers and footers on the title page
+
+    \includegraphics[height = 50mm, width = 55mm]{ACM_LOGO.png}
+
+	\centering % Centre everything on the title page
+
+	\vspace*{5\baselineskip} % White space at the top of the page
+	
+	\rule{\textwidth}{1.6pt}\vspace*{-\baselineskip}\vspace*{2pt} % Thick horizontal rule
+	\rule{\textwidth}{0.4pt} % Thin horizontal rule
+	
+	\vspace{\baselineskip} % Whitespace above the title
+	
+	\fs\xiaochuhao{火车站订票系统开发报告} % Title
+	
+	%\vspace{0.5\baselineskip} % Whitespace below the title
+	
+	\rule{\textwidth}{0.4pt}\vspace*{-\baselineskip}\vspace{3.2pt} % Thin horizontal rule
+	\rule{\textwidth}{1.6pt} % Thick horizontal rule
+	
+	\vspace{15\baselineskip} % Whitespace after the title block
+	
+	
+    \xiaoerhao
+    \fs 组长：\kai\underline{\ \ \ \ \ \ \ \ \ \ \ 郑文鑫\ \ \ \ \ \ \ \ \ \ \ \ }
+
+    \vspace{\baselineskip}
+    \fs 组员：\kai\underline{凌皓煜、何俊、赵寒烨}
+
+    \vspace{\baselineskip}
+    \fs 日期：\kai\underline{\ \ \ \ 2018年6月15日\ \ \ \ }
+\end{titlepage}
+%===========================================================================================
+\tableofcontents
+\newpage
+%========================================================================CHAPTER 1===========================================================
+\chapter{项目简介}
+\section{项目概念}
+\par 本项目是上海交通大学2017级ACM班2017-2018学年春季学期数据结构课程的大作业，要求完成类12306的火车票查询与预订系统。其中，后端应支持用户、火车、车票三大部分相关的命令；前端应在Windows和Linux端、网页端、Android端中实现至少一个；前后端使用socket通信。
+\par 本次作业后端强制使用C++，且不得使用STL、string、algorithm等工具，要求使用B/B+/B*树一类数据处理形式；前端和前后端通信语言不限。
+\par 具体要求请见\color{blue}\url{https://github.com/camelop/ticket_office_cw-DS2018}\color{black}。
+\section{项目组成}
+\subsection{前端部分}
+%TODO
+%picture needed
+\subsection{后端部分}
+\par 后端由解释器、数据库和一些必要的辅助工具组成。
+\par 解释器对传入的命令进行解释，并调用相应的数据库接口，再将返回值以一定的格式输出。数据库的主体是B*树，再用多棵B*树分别存储用户、火车等信息。辅助工具包括存储字符串的String、 记录日期时间的Date和Time、传递信息的Vector、Set、Pair等。
+\subsection{通信部分}
+%TODO
+\newpage
+%========================================================================CHAPTER 2===========================================================
+\chapter{使用手册}
+\newpage
+%========================================================================CHAPTER 3===========================================================
+\chapter{开发日志}
+\par 以下列出开发过程中的重要节点，详细记录请访问\color{blue}\url{https://github.com/peterzheng98/2017-2018-B_DS_TrainTicketBooking}\color{black}查看。
+\section{前端部分}
+%TODO
+\section{后端部分}
+\subsection{04/14 ~ 05/07}
+\par 经过长时间的商讨，敲定了标准接口表。同时初步完成了辅助工具。其中，String、Vector、Pair由郑文鑫编写，Set由赵寒烨编写，凌皓煜进行了测试。
+\par 此时，我们错误地认为需要处理中文编码问题，在如何用String正常存储显示中文上耗费了太多时间。
+\subsection{05/08 ~ 05/12}
+\par 赵寒烨开始动手B*树，第一个能通过编译的版本在5月12日完成。其间修复了String的部分漏洞。
+\subsection{05/13 ~ 05/26}
+\par 在此期间，后端的主要工作是调试B*树，
+\end{document}
