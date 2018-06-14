@@ -31,12 +31,9 @@ private slots:
 
     void on_tab5_nologin_frame_register_clicked();
 
-    QString Read();
+    void on_tab4_logined_frame_usercheckid_clicked();
 
-    void Write(QString str);
-
-private:
-    QTcpSocket *socket;
+    QString get(QString str);
 
 private:
     Ui::MainWindow *ui;

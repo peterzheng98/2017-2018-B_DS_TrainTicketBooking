@@ -1,15 +1,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QDebug>
+#include <QStringListModel>
+#include <QStandardItemModel>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->socket = new QTcpSocket(this);
-    this->socket->connectToHost("127.0.0.1", 100, QTcpSocket::ReadWrite);
 
-    connect(this->socket, SIGNAL(connected()), this, SLOT(connected()));
     ui->userFrame->setVisible(false);
 
     ui->tab1_nologin->setVisible(true);
@@ -29,28 +30,15 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-QString MainWindow::Read()
+QString MainWindow::get(QString str)
 {
-    char *tmp;
-    int l = this->socket->read(tmp, 110);
-    QString str;
-    for(int i = 0; i < l; i++)
-        str[i] = tmp[i];
-    str[l] = 0;
     return str;
-}
-
-void MainWindow::Write(QString str)
-{
-    this->socket->write(str.toStdString().c_str(), strlen(str.toStdString().c_str()));
 }
 
 void MainWindow::on_login_frame_login_clicked()
 {
     QString loginid = ui->login_frame_id->text();
     QString password = ui->login_frame_word->text();
-    this -> Write((QString)"login" + (QString)" " + loginid + (QString)" " + password);
-    this -> Read();
     int len = loginid.length();
     bool goodDigits = true;
     for(int i = 0; i < len;i++) if(loginid[i] < '0' || loginid[i] > '9') {
@@ -60,27 +48,35 @@ void MainWindow::on_login_frame_login_clicked()
         goodDigits = false;
     }
     if(goodDigits){
-    //TODO : checkUser
-    //TODO : Accepted
-    ui->loginFrame->setVisible(false);
-    ui->userFrame->setVisible(true);
-    ui->user_frame_auth->setText("您的权限级别为：");
-    ui->user_frame_welcomeMessage->setText("欢迎您！");
+        QString tmp = get((QString)"login" + (QString)" " + loginid + (QString)" " + password);
+        if(tmp[0] == '0')
+        {
+            ui->login_frame_id->setText("");
+            ui->login_frame_word->setText("");
+        }
+        else
+        {
+            ui->loginFrame->setVisible(false);
+            ui->userFrame->setVisible(true);
+            ui->user_frame_auth->setText("您的权限级别为：");
+            ui->user_frame_welcomeMessage->setText("欢迎您！");
 
-    ui->tab1_nologin->setVisible(false);
-    ui->tab2_nologin->setVisible(false);
-    ui->tab3_nologin->setVisible(false);
-    ui->tab4_nologin->setVisible(false);
-    ui->tab5_nologin->setVisible(false);
-    ui->tab1_logined->setVisible(true);
-    ui->tab2_logined->setVisible(true);
-    ui->tab3_logined->setVisible(true);
-    ui->tab4_logined->setVisible(true);
-    ui->tab5_logined->setVisible(true);
-    if(loginid == "2018") {
-        ui->user_frame_welcomeMessage->setText("欢迎您！冯思远，您暂时被禁止订票");
-        on_login_frame_reset_clicked();
-    }
+            ui->tab1_nologin->setVisible(false);
+            ui->tab2_nologin->setVisible(false);
+            ui->tab3_nologin->setVisible(false);
+            ui->tab4_nologin->setVisible(false);
+            ui->tab5_nologin->setVisible(false);
+            ui->tab1_logined->setVisible(true);
+            ui->tab2_logined->setVisible(true);
+            ui->tab3_logined->setVisible(true);
+            ui->tab4_logined->setVisible(true);
+            ui->tab5_logined->setVisible(true);
+            if(loginid == "2018")
+            {
+                ui->user_frame_welcomeMessage->setText("欢迎您！冯思远，您暂时被禁止订票");
+                on_login_frame_reset_clicked();
+            }
+        }
     }
 }
 
@@ -133,33 +129,56 @@ void MainWindow::on_tab5_nologin_frame_register_clicked()
         }
         if(flag)
         {
-            //TODO
-            this->Write((QString)"register" + (QString)" " + registerName + (QString)" " +
-                        registerPassword + (QString)" " + registerEmail + (QString)" " + registerPhone);
-            this->Read();
-            ui->loginFrame->setVisible(false);
-            ui->userFrame->setVisible(true);
-            ui->user_frame_auth->setText("您的权限级别为：");
-            ui->user_frame_welcomeMessage->setText("欢迎您！");
-            ui->tab1_nologin->setVisible(false);
-            ui->tab2_nologin->setVisible(false);
-            ui->tab3_nologin->setVisible(false);
-            ui->tab4_nologin->setVisible(false);
-            ui->tab5_nologin->setVisible(false);
-            ui->tab1_logined->setVisible(true);
-            ui->tab2_logined->setVisible(true);
-            ui->tab3_logined->setVisible(true);
-            ui->tab4_logined->setVisible(true);
-            ui->tab5_logined->setVisible(true);
-            if(registerName == "2018")
+            QString tmp = get((QString)"register" + (QString)" " + registerName + (QString)" " + registerPassword +
+                              (QString)" " + registerEmail + (QString)" " + registerPhone);
+            if(tmp[0] == '-')
             {
-                ui->user_frame_welcomeMessage->setText("欢迎您！冯思远，您暂时被禁止订票");
-                on_login_frame_reset_clicked();
+                ui->tab5_nologin_frame_name->setText("");
+                ui->tab5_nologin_frame_password->setText("");
+                ui->tab5_nologin_frame_email->setText("");
+                ui->tab5_nologin_frame_phone->setText("");
+            }
+            else
+            {
+                ui->loginFrame->setVisible(false);
+                ui->userFrame->setVisible(true);
+                ui->user_frame_auth->setText("您的权限级别为：");
+                ui->user_frame_welcomeMessage->setText("欢迎您！");
+                ui->tab1_nologin->setVisible(false);
+                ui->tab2_nologin->setVisible(false);
+                ui->tab3_nologin->setVisible(false);
+                ui->tab4_nologin->setVisible(false);
+                ui->tab5_nologin->setVisible(false);
+                ui->tab1_logined->setVisible(true);
+                ui->tab2_logined->setVisible(true);
+                ui->tab3_logined->setVisible(true);
+                ui->tab4_logined->setVisible(true);
+                ui->tab5_logined->setVisible(true);
+                if(registerName == "hzfengsy")
+                {
+                    ui->user_frame_welcomeMessage->setText("欢迎您！冯思远，您暂时被禁止订票");
+                    on_login_frame_reset_clicked();
+                }
             }
         }
         else
         {
             ui->tab5_nologin_frame_email->setText("");
         }
+    }
+}
+
+void MainWindow::on_tab4_logined_frame_usercheckid_clicked()
+{
+    QString tmp = get((QString)"query_profile" + (QString)" " + ui->tab4_logined_frame_userid->text());
+    int len = tmp.length();
+    if(len == 1)ui->tab4_logined_frame_username->setText("不存在该用户！");
+    else
+    {
+        QString str = "";
+        for(int i = 0; i < len; i++)
+            if(tmp[i] == ' ')break;
+            else str += tmp[i];
+        ui->tab4_logined_frame_username->setText(str);
     }
 }
