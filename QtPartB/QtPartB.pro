@@ -33,3 +33,8 @@ HEADERS += \
 
 FORMS += \
         mainwindow.ui
+
+DISTFILES +=
+
+RESOURCES += \
+    picture.qrc

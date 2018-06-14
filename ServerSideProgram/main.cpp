@@ -11,6 +11,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <signal.h>
 
 #define PORT 10774
 #define IPAddr "0.0.0.0"
@@ -40,9 +41,6 @@ void receiveData() {
     while (true) {
         int sizeC = connVector.size();
         for (int i = 0; i < sizeC; ++i) {
-//            printf("DEBUG SOCKET:\n");
-//	    for(int j = 0; j < sizeC; ++j) printf("In stage %d: %d -> %d\n", i, j, connVector[j]);
-//	    printf("END\n");
             if (connVector[i] <= 0) continue;
             fd_set fdSet;
             FD_ZERO(&fdSet);
@@ -53,20 +51,14 @@ void receiveData() {
             returnVal = select(maxFd + 1, &fdSet, nullptr, nullptr, &timeval1);
             if (returnVal == -1) printf("Selection Error!\n");
             else if (returnVal == 0) {
-                //printf("No Message!\n");
                 if (flag) {
                     fprintf(fp, "\nexit\n");
                     fclose(fp);
                     flag = false;
                     system("./code < in.in > out.out");
-                    //printf("SYSTEM EXECUTED:INPUT WAITING\n");
-                    //int t;
-                    //scanf("%d", &t);
                     fp = fopen("in.in", "w+");
                     FILE *out = fopen("out.out", "r+");
                     char bufferB[1024000];
-                    //Get Data
-                    //fscanf(out, "%s", buffer);
                     int len = 0;
                     fseek(out, 0, SEEK_SET);
                     char ch = fgetc(out);
@@ -76,11 +68,14 @@ void receiveData() {
                         ch = fgetc(out);
                     }
                     bufferB[len] = '\0';
-//                    fgets(bufferB, sizeof(bufferB), out);
                     printf("Send Data : [%s]\n", bufferB);
                     int sizeC = connVector.size();
                     for (int i = 0; i < sizeC; ++i)
                         send(connVector[i], bufferB, sizeof(bufferB), 0);
+                    fclose(out);
+                    out = fopen("out.out", "w+");
+                    fprintf(out, "");
+                    fclose(out);
                 }
             } else {
                 char buffer[1024];
@@ -89,16 +84,31 @@ void receiveData() {
                 flag = true;
                 printf("Received Data [%s]\n", buffer);
                 if (length == 0) {
-                    char bufferS[1024];
-                    buffer[0] = 'B';
-                    buffer[1] = 'Y';
-                    buffer[2] = 'E';
-                    buffer[3] = '\0';
-                    printf("Sending Data : [%s]\n", buffer);
-                    int sizeC = connVector.size();
-                    for (int i = 0; i < sizeC; ++i)
-                        send(connVector[i], buffer, sizeof(buffer), 0);
-                    connVector[i] = -1;
+                    FILE *out = fopen("out.out", "r+");
+                    char ch = fgetc(out);
+                    char bufferB[1024000];
+                    int len = 0;
+                    while (ch != EOF) {
+                        bufferB[len] = (char) ch;
+                        len++;
+                        ch = fgetc(out);
+                    }
+                    bufferB[len] = '\0';
+                    if(len > 0 && bufferB[0] != '\0'){
+                        printf("Send Data : [%s]\n", bufferB);
+                        int sizeC = connVector.size();
+                        for (int i = 0; i < sizeC; ++i)
+                            send(connVector[i], bufferB, sizeof(bufferB), 0);
+                    }
+//                    buffer[0] = 'B';
+//                    buffer[1] = 'Y';
+//                    buffer[2] = 'E';
+//                    buffer[3] = '\0';
+//                    printf("Sending Data : [%s]\n", buffer);
+//                    int sizeC = connVector.size();
+//                    for (int i = 0; i < sizeC; ++i)
+//                        send(connVector[i], buffer, sizeof(buffer), 0);
+                    close(connVector[i]);
                     flag = false;
                 }
                 fprintf(fp, "%s", buffer);
@@ -128,6 +138,7 @@ void Timer() {
 }
 
 int main() {
+    signal(SIGPIPE, SIG_IGN);
     s = socket(AF_INET, SOCK_STREAM, 0);
     memset(&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
