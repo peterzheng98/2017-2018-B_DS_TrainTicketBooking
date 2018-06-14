@@ -3,4 +3,4 @@ project(ServerSideProgram)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(ServerSideProgram main.cpp Timer.h CoreData.h DateAndTime.h String.h)
+add_executable(ServerSideProgram main3.cpp Timer.h CoreData.h DateAndTime.h String.h)

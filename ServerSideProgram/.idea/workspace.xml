@@ -12,6 +12,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7667aa1c-cde4-4277-86e0-ba12895947c7" name="Default" comment="">
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/../PythonServer/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../PythonServer/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../QtPartB/mainwindow.ui" beforeDir="false" afterPath="$PROJECT_DIR$/../QtPartB/mainwindow.ui" afterDir="false" />
+>>>>>>> 09791311be477a551ad5cc1b3680d6759c9b9737
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
     </list>
@@ -47,8 +52,13 @@
       <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="780">
               <caret line="85" column="34" lean-forward="true" selection-start-line="85" selection-start-column="34" selection-end-line="85" selection-end-column="34" />
+=======
+            <state relative-caret-position="286">
+              <caret line="83" column="5" lean-forward="true" selection-start-line="83" selection-start-column="5" selection-end-line="83" selection-end-column="5" />
+>>>>>>> 09791311be477a551ad5cc1b3680d6759c9b9737
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -116,7 +126,7 @@
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds">
     <option name="y" value="23" />
-    <option name="width" value="1440" />
+    <option name="width" value="1506" />
     <option name="height" value="822" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -129,7 +139,7 @@
         <subPane>
           <expand>
             <path>
-              <item name="ServerSideProgram" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ServerSideProgram" type="dad4c3:CidrFilesViewHelper$MyProjectTreeStructure$1" />
               <item name="ServerSideProgram" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -181,14 +191,22 @@
       <workItem from="1527845090977" duration="16000" />
       <workItem from="1528810064881" duration="2188000" />
       <workItem from="1528812264694" duration="759000" />
+<<<<<<< HEAD
       <workItem from="1528814117593" duration="2968000" />
       <workItem from="1528897871655" duration="1777000" />
       <workItem from="1528939906829" duration="2676000" />
+=======
+      <workItem from="1528814117593" duration="648000" />
+>>>>>>> 09791311be477a551ad5cc1b3680d6759c9b9737
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
+<<<<<<< HEAD
     <option name="totallyTimeSpent" value="16765000" />
+=======
+    <option name="totallyTimeSpent" value="9992000" />
+>>>>>>> 09791311be477a551ad5cc1b3680d6759c9b9737
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -200,15 +218,20 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="822" extended-state="0" />
+    <frame x="0" y="23" width="1506" height="822" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.492" visible="true" weight="0.22832981" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.492" visible="true" weight="0.052525252" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49753347" weight="0.3286908" />
+      <window_info anchor="bottom" id="Messages" order="7" weight="0.20967741" />
       <window_info anchor="bottom" id="CMake" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5024665" side_tool="true" weight="0.3259053" />
       <window_info anchor="bottom" id="Version Control" order="10" />
+<<<<<<< HEAD
       <window_info anchor="bottom" id="Run" order="2" weight="0.24" />
+=======
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32827586" />
+>>>>>>> 09791311be477a551ad5cc1b3680d6759c9b9737
       <window_info id="Structure" order="1" sideWeight="0.49530202" side_tool="true" weight="0.14376321" />
       <window_info anchor="bottom" id="Terminal" order="11" />
       <window_info id="Favorites" order="2" sideWeight="0.504698" side_tool="true" weight="0.25" />
@@ -221,7 +244,13 @@
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
+<<<<<<< HEAD
       <window_info anchor="bottom" id="Messages" order="7" weight="0.20967741" />
+=======
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
+>>>>>>> 09791311be477a551ad5cc1b3680d6759c9b9737
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -601,8 +630,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="780">
           <caret line="85" column="34" lean-forward="true" selection-start-line="85" selection-start-column="34" selection-end-line="85" selection-end-column="34" />
+=======
+        <state relative-caret-position="286">
+          <caret line="83" column="5" lean-forward="true" selection-start-line="83" selection-start-column="5" selection-end-line="83" selection-end-column="5" />
+>>>>>>> 09791311be477a551ad5cc1b3680d6759c9b9737
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>
