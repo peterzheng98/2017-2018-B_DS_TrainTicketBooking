@@ -150,7 +150,7 @@
      <string notr="true"/>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -990,6 +990,16 @@
        </property>
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;开发者：Peter Zheng&lt;/p&gt;&lt;p&gt;简单版火车票订票系统 0.1&lt;/p&gt;&lt;p&gt;由Qt引擎开发&lt;/p&gt;&lt;p&gt;联系方式：peterzheng98@sjtu.edu.cn&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+      <widget class="QTextEdit" name="tmpText">
+       <property name="geometry">
+        <rect>
+         <x>370</x>
+         <y>60</y>
+         <width>151</width>
+         <height>121</height>
+        </rect>
        </property>
       </widget>
      </widget>

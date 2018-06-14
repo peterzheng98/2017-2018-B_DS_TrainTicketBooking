@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QDebug>
+#include <QTextCodec>
 #include <QStringListModel>
 #include <QStandardItemModel>
 
@@ -10,6 +11,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    socket = new QTcpSocket();
+    QObject::connect(socket, &QTcpSocket::readyRead, this, &MainWindow::socket_Read_Data);
+    QObject::connect(socket, &QTcpSocket::disconnected, this, &MainWindow::socket_Disconnected);
 
     ui->userFrame->setVisible(false);
 
@@ -30,9 +35,50 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::socket_Read_Data()
+{
+    qDebug() << "yeah!";
+    QByteArray buffer;
+    buffer = socket->readAll();
+    if(!buffer.isEmpty())
+    {
+        ui->tmpText->setText(buffer);
+    }
+}
+
+void MainWindow::socket_Disconnected()
+{
+    socket->close();
+    socket->disconnectFromHost();
+    socket->waitForDisconnected();
+}
+
 QString MainWindow::get(QString str)
 {
-    return str;
+    socket->connectToHost("101.132.131.164", 10774);
+    if(!socket->waitForConnected(30000))
+    {
+        qDebug() << "Connection failed!";
+    }
+    qDebug() << "Connect successfully!";
+    qDebug() << "Send: " << str;
+    QTextCodec *code= QTextCodec::codecForName("UTF-8");
+    QByteArray bytest = code->fromUnicode( str );
+    socket->write(bytest);
+    socket->flush();
+    qDebug() << "yeah!";
+    QByteArray buffer;
+    buffer = socket->readAll();
+    if(!buffer.isEmpty())
+    {
+        ui->tmpText->setText(buffer);
+    }
+
+    socket->close();
+    socket->disconnectFromHost();
+    socket->waitForDisconnected();
+
+    return ui->tmpText->toPlainText();
 }
 
 void MainWindow::on_login_frame_login_clicked()
@@ -49,7 +95,7 @@ void MainWindow::on_login_frame_login_clicked()
     }
     if(goodDigits){
         QString tmp = get((QString)"login" + (QString)" " + loginid + (QString)" " + password);
-        if(tmp[0] == '0')
+        if(tmp[0] != '1')
         {
             ui->login_frame_id->setText("");
             ui->login_frame_word->setText("");

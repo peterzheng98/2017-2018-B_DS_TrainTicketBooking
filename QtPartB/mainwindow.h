@@ -33,10 +33,15 @@ private slots:
 
     void on_tab4_logined_frame_usercheckid_clicked();
 
+    void socket_Read_Data();
+
+    void socket_Disconnected();
+
     QString get(QString str);
 
 private:
     Ui::MainWindow *ui;
+    QTcpSocket *socket;
 };
 
 #endif // MAINWINDOW_H
