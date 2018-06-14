@@ -150,7 +150,7 @@
      <string notr="true"/>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -164,9 +164,6 @@
         <width>221</width>
         <height>91</height>
        </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QFrame{border: 0px;}</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -196,9 +193,6 @@
         <width>571</width>
         <height>251</height>
        </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QFrame{border: 0px;}</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -612,6 +606,17 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
+      <widget class="QWidget" name="gridLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>20</y>
+         <width>321</width>
+         <height>191</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout"/>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_3">
@@ -1052,7 +1057,7 @@
      <x>0</x>
      <y>0</y>
      <width>589</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

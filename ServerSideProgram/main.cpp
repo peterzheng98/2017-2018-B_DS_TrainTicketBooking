@@ -22,14 +22,14 @@ socklen_t socklen;
 std::vector<int> connVector;
 int globalTimer = 0;
 
-
-void Connect() {
-    while (true) {
-        int conn = accept(s, (sockaddr *) &serverAddr, &socklen);
+void Connect(){
+    while(true){
+        int conn = accept(s, (sockaddr*) &serverAddr, &socklen);
         connVector.push_back(conn);
         printf("Connection : ID: %d Address: %s\n", conn, inet_ntoa(serverAddr.sin_addr));
     }
 }
+
 
 void receiveData() {
     FILE *fp = fopen("in.in", "w+");
@@ -102,7 +102,6 @@ void receiveData() {
                     flag = false;
                 }
                 fprintf(fp, "%s", buffer);
-
             }
         }
         sleep(1);

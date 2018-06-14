@@ -3,7 +3,6 @@
 //
 #define  _NO_DEBUG
 
-#include <stdint.h>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
