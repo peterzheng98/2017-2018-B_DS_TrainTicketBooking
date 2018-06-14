@@ -714,3 +714,22 @@ void MainWindow::on_pushButton_8_clicked()
     seatRest[nowx][nowy] = QString::number(nowRest);
     ui->tab2_remain->setText((QString)"余票 " + seatRest[nowx][nowy]);
 }
+
+void MainWindow::on_tab3_ticketHistory_clicked(const QModelIndex &index)
+{
+    //TODO 把选择的那一项的车次号显示在上面的文本框里面
+}
+
+void MainWindow::on_group_refund_button_clicked()
+{
+    if(!(ui->group_num->text()).length())
+    {
+        QMessageBox::critical(NULL, "订票错误", "订票数量不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    QString tmp = get((QString)"refund_ticket " + userInfo.id + (QString)" " + ui->group_num->text() +
+                      /* Train ID  +*/ (QString)" " + /* loc1  +*/ (QString)" " + /* loc2  + */(QString)" " //+
+                      /* Ticket Kind */);
+    if(tmp == "") return;
+    //TODO 发送订票
+}

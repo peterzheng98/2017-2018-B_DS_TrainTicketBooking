@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>589</width>
-    <height>574</height>
+    <width>796</width>
+    <height>660</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>461</width>
+      <width>651</width>
       <height>71</height>
      </rect>
     </property>
@@ -32,7 +32,7 @@
     <widget class="QPushButton" name="login_frame_login">
      <property name="geometry">
       <rect>
-       <x>362</x>
+       <x>550</x>
        <y>0</y>
        <width>91</width>
        <height>32</height>
@@ -45,7 +45,7 @@
     <widget class="QPushButton" name="login_frame_reset">
      <property name="geometry">
       <rect>
-       <x>362</x>
+       <x>550</x>
        <y>30</y>
        <width>91</width>
        <height>32</height>
@@ -110,11 +110,50 @@
       <string>密码</string>
      </property>
     </widget>
+    <widget class="QLabel" name="label_26">
+     <property name="geometry">
+      <rect>
+       <x>370</x>
+       <y>10</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>使用文件登陆</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_35">
+     <property name="geometry">
+      <rect>
+       <x>370</x>
+       <y>30</y>
+       <width>60</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_3">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>30</y>
+       <width>113</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>选择文件</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>670</x>
       <y>10</y>
       <width>113</width>
       <height>32</height>
@@ -127,7 +166,7 @@
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>670</x>
       <y>40</y>
       <width>113</width>
       <height>32</height>
@@ -142,15 +181,15 @@
      <rect>
       <x>10</x>
       <y>90</y>
-      <width>571</width>
-      <height>421</height>
+      <width>781</width>
+      <height>501</height>
      </rect>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -190,8 +229,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>571</width>
-        <height>381</height>
+        <width>761</width>
+        <height>461</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -325,6 +364,19 @@
         <string>密码</string>
        </property>
       </widget>
+      <widget class="QLabel" name="label_36">
+       <property name="geometry">
+        <rect>
+         <x>480</x>
+         <y>40</y>
+         <width>221</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>注册成功！</string>
+       </property>
+      </widget>
       <zorder>label_24</zorder>
       <zorder>label_16</zorder>
       <zorder>label_17</zorder>
@@ -334,6 +386,7 @@
       <zorder>tab5_nologin_frame_register</zorder>
       <zorder>tab5_nologin_frame_name</zorder>
       <zorder>label_15</zorder>
+      <zorder>label_36</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="tab">
@@ -772,8 +825,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>561</width>
-        <height>381</height>
+        <width>771</width>
+        <height>471</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -790,8 +843,8 @@
         <rect>
          <x>0</x>
          <y>10</y>
-         <width>551</width>
-         <height>211</height>
+         <width>761</width>
+         <height>301</height>
         </rect>
        </property>
       </widget>
@@ -799,7 +852,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>230</y>
+         <y>330</y>
          <width>60</width>
          <height>16</height>
         </rect>
@@ -812,7 +865,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>260</y>
+         <y>360</y>
          <width>71</width>
          <height>16</height>
         </rect>
@@ -825,7 +878,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>330</y>
+         <y>430</y>
          <width>113</width>
          <height>32</height>
         </rect>
@@ -838,7 +891,7 @@
        <property name="geometry">
         <rect>
          <x>130</x>
-         <y>330</y>
+         <y>430</y>
          <width>113</width>
          <height>32</height>
         </rect>
@@ -851,7 +904,7 @@
        <property name="geometry">
         <rect>
          <x>90</x>
-         <y>260</y>
+         <y>360</y>
          <width>191</width>
          <height>26</height>
         </rect>
@@ -861,7 +914,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>300</y>
+         <y>400</y>
          <width>101</width>
          <height>16</height>
         </rect>
@@ -874,7 +927,7 @@
        <property name="geometry">
         <rect>
          <x>130</x>
-         <y>300</y>
+         <y>400</y>
          <width>131</width>
          <height>16</height>
         </rect>
@@ -886,8 +939,8 @@
       <widget class="QLabel" name="tab2_picture">
        <property name="geometry">
         <rect>
-         <x>370</x>
-         <y>230</y>
+         <x>590</x>
+         <y>330</y>
          <width>171</width>
          <height>131</height>
         </rect>
@@ -906,7 +959,7 @@
        <property name="geometry">
         <rect>
          <x>90</x>
-         <y>230</y>
+         <y>330</y>
          <width>201</width>
          <height>21</height>
         </rect>
@@ -916,7 +969,7 @@
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>300</y>
+         <y>400</y>
          <width>113</width>
          <height>21</height>
         </rect>
@@ -968,8 +1021,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>561</width>
-        <height>381</height>
+        <width>771</width>
+        <height>471</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -1072,16 +1125,16 @@
         <rect>
          <x>0</x>
          <y>150</y>
-         <width>551</width>
-         <height>231</height>
+         <width>761</width>
+         <height>311</height>
         </rect>
        </property>
       </widget>
       <widget class="QGroupBox" name="groupBox_2">
        <property name="geometry">
         <rect>
-         <x>230</x>
-         <y>0</y>
+         <x>440</x>
+         <y>10</y>
          <width>321</width>
          <height>131</height>
         </rect>
@@ -1160,8 +1213,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>561</width>
-        <height>381</height>
+        <width>771</width>
+        <height>461</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -1339,8 +1392,8 @@
       <widget class="QPushButton" name="tab4_logined_frame_modifyinfo">
        <property name="geometry">
         <rect>
-         <x>270</x>
-         <y>170</y>
+         <x>20</x>
+         <y>220</y>
          <width>113</width>
          <height>32</height>
         </rect>
@@ -1418,8 +1471,8 @@
        <rect>
         <x>0</x>
         <y>10</y>
-        <width>561</width>
-        <height>371</height>
+        <width>761</width>
+        <height>451</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -1447,11 +1500,24 @@
       <widget class="QTextEdit" name="tmpText">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>20</y>
-         <width>511</width>
-         <height>301</height>
+         <x>10</x>
+         <y>280</y>
+         <width>731</width>
+         <height>161</height>
         </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_37">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>250</y>
+         <width>60</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string> 调试信息</string>
        </property>
       </widget>
      </widget>
@@ -1462,7 +1528,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>461</width>
+      <width>651</width>
       <height>71</height>
      </rect>
     </property>
@@ -1518,8 +1584,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>589</width>
-     <height>26</height>
+     <width>796</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>

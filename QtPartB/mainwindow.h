@@ -65,6 +65,10 @@ private slots:
 
     void on_pushButton_8_clicked();
 
+    void on_tab3_ticketHistory_clicked(const QModelIndex &index);
+
+    void on_group_refund_button_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket *socket;
