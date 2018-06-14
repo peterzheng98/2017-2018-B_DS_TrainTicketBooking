@@ -5,6 +5,7 @@
 #ifndef INC_2018DATASTRUCTUREBIGWORK_BPLUSTREE_H
 #define INC_2018DATASTRUCTUREBIGWORK_BPLUSTREE_H
 
+#include <stdint.h>
 #include <cstdio>
 #include <fstream>
 #include <functional>
@@ -27,13 +28,13 @@ public:
     using key_type          = Key;
     using value_type        = Val;
 	using key_compare       = Compare;
-	using size_type         = size_t;
+	using size_type         = uint32_t;
     using difference_type   = std::ptrdiff_t;
 
 private:
     struct Index{
         Key key;
-        off_t child;
+        int32_t child;
     };
 
     struct Record{
@@ -41,20 +42,20 @@ private:
         Val value;
     };
 
-    static const size_t M = (4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Index));
-    static const size_t L = (4096 - 3 * sizeof(off_t) - sizeof(size_t)) / (sizeof(Record));
+    static const uint32_t M = (4096 - 3 * sizeof(int32_t) - sizeof(uint32_t)) / (sizeof(Index));
+    static const uint32_t L = (4096 - 3 * sizeof(int32_t) - sizeof(uint32_t)) / (sizeof(Record));
 
     struct LeafNode{
-        off_t parent = 0;
-        off_t prev = 0, succ = 0;
-        size_t size = 0;
+        int32_t parent = 0;
+        int32_t prev = 0, succ = 0;
+        uint32_t size = 0;
         Record record[L];
     };
 
     struct TreeNode{
-        off_t parent = 0;
-        off_t prev = 0, succ = 0;
-        size_t size = 0;
+        int32_t parent = 0;
+        int32_t prev = 0, succ = 0;
+        uint32_t size = 0;
         Index index[M];
     };
 
@@ -64,8 +65,8 @@ private:
     mutable int isOpen = 0;
 
     struct CoreData{
-        off_t root = 0, slot = 0, pos = UNIT;
-        size_t _size = 0;
+        int32_t root = 0, slot = 0, pos = UNIT;
+        uint32_t _size = 0;
         int height = 0;
     };
 
@@ -91,21 +92,21 @@ public:
     }
 
 private:
-    off_t alloc(){
-        off_t s = core.slot;
+    int32_t alloc(){
+        int32_t s = core.slot;
         core.slot += UNIT;
         //write(&core, core.pos);
         return s;
     }
 
     template <class T>
-    size_t read(T *val, off_t offset){
+    uint32_t read(T *val, int32_t offset){
 #ifndef _NO_DEBUG
         openFile();
 #endif
         fseek(fp, offset, SEEK_SET);
         char ch[UNIT];
-        size_t s = fread(ch, UNIT, 1, fp);
+        uint32_t s = fread(ch, UNIT, 1, fp);
         *val = *(reinterpret_cast<T *>(ch));
 #ifndef _NO_DEBUG
         closeFile();
@@ -114,14 +115,14 @@ private:
     }
 
     template <class T>
-    size_t write(T *val, off_t offset, char *mode = "rb+"){
+    uint32_t write(T *val, int32_t offset, char *mode = "rb+"){
 #ifndef _NO_DEBUG
         openFile(mode);
 #endif
         fseek(fp, offset, SEEK_SET);
         char *ch;
         ch = reinterpret_cast<char *>(val);
-        size_t s = fwrite(ch, UNIT, 1, fp);
+        uint32_t s = fwrite(ch, UNIT, 1, fp);
 #ifndef _NO_DEBUG
         closeFile();
 #endif
@@ -174,7 +175,7 @@ private:
     Index *binarySearchKey(TreeNode &tn, const Key &key){
         if (tn.size == 0)
             return end(tn);
-        size_t l = 0, r = tn.size - 1, mid;
+        uint32_t l = 0, r = tn.size - 1, mid;
         while (l < r){
             mid = (l + r) / 2;
             if (comp(tn.index[mid].key, key))
@@ -188,7 +189,7 @@ private:
     Record *binarySearchRecord(LeafNode &ln, const Key &key){
         if (ln.size == 0)
             return end(ln);
-        size_t l = 0, r = ln.size - 1, mid;
+        uint32_t l = 0, r = ln.size - 1, mid;
         while (l < r){
             mid = (l + r) / 2;
             if (comp(ln.record[mid].key, key))
@@ -199,7 +200,7 @@ private:
         return ln.record + l;
     }
 
-    void updateNodeParentPos(Index *first, Index *last, off_t newParent){
+    void updateNodeParentPos(Index *first, Index *last, int32_t newParent){
         TreeNode tn;
         while (first != last){
             read(&tn, first->child);
@@ -209,7 +210,7 @@ private:
         }
     }
 
-    void updateLeafParentPos(Index *first, Index *last, off_t newParent) {
+    void updateLeafParentPos(Index *first, Index *last, int32_t newParent) {
         LeafNode ln;
         while (first != last) {
             read(&ln, first->child);
@@ -219,7 +220,7 @@ private:
         }
     }
 
-    void updateChildIndex(off_t parent, const Key &oldKey, const Key &newKey){
+    void updateChildIndex(int32_t parent, const Key &oldKey, const Key &newKey){
         if (parent == 0)
             return;
         TreeNode tn;
@@ -241,7 +242,7 @@ private:
         }
     }
 
-    void updateChildPos(off_t parent, const Key &oldKey, off_t newPos) {
+    void updateChildPos(int32_t parent, const Key &oldKey, int32_t newPos) {
         if (parent == 0)
             return;
         TreeNode tn;
@@ -258,7 +259,7 @@ private:
         }
     }
 
-    void removeIndex(off_t offset, const Key &key, bool mode = false){
+    void removeIndex(int32_t offset, const Key &key, bool mode = false){
         TreeNode tn;
         read(&tn, offset);
         if (tn.size == 0)
@@ -322,7 +323,7 @@ private:
         }
     }
 
-    void createTreeNode(off_t offset, TreeNode *tn, TreeNode *nx){
+    void createTreeNode(int32_t offset, TreeNode *tn, TreeNode *nx){
         nx->parent = tn->parent;
         nx->succ = tn->succ;
         nx->prev = offset;
@@ -334,7 +335,7 @@ private:
             write(&on, nx->succ);
         }
     }
-    void createLeafNode(off_t offset, LeafNode *ln, LeafNode *nx){
+    void createLeafNode(int32_t offset, LeafNode *ln, LeafNode *nx){
         nx->parent = ln->parent;
         nx->succ = ln->succ;
         nx->prev = offset;
@@ -369,7 +370,7 @@ private:
         copyRecord(begin(*from), end(*from), end(*des));
         Key oldKey = des->record[des->size - 1].key;
         Key key = from->record[from->size - 1].key;
-        off_t offset = from->prev;
+        int32_t offset = from->prev;
         des->size += from->size;
         updateChildPos(des->parent, key, offset);
         removeLeafNode(des, from);
@@ -379,7 +380,7 @@ private:
         copyIndex(begin(from), end(from), end(des));
         Key oldKey = des.index[des.size - 1].key;
         Key key = from.index[from.size - 1].key;
-        off_t offset = from.prev;
+        int32_t offset = from.prev;
         des.size += from.size;
         updateChildPos(des.parent, key, offset);
         if (!mode)
@@ -390,10 +391,10 @@ private:
         removeIndex(des.parent, oldKey);
     }
 
-    off_t findKey(const Key &key, bool mode = false) {
+    int32_t findKey(const Key &key, bool mode = false) {
         TreeNode tn;
         read(&tn, core.root);
-        off_t parent = core.root, prt;
+        int32_t parent = core.root, prt;
         if (tn.size == 0)
             return tn.index[0].child;
         //if (core.height == 3)
@@ -431,7 +432,7 @@ private:
             return 0;
     }
 
-    void insertNewIndex(off_t offset, const Key &key, off_t child, bool mode = false){
+    void insertNewIndex(int32_t offset, const Key &key, int32_t child, bool mode = false){
         TreeNode tn;
         read(&tn, offset);
         if (tn.size != M){
@@ -570,8 +571,8 @@ private:
 #else
     public:
 #endif //_NO_DEBUG
-    std::pair<Record, bool> nextRecord(Record rc){
-        off_t pos = findKey(rc.key, true);
+    std::pair<Record, bool> nextRecord(Record &rc){
+        int32_t pos = findKey(rc.key, true);
         LeafNode ln;
         read(&ln, pos);
         int l = 0, r = ln.size - 1, mid;
@@ -588,7 +589,7 @@ private:
             return std::make_pair(ln.record[l + 1], true);
         else{
             Key des = ln.record[ln.size - 1].key;
-            off_t pos = ln.parent;
+            int32_t pos = ln.parent;
             bool flag = false;
             int layer = 1;
             TreeNode tn;
@@ -708,7 +709,7 @@ public:
     }
 
     std::pair<Val, bool> search(const Key &key){
-        off_t pos = findKey(key, true);
+        int32_t pos = findKey(key, true);
         LeafNode ln;
         read(&ln, pos);
         Record *rc = binarySearchRecord(ln, key);
@@ -720,7 +721,7 @@ public:
 
     Vector<Val> searchFirst(const Key &key){
         Vector<Val> ans;
-        off_t pos = findKey(key, true);
+        int32_t pos = findKey(key, true);
         LeafNode ln;
         read(&ln, pos);
         Record *rc = binarySearchRecord(ln, key);
@@ -744,7 +745,7 @@ public:
     
     Vector<Val> searchFirstAndSecond(const Key &key){
         Vector<Val> ans;
-        off_t pos = findKey(key, true);
+        int32_t pos = findKey(key, true);
         LeafNode ln;
         read(&ln, pos);
         Record *rc = binarySearchRecord(ln, key);
@@ -767,7 +768,7 @@ public:
     }
 
     void insert(const Key &key, const Val &value){
-        off_t childPos = findKey(key, true);
+        int32_t childPos = findKey(key, true);
         LeafNode ln;
         read(&ln, childPos);
         if (L <= 3){
@@ -901,7 +902,7 @@ public:
     }
 
     void erase(const Key &key){
-        off_t pos = findKey(key, true);
+        int32_t pos = findKey(key, true);
         if (pos == 0)
             return;
         LeafNode ln;
@@ -958,7 +959,7 @@ public:
     }
 
     void update(const Key &key, const Val &value){
-        off_t pos = findKey(key, true);
+        int32_t pos = findKey(key, true);
         if (pos == 0)
             return;
         LeafNode ln;
@@ -977,7 +978,7 @@ public:
         write(&ln, pos);
     }
     
-    size_t size(){
+    uint32_t size(){
         return core._size; 
     }
 

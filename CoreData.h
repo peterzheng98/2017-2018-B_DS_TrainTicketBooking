@@ -9,6 +9,7 @@
 #define INC_IOSTREAM
 
 #include <iostream>
+#include <stdint.h>
 
 #endif
 
@@ -69,13 +70,13 @@ namespace myAlgorithm {
             return *this;
         }
 
-        T first() { return t1; }
+        T& first() { return t1; }
 
-        const T first() const { return t1; }
+        const T& first() const { return t1; }
 
-        U second() { return t2; }
+        U& second() { return t2; }
 
-        const U second() const { return t2; }
+        const U& second() const { return t2; }
 
         void setFirst(T _t1) {
             t1 = _t1;
