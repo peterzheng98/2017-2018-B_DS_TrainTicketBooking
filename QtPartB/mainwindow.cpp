@@ -1,10 +1,18 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <unistd.h>
 #include <QDebug>
+#include <QMessageBOX>
 #include <QTextCodec>
 #include <QStringListModel>
 #include <QStandardItemModel>
+
+struct UserInfo{
+    QString id;
+    int privilege;
+}userInfo;
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    if(socket)delete socket;
     delete ui;
 }
 
@@ -53,30 +62,36 @@ void MainWindow::socket_Disconnected()
     socket->waitForDisconnected();
 }
 
+void MainWindow::work(QString str)
+{
+    qDebug() << "Send: " << str;
+    QTextCodec *code= QTextCodec::codecForName("UTF-8");
+    QByteArray bytest = code->fromUnicode(str);
+    socket->write(bytest);
+    socket->flush();
+}
+
 QString MainWindow::get(QString str)
 {
+    socket->abort();
     socket->connectToHost("101.132.131.164", 10774);
     if(!socket->waitForConnected(30000))
     {
+        QMessageBox::critical(NULL, "网络错误", "连接失败！", QMessageBox::Yes, QMessageBox::Yes);
         qDebug() << "Connection failed!";
+        return "";
     }
     qDebug() << "Connect successfully!";
-    qDebug() << "Send: " << str;
-    QTextCodec *code= QTextCodec::codecForName("UTF-8");
-    QByteArray bytest = code->fromUnicode( str );
-    socket->write(bytest);
-    socket->flush();
-    qDebug() << "yeah!";
+    work(str);
     QByteArray buffer;
+    socket->waitForReadyRead();
     buffer = socket->readAll();
     if(!buffer.isEmpty())
     {
         ui->tmpText->setText(buffer);
     }
-
+    qDebug() << buffer;
     socket->close();
-    socket->disconnectFromHost();
-    socket->waitForDisconnected();
 
     return ui->tmpText->toPlainText();
 }
@@ -85,26 +100,55 @@ void MainWindow::on_login_frame_login_clicked()
 {
     QString loginid = ui->login_frame_id->text();
     QString password = ui->login_frame_word->text();
-    int len = loginid.length();
-    bool goodDigits = true;
-    for(int i = 0; i < len;i++) if(loginid[i] < '0' || loginid[i] > '9') {
-        ui->login_frame_id->setText("");
-        ui->login_frame_word->setText("");
-        //TODO : Alert Wrong Userid
-        goodDigits = false;
+    int lenid = loginid.length();
+    int lenpass = password.length();
+    if(!lenid || ! lenpass)
+    {
+        QMessageBox::critical(NULL, "登陆错误", "用户名或密码不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
     }
-    if(goodDigits){
+    int nowid = loginid.toInt();
+    if(nowid < 2018)
+    {
+        QMessageBox::critical(NULL, "登录错误", "用户ID不在范围内！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    else
+    {
         QString tmp = get((QString)"login" + (QString)" " + loginid + (QString)" " + password);
+        if(tmp == "")return;
         if(tmp[0] != '1')
         {
+            QMessageBox::critical(NULL, "登录错误", "用户ID或密码错误！", QMessageBox::Yes, QMessageBox::Yes);
             ui->login_frame_id->setText("");
             ui->login_frame_word->setText("");
         }
         else
         {
+            tmp = get((QString)"query_profile" + (QString)" " + loginid);
+            if(tmp == "")return;
+            int len = tmp.length();
+            userInfo.id = loginid;
+            int flag = 2;
+            for(int i = len - 1; i >= 0; i--)
+                if(tmp[i] >= '0' && tmp[i] <= '9')
+                {
+                    if(tmp[i] == '1')flag = 1;
+                    else flag = 2;
+                    break;
+                }
+            if(flag == 1)
+            {
+                userInfo.privilege = 1;
+                ui->label_8->setVisible(false);
+                ui->tab4_logined_frame_userid->setVisible(false);
+                ui->tab4_logined_frame_usercheckid->setVisible(false);
+                ui->tab4_logined_frame_modifyprivilege->setVisible(false);
+            }
+            else userInfo.privilege = 2;
             ui->loginFrame->setVisible(false);
             ui->userFrame->setVisible(true);
-            ui->user_frame_auth->setText("您的权限级别为：");
+            ui->user_frame_auth->setText((QString)"您的权限级别为：" + (QString)(userInfo.privilege == 1 ? "普通用户" : "管理员"));
             ui->user_frame_welcomeMessage->setText("欢迎您！");
 
             ui->tab1_nologin->setVisible(false);
@@ -131,11 +175,40 @@ void MainWindow::on_pushButton_clicked()
     exit(0);
 }
 
+void MainWindow::tab1_reset()
+{
+}
+
+void MainWindow::tab2_reset()
+{
+
+}
+
+void MainWindow::tab3_reset()
+{
+
+}
+
+void MainWindow::tab4_reset()
+{
+
+}
+
+void MainWindow::tab5_reset()
+{
+
+}
+
 void MainWindow::on_user_frame_logout_clicked()
 {
     ui->userFrame->setVisible(false);
     ui->loginFrame->setVisible(true);
     on_login_frame_reset_clicked();
+    tab1_reset();
+    tab2_reset();
+    tab3_reset();
+    tab4_reset();
+    tab5_reset();
 }
 
 void MainWindow::on_login_frame_reset_clicked()
@@ -157,10 +230,35 @@ void MainWindow::on_login_frame_reset_clicked()
 void MainWindow::on_tab5_nologin_frame_register_clicked()
 {
     QString registerName = ui->tab5_nologin_frame_name->text();
+    if(registerName.length() == 0)
+    {
+        QMessageBox::critical(NULL, "注册错误", "用户名不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
     QString registerPassword = ui->tab5_nologin_frame_password->text();
+    if(registerPassword.length() == 0)
+    {
+        QMessageBox::critical(NULL, "注册错误", "密码不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
     QString registerEmail = ui->tab5_nologin_frame_email->text();
+    if(registerEmail.length() == 0)
+    {
+        QMessageBox::critical(NULL, "注册错误", "邮箱不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
     QString registerPhone = ui->tab5_nologin_frame_phone->text();
-    if(registerPhone.length() != 11)ui->tab5_nologin_frame_phone->setText("");
+    if(registerPhone.length() == 0)
+    {
+        QMessageBox::critical(NULL, "注册错误", "手机号码不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    if(registerPhone.length() != 11)
+    {
+        ui->tab5_nologin_frame_phone->setText("");
+        QMessageBox::critical(NULL, "注册错误", "手机号码不合法！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
     else
     {
         int len = registerEmail.length();
@@ -177,18 +275,27 @@ void MainWindow::on_tab5_nologin_frame_register_clicked()
         {
             QString tmp = get((QString)"register" + (QString)" " + registerName + (QString)" " + registerPassword +
                               (QString)" " + registerEmail + (QString)" " + registerPhone);
+            if(tmp.length() == 0)return;
             if(tmp[0] == '-')
             {
                 ui->tab5_nologin_frame_name->setText("");
                 ui->tab5_nologin_frame_password->setText("");
                 ui->tab5_nologin_frame_email->setText("");
                 ui->tab5_nologin_frame_phone->setText("");
+                QMessageBox::critical(NULL, "注册错误", "注册失败！", QMessageBox::Yes, QMessageBox::Yes);
+                return;
             }
             else
             {
+                userInfo.id = tmp;
+                userInfo.privilege = 1;
+                ui->label_8->setVisible(false);
+                ui->tab4_logined_frame_userid->setVisible(false);
+                ui->tab4_logined_frame_usercheckid->setVisible(false);
+                ui->tab4_logined_frame_modifyprivilege->setVisible(false);
                 ui->loginFrame->setVisible(false);
                 ui->userFrame->setVisible(true);
-                ui->user_frame_auth->setText("您的权限级别为：");
+                ui->user_frame_auth->setText("您的权限级别为：普通用户");
                 ui->user_frame_welcomeMessage->setText("欢迎您！");
                 ui->tab1_nologin->setVisible(false);
                 ui->tab2_nologin->setVisible(false);
@@ -210,6 +317,8 @@ void MainWindow::on_tab5_nologin_frame_register_clicked()
         else
         {
             ui->tab5_nologin_frame_email->setText("");
+            QMessageBox::critical(NULL, "注册错误", "邮箱不合法！", QMessageBox::Yes, QMessageBox::Yes);
+            return;
         }
     }
 }
@@ -218,13 +327,101 @@ void MainWindow::on_tab4_logined_frame_usercheckid_clicked()
 {
     QString tmp = get((QString)"query_profile" + (QString)" " + ui->tab4_logined_frame_userid->text());
     int len = tmp.length();
-    if(len == 1)ui->tab4_logined_frame_username->setText("不存在该用户！");
+    if(len == 1)
+    {
+        ui->tab4_logined_frame_username->setText("不存在该用户！");
+    }
     else
     {
         QString str = "";
-        for(int i = 0; i < len; i++)
+        int i = 0;
+        for(; i < len; i++)
             if(tmp[i] == ' ')break;
             else str += tmp[i];
+        str = "";
         ui->tab4_logined_frame_username->setText(str);
+        for(i++; i < len; i++)
+            if(tmp[i] == ' ')break;
+            else str += tmp[i];
+        ui->tab4_logined_frame_usermail->setText(str);
+        str = "";
+        for(i++; i < len; i++)
+            if(tmp[i] == ' ')break;
+            else str += tmp[i];
+        ui->tab4_logined_frame_userphone->setText(str);
+    }
+}
+
+void MainWindow::on_tab4_logined_frame_modifyinfo_clicked()
+{
+    QString registerName = ui->tab4_logined_frame_username->text();
+    if(registerName.length() == 0)
+    {
+        QMessageBox::critical(NULL, "修改信息错误", "用户名不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    QString registerPassword = ui->tab4_logined_frame_userword->text();
+    if(registerPassword.length() == 0)
+    {
+        QMessageBox::critical(NULL, "修改信息错误", "密码不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    QString registerEmail = ui->tab4_logined_frame_usermail->text();
+    if(registerEmail.length() == 0)
+    {
+        QMessageBox::critical(NULL, "修改信息错误", "邮箱不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    QString registerPhone = ui->tab4_logined_frame_userphone->text();
+    if(registerPhone.length() == 0)
+    {
+        QMessageBox::critical(NULL, "修改信息错误", "手机号码不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    if(registerPhone.length() != 11)
+    {
+        ui->tab5_nologin_frame_phone->setText("");
+        QMessageBox::critical(NULL, "修改信息错误", "手机号码不合法！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    if(ui->tab4_logined_frame_userword->text() != ui->tab4_logined_frame_userword_2->text())
+    {
+        QMessageBox::critical(NULL, "修改信息错误", "两次密码不同！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    QString tmp = get((QString)"modify_profile" + (QString)" " + userInfo.id + (QString)" " +
+                      ui->tab4_logined_frame_username->text() + (QString)" " +
+                      ui->tab4_logined_frame_userword->text() + (QString)" " +
+                      ui->tab4_logined_frame_usermail->text() + (QString)" " +
+                      ui->tab4_logined_frame_userphone->text());
+    if(tmp == "")return;
+    if(tmp[0] != '1')
+    {
+        QMessageBox::critical(NULL, "修改信息错误", "修改信息失败！", QMessageBox::Yes, QMessageBox::Yes);
+    }
+    else
+    {
+        QMessageBox::critical(NULL, "修改信息成功", "修改信息成功！", QMessageBox::Yes, QMessageBox::Yes);
+    }
+}
+
+void MainWindow::on_tab4_logined_frame_modifyprivilege_clicked()
+{
+    QString modifyUserID = ui->tab4_logined_frame_modifyuserid->text();
+    if(modifyUserID.length() == 0)
+    {
+        QMessageBox::critical(NULL, "提升权限错误", "用户ID不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    QString tmp = get((QString)"modify_privilege" + (QString)" " + userInfo.id + (QString)" " +
+                      modifyUserID + (QString)" " + (QString)"2");
+    if(tmp == "")return;
+    if(tmp[0] != '1')
+    {
+        QMessageBox::critical(NULL, "提升权限错误", "提升权限失败！", QMessageBox::Yes, QMessageBox::Yes);
+    }
+    else
+    {
+        QMessageBox::critical(NULL, "提升权限错误", "提升权限成功！", QMessageBox::Yes, QMessageBox::Yes);
     }
 }

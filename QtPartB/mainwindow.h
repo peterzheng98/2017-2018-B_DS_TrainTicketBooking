@@ -39,6 +39,22 @@ private slots:
 
     QString get(QString str);
 
+    void on_tab4_logined_frame_modifyinfo_clicked();
+
+    void on_tab4_logined_frame_modifyprivilege_clicked();
+
+    void tab1_reset();
+
+    void tab2_reset();
+
+    void tab3_reset();
+
+    void tab4_reset();
+
+    void tab5_reset();
+
+    void work(QString str);
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket *socket;
