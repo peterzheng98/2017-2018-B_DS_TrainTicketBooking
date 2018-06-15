@@ -189,7 +189,7 @@
      <string notr="true"/>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>7</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -386,7 +386,6 @@
       <zorder>tab5_nologin_frame_register</zorder>
       <zorder>tab5_nologin_frame_name</zorder>
       <zorder>label_15</zorder>
-      <zorder>user_frame_logout</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="tab">
@@ -1292,23 +1291,6 @@
         <string>0000000</string>
        </property>
       </widget>
-      <zorder>label_8</zorder>
-      <zorder>tab4_logined_frame_userid</zorder>
-      <zorder>tab4_logined_frame_usercheckid</zorder>
-      <zorder>label_9</zorder>
-      <zorder>label_10</zorder>
-      <zorder>label_11</zorder>
-      <zorder>label_12</zorder>
-      <zorder>label_13</zorder>
-      <zorder>tab4_logined_frame_username</zorder>
-      <zorder>tab4_logined_frame_userword</zorder>
-      <zorder>tab4_logined_frame_userword_2</zorder>
-      <zorder>tab4_logined_frame_userphone</zorder>
-      <zorder>tab4_logined_frame_usermail</zorder>
-      <zorder>tab4_logined_frame_modifyinfo</zorder>
-      <zorder>tab4_logined_frame_modifyprivilege</zorder>
-      <zorder>tab4_logined_frame_modifyuserid</zorder>
-      <zorder>user_frame_logout</zorder>
      </widget>
      <widget class="QFrame" name="tab4_nologin">
       <property name="geometry">
@@ -1405,7 +1387,7 @@
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
-      <string>添加火车</string>
+      <string>管理火车1</string>
      </attribute>
      <widget class="QGroupBox" name="groupBox_4">
       <property name="geometry">
@@ -1417,13 +1399,13 @@
        </rect>
       </property>
       <property name="title">
-       <string>添加火车</string>
+       <string>添加/修改火车</string>
       </property>
       <widget class="QLabel" name="label_42">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>260</y>
+         <y>210</y>
          <width>51</width>
          <height>16</height>
         </rect>
@@ -1436,7 +1418,7 @@
        <property name="geometry">
         <rect>
          <x>70</x>
-         <y>260</y>
+         <y>210</y>
          <width>48</width>
          <height>24</height>
         </rect>
@@ -1452,7 +1434,7 @@
        <property name="geometry">
         <rect>
          <x>70</x>
-         <y>290</y>
+         <y>240</y>
          <width>48</width>
          <height>24</height>
         </rect>
@@ -1468,7 +1450,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>290</y>
+         <y>240</y>
          <width>51</width>
          <height>16</height>
         </rect>
@@ -1481,7 +1463,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>360</y>
+         <y>380</y>
          <width>113</width>
          <height>32</height>
         </rect>
@@ -1494,7 +1476,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>400</y>
+         <y>420</y>
          <width>113</width>
          <height>32</height>
         </rect>
@@ -1507,7 +1489,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>320</y>
+         <y>270</y>
          <width>111</width>
          <height>31</height>
         </rect>
@@ -1540,7 +1522,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>70</y>
+         <y>50</y>
          <width>113</width>
          <height>21</height>
         </rect>
@@ -1550,7 +1532,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>160</y>
+         <y>110</y>
          <width>113</width>
          <height>21</height>
         </rect>
@@ -1573,7 +1555,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>120</y>
+         <y>90</y>
          <width>72</width>
          <height>15</height>
         </rect>
@@ -1586,7 +1568,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>190</y>
+         <y>140</y>
          <width>72</width>
          <height>15</height>
         </rect>
@@ -1599,10 +1581,136 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>220</y>
+         <y>170</y>
          <width>113</width>
          <height>21</height>
         </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="addTrainBox_button_modify">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>330</y>
+         <width>113</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>修改火车</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_7">
+     <attribute name="title">
+      <string>管理火车2</string>
+     </attribute>
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>761</width>
+        <height>471</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>查询/公开/删除火车</string>
+      </property>
+      <widget class="QLabel" name="label_32">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>40</y>
+         <width>72</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>火车ID</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="tab7_trainid">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>40</y>
+         <width>113</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="tab7_sale_train">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>40</y>
+         <width>93</width>
+         <height>28</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>公开车次</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="tab7_delete_train">
+       <property name="geometry">
+        <rect>
+         <x>400</x>
+         <y>40</y>
+         <width>93</width>
+         <height>28</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>删除车次</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="tab7_query_train">
+       <property name="geometry">
+        <rect>
+         <x>520</x>
+         <y>40</y>
+         <width>93</width>
+         <height>28</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>查询车次</string>
+       </property>
+      </widget>
+      <widget class="QTableWidget" name="tab7_statInf">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>170</y>
+         <width>711</width>
+         <height>281</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QTableWidget" name="tab7_trainInf">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>90</y>
+         <width>711</width>
+         <height>71</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="tab7_reset">
+       <property name="geometry">
+        <rect>
+         <x>650</x>
+         <y>40</y>
+         <width>93</width>
+         <height>28</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>重置</string>
        </property>
       </widget>
      </widget>

@@ -53,6 +53,10 @@ private slots:
 
     void tab5_reset();
 
+    void tab6_reset();
+
+    void tab7_reset();
+
     void work(QString str);
 
     void on_tab4_logined_frame_search_clicked();
@@ -71,6 +75,8 @@ private slots:
 
     void do_with_privilege();
 
+    void do_with_privilege_admin();
+
     void on_addTrainBox_reset_clicked();
 
     void on_pushButton_9_clicked();
@@ -82,6 +88,16 @@ private slots:
     void on_addTrainBox_button_add_2_clicked();
 
     void on_addTrainBox_reset_2_clicked();
+
+    void on_addTrainBox_button_modify_clicked();
+
+    void on_tab7_sale_train_clicked();
+
+    void on_tab7_delete_train_clicked();
+
+    void on_tab7_query_train_clicked();
+
+    void on_tab7_reset_clicked();
 
 private:
     Ui::MainWindow *ui;

@@ -173,6 +173,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tab3_logined->setVisible(false);
     ui->tab4_logined->setVisible(false);
     ui->tab5_logined->setVisible(false);
+    ui->groupBox_4->setVisible(false);
+    ui->groupBox_3->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -238,6 +240,12 @@ void MainWindow::do_with_privilege()
     ui->label_22->setVisible(false);
 }
 
+void MainWindow::do_with_privilege_admin()
+{
+    ui->groupBox_4->setVisible(true);
+    ui->groupBox_3->setVisible(true);
+}
+
 void MainWindow::on_login_frame_login_clicked()
 {
     QString loginid = ui->login_frame_id->text();
@@ -290,7 +298,11 @@ void MainWindow::on_login_frame_login_clicked()
                 userInfo.privilege = 1;
                 do_with_privilege();
             }
-            else userInfo.privilege = 2;
+            else
+            {
+                do_with_privilege_admin();
+                userInfo.privilege = 2;
+            }
             ui->loginFrame->setVisible(false);
             ui->userFrame->setVisible(true);
             ui->user_frame_auth->setText((QString)"您的权限级别为：" + (QString)(userInfo.privilege == 1 ? "普通用户" : "管理员"));
@@ -377,6 +389,17 @@ void MainWindow::tab5_reset()
     ui->userInfo_id->setText("");
 }
 
+void MainWindow::tab6_reset()
+{
+    on_addTrainBox_reset_2_clicked();
+    ui->groupBox_4->setVisible(false);
+}
+
+void MainWindow::tab7_reset()
+{
+    ui->groupBox_3->setVisible(false);
+}
+
 void MainWindow::on_user_frame_logout_clicked()
 {
     ui->userFrame->setVisible(false);
@@ -387,6 +410,8 @@ void MainWindow::on_user_frame_logout_clicked()
     tab3_reset();
     tab4_reset();
     tab5_reset();
+    tab6_reset();
+    tab7_reset();
 }
 
 void MainWindow::on_login_frame_reset_clicked()
@@ -777,6 +802,7 @@ void MainWindow::on_tab3_logined_frame_search_clicked()
     if(searchUser == "")searchUser = userInfo.id;
     QString tmp = get((QString)"query_order " + searchUser + (QString)" " +
                   ttmp + (QString)" " + catalog);
+    if(tmp == "")return;
     ui->tab3_ticketHistory->clearContents();
     ui->tab3_ticketHistory->setRowCount(0);
 
@@ -1064,7 +1090,11 @@ void MainWindow::on_choose_file_clicked()
                     userInfo.privilege = 1;
                     do_with_privilege();
                 }
-                else userInfo.privilege = 2;
+                else
+                {
+                    userInfo.privilege = 2;
+                    do_with_privilege_admin();
+                }
                 ui->loginFrame->setVisible(false);
                 ui->userFrame->setVisible(true);
                 ui->user_frame_auth->setText((QString)"您的权限级别为：" + (QString)(userInfo.privilege == 1 ? "普通用户" : "管理员"));
@@ -1152,4 +1182,195 @@ void MainWindow::on_addTrainBox_reset_2_clicked()
     ui->add_train_name->setText("");
     ui->addTrainBox_stat_num->setValue(1);
     ui->addTrainBox_price_num->setValue(1);
+}
+
+void MainWindow::on_addTrainBox_button_modify_clicked()
+{
+    QString str = "modify_train " + ui->add_train_id->text() + " " + ui->add_train_name->text() + " " +
+            ui->add_train_cata->text() + " " + ui->addTrainBox_stat_num->text() + " " +
+            ui->addTrainBox_price_num->text();
+    for(int i = 0; i < ui->add_ticketname->columnCount(); i++)
+        if(ui->add_ticketname->item(0,i)!=NULL)
+        {
+            qDebug()<<ui->add_ticketname->item(0,i)->text();
+            str += " " + ui->add_ticketname->item(0,i)->text();
+        }
+        else
+        {
+            QMessageBox::critical(NULL, "修改火车错误", "座位名称不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+            return;
+        }
+    qDebug() << str;
+    for(int i = 0; i < ui->add_train->rowCount(); i++)
+    {
+        str += '\n';
+        for(int j = 0; j < ui->add_train->columnCount(); j++)
+            if(ui->add_train->item(i, j) != NULL)
+            {
+                if(j < 4)str += ui->add_train->item(i, j)->text() + " ";
+                else
+                {
+                    str += ui->add_train->item(i, j)->text();
+                    if(j < ui->add_train->columnCount() - 1)str += " ";
+                }
+            }
+            else
+            {
+                QMessageBox::critical(NULL, "修改火车错误", "火车信息不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+                return;
+            }
+    }
+    qDebug() << str;
+    QString tmp = get(str);
+    qDebug() << tmp;
+    if(tmp == "")return;
+    if(tmp[0] == '0')
+    {
+        QMessageBox::critical(NULL, "修改火车错误", "修改火车失败！", QMessageBox::Yes, QMessageBox::Yes);
+    }
+    else
+    {
+        QMessageBox::information(NULL, "修改火车成功", "修改火车成功", QMessageBox::Yes, QMessageBox::Yes);
+    }
+}
+
+void MainWindow::on_tab7_sale_train_clicked()
+{
+    QString tmp = get((QString)"sale_train " + ui->tab7_trainid->text());
+    if(tmp == "")return;
+    if(tmp[0] == '1')
+    {
+        QMessageBox::information(NULL, "公开火车成功", "公开火车成功", QMessageBox::Yes, QMessageBox::Yes);
+    }
+    else
+    {
+        QMessageBox::critical(NULL, "公开火车错误", "公开火车失败！", QMessageBox::Yes, QMessageBox::Yes);
+    }
+}
+
+void MainWindow::on_tab7_delete_train_clicked()
+{
+    QString tmp = get((QString)"delete_train " + ui->tab7_trainid->text());
+    if(tmp == "")return;
+    if(tmp[0] == '1')
+    {
+        QMessageBox::information(NULL, "删除火车成功", "删除火车成功", QMessageBox::Yes, QMessageBox::Yes);
+    }
+    else
+    {
+        QMessageBox::critical(NULL, "删除火车错误", "删除火车失败！", QMessageBox::Yes, QMessageBox::Yes);
+    }
+}
+
+void MainWindow::on_tab7_query_train_clicked()
+{
+    QString tmp = get((QString)"query_train " + ui->tab7_trainid->text()), str = "";
+    if(tmp[0] == '0')
+    {
+        QMessageBox::information(NULL, "查询火车", "不存在该ID的列车！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    qDebug() << tmp;
+    int len = tmp.length(), cnt = 0, seatcnt = 0, statcnt = 0;
+    QStringList headers;
+    headers.clear();
+    ui->tab7_trainInf->clear();
+    int i = 0;
+    for(; i < len; i++)
+    {
+        if(cnt == 3)
+        {
+            str += tmp[i];
+            statcnt = str.toInt();
+        }
+        if(tmp[i] == ' ')
+        {
+            if(cnt == 3)
+            {
+                str = "";
+            }
+            cnt++;
+        }
+        if(cnt == 4)
+        {
+            str += tmp[i + 1];
+            break;
+        }
+    }
+    seatcnt = str.toInt();
+    qDebug() << statcnt << " " << seatcnt;
+    headers<<"火车ID"<<"火车名字"<<"火车类型"<< "车站数" << "座位种类数";
+    for(int i = 1; i <= seatcnt; i++)
+        headers.push_back((QString)"座位种类" + QString::number(i));
+    ui->tab7_trainInf->setColumnCount(5 + seatcnt);
+    ui->tab7_trainInf->setRowCount(1);
+    ui->tab7_trainInf->setEditTriggers(QAbstractItemView::NoEditTriggers);//禁止修改
+    ui->tab7_trainInf->setHorizontalHeaderLabels(headers);
+
+    ui->tab7_statInf->setColumnCount(5);
+    ui->tab7_statInf->setRowCount(statcnt);
+    ui->tab7_statInf->setEditTriggers(QAbstractItemView::NoEditTriggers);//禁止修改
+    headers.clear();
+    headers  << "车站" << "出发时间" << "到达时间" << "停站时间";
+    for(int i = 1; i <= seatcnt; i++)
+        headers.push_back((QString)"票价" + QString::number(i));
+    ui->tab7_statInf->setHorizontalHeaderLabels(headers);
+    i = 0;
+    cnt = 0;
+    for(; i < len && cnt < 6; i++)
+    {
+        if(tmp[i] == '\n')break;
+        str = "";
+        while(i < len && tmp[i] != ' ' && tmp[i] != '\n')
+        {
+            str += tmp[i];
+            i++;
+        }
+        ui->tab7_trainInf->setItem(0, cnt, new QTableWidgetItem(str));
+        cnt++;
+    }
+    int nowh = 0;
+    while(i < len)
+    {
+        while(i < len && (tmp[i] == ' ' || tmp[i] == '\n' || tmp[i] == '\r'))i++;
+        cnt = 0;
+        for(; i <len && cnt < 4 + seatcnt; i++)
+        {
+            if(tmp[i] == '\n')break;
+            str = "";
+            while(i < len && tmp[i] != ' ' && tmp[i] != '\n')
+            {
+                str += tmp[i];
+                i++;
+            }
+            if(cnt == 3 + seatcnt)
+            {
+                QString tmpstr = "";
+                int len = str.length();
+                for(int i = 1; i < len; i++)
+                    tmpstr += str[i];
+                double now = tmpstr.toDouble();
+                qDebug() << tmpstr;
+                QChar tmpschar = str[0];
+                str = "";
+                str += tmpschar;
+                str += QString::number(now, 'f', 2);
+            }
+            ui->tab7_statInf->setItem(nowh, cnt, new QTableWidgetItem(str));
+            cnt++;
+        }
+        nowh++;
+        if(nowh == statcnt)break;
+    }
+}
+
+void MainWindow::on_tab7_reset_clicked()
+{
+    ui->tab7_trainid->setText("");
+    ui->tab7_statInf->clear();
+    ui->tab7_statInf->setColumnCount(0);
+    ui->tab7_statInf->setRowCount(0);
+    ui->tab7_trainInf->clear();
+    ui->tab7_trainInf->setColumnCount(0);
+    ui->tab7_trainInf->setRowCount(0);
 }
