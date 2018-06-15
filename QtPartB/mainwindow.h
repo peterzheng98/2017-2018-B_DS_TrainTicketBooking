@@ -63,11 +63,11 @@ private slots:
 
     void on_tab3_logined_frame_search_clicked();
 
-    void on_pushButton_8_clicked();
-
     void on_tab3_ticketHistory_clicked(const QModelIndex &index);
 
     void on_group_refund_button_clicked();
+
+    void on_tab2_booking_clicked();
 
 private:
     Ui::MainWindow *ui;

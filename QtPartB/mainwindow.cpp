@@ -548,10 +548,17 @@ void MainWindow::on_tab4_logined_frame_search_clicked()
             }
             nowSeatRest.push_back(str);
             str = "";
+            int cnt = 0, flag = 0;
             for(i++; i < len; i++)
             {
                 if(tmp[i] == '\n' || tmp[i] == ' ')break;
-                else str += tmp[i];
+                else
+                {
+                    if(!flag || cnt < 2)str += tmp[i];
+                    if(flag)cnt++;
+                    if(cnt == 2 && tmp[i] >= '5')str = QString::number(str.toDouble() + 0.01, 'f', 2);
+                    if(tmp[i] == '.')flag = 1;
+                }
             }
             nowSeatCost.push_back(str);
             qDebug() << str;
@@ -582,8 +589,8 @@ void MainWindow::on_tab2_cata_currentIndexChanged(int index)
     }
 }
 
-QStringList idHistory;
-QList<QStringList> seatKindHistory, seatRestHistory, seatCostHistory;
+QStringList idHistory, seatKindHistory, seatRestHistory, seatCostHistory, loc1History, loc2History, dateHistory;
+QList<int> belong;
 
 void MainWindow::on_tab3_logined_frame_search_clicked()
 {
@@ -592,7 +599,9 @@ void MainWindow::on_tab3_logined_frame_search_clicked()
     int lentmp = ttmp.length();
     for(int i = 0; i < lentmp; i++)
         if(ttmp[i] == '/')ttmp[i] = '-';
-    QString tmp = get((QString)"query_order " + userInfo.id + (QString)" " +
+    QString searchUser = ui->tab3_logined_frame_userid->text();
+    if(searchUser == "")searchUser = userInfo.id;
+    QString tmp = get((QString)"query_order " + searchUser + (QString)" " +
                   ttmp + (QString)" " + catalog);
     ui->tab3_ticketHistory->clear();
     ui->tab3_ticketHistory->setRowCount(0);
@@ -614,7 +623,11 @@ void MainWindow::on_tab3_logined_frame_search_clicked()
         str += tmp[i];
     }
 
+    belong.clear();
     idHistory.clear();
+    dateHistory.clear();
+    loc1History.clear();
+    loc2History.clear();
     seatKindHistory.clear();
     seatRestHistory.clear();
     seatCostHistory.clear();
@@ -642,6 +655,9 @@ void MainWindow::on_tab3_logined_frame_search_clicked()
                 str += tmp[i];
             }
             ui->tab3_ticketHistory->setItem(RowCont, l, new QTableWidgetItem(str));
+            if(l == 0)loc1History.push_back(str);
+            if(l == 1)dateHistory.push_back(str);
+            if(l == 3)loc2History.push_back(str);
         }
         QStringList nowSeatKind, nowSeatRest, nowSeatCost;
         nowSeatKind.clear();
@@ -653,6 +669,7 @@ void MainWindow::on_tab3_logined_frame_search_clicked()
         qDebug() << tot;
         for(int j = 0; j < tot / 3; j++)
         {
+            belong.push_back(k);
             if(j > 0)
             {
                 RowCont = ui->tab3_ticketHistory->rowCount();
@@ -665,43 +682,100 @@ void MainWindow::on_tab3_logined_frame_search_clicked()
                 else str += tmp[i];
             }
             ui->tab3_ticketHistory->setItem(RowCont, 6, new QTableWidgetItem(str));
-            nowSeatKind.push_back(str);
+            seatKindHistory.push_back(str);
             str = "";
+            int toDelete = 0;
             for(i++; i < len; i++)
             {
                 if(tmp[i] == '\n' || tmp[i] == ' ')break;
                 else str += tmp[i];
             }
+            if(str.toInt() == 0)toDelete = 1;
             ui->tab3_ticketHistory->setItem(RowCont, 7, new QTableWidgetItem(str));
-            nowSeatRest.push_back(str);
+            seatRestHistory.push_back(str);
             str = "";
+            int cnt = 0, flag = 0;
             for(i++; i < len; i++)
             {
                 if(tmp[i] == '\n' || tmp[i] == ' ')break;
-                else str += tmp[i];
+                else
+                {
+                    if(!flag || cnt < 2)str += tmp[i];
+                    if(flag)cnt++;
+                    if(cnt == 2 && tmp[i] >= '5')str = QString::number(str.toDouble() + 0.01, 'f', 2);
+                    if(tmp[i] == '.')flag = 1;
+                }
             }
             ui->tab3_ticketHistory->setItem(RowCont, 8, new QTableWidgetItem(str));
-            nowSeatCost.push_back(str);
+            seatCostHistory.push_back(str);
+            if(toDelete == 1)
+            {
+                ui->tab3_ticketHistory->removeRow(RowCont);
+                belong.pop_back();
+                seatKindHistory.pop_back();
+                seatRestHistory.pop_back();
+                seatCostHistory.pop_back();
+            }
             qDebug() << str;
         }
-        seatKindHistory.push_back(nowSeatKind);
-        seatRestHistory.push_back(nowSeatRest);
-        seatCostHistory.push_back(nowSeatCost);
     }
 }
 
-void MainWindow::on_pushButton_8_clicked()
+void MainWindow::on_tab3_ticketHistory_clicked(const QModelIndex &index)
+{
+    int now = ui->tab3_ticketHistory->currentRow();
+    qDebug() << now;
+    if(now >= 0)
+    {
+        ui->group_tid->setText(idHistory[belong[now]]);
+        qDebug() << seatKindHistory[now] << " " << seatRestHistory[now] << " " << seatCostHistory[now];
+        qDebug() << loc1History[belong[now]] << " " << loc2History[belong[now]];
+    }
+}
+
+void MainWindow::on_group_refund_button_clicked()
+{
+    if(!(ui->group_num->text()).length())
+    {
+        QMessageBox::critical(NULL, "退票错误", "退票数量不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    int nowNum = ui->group_num->text().toInt();
+    int now = ui->tab3_ticketHistory->currentRow();
+    if(nowNum > seatRestHistory[now].toInt())
+    {
+        QMessageBox::critical(NULL, "退票错误", "退票数量不能大于订票数量！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    if(!nowNum)
+    {
+        QMessageBox::critical(NULL, "退票错误", "退票数量不能为0！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    QString tmp = get((QString)"refund_ticket " + userInfo.id + (QString)" " + ui->group_num->text() + (QString)" " +
+                      idHistory[belong[now]] + (QString)" " + loc1History[belong[now]]  + (QString)" " + loc2History[belong[now]] +
+                      (QString)" " + dateHistory[belong[now]] + (QString)" " + seatKindHistory[now]);
+    if(tmp == "") return;
+    //TODO 发送订票
+}
+
+void MainWindow::on_tab2_booking_clicked()
 {
     int nowx = ui->tab2_ticketShowing->currentRow(), nowy = ui->tab2_cata->currentIndex();
     if(nowy == -1)
     {
-        QMessageBox::critical(NULL, "订票错误", "请单击要订的票！", QMessageBox::Yes, QMessageBox::Yes);
+        QMessageBox::critical(NULL, "订票错误", "请单击要订的车次！", QMessageBox::Yes, QMessageBox::Yes);
         return;
     }
     qDebug() << nowx << " !! ?? " << nowy;
     if(!(ui->tab2_ticketCount->text()).length())
     {
         QMessageBox::critical(NULL, "订票错误", "订票数量不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    if((ui->tab2_ticketCount->text()).toInt() == 0)
+    {
+        QMessageBox::critical(NULL, "订票错误", "订票数量不能为零！", QMessageBox::Yes, QMessageBox::Yes);
         return;
     }
     QString nowdate = ui->tab2_ticketShowing->item(nowx, 1)->text();
@@ -713,23 +787,4 @@ void MainWindow::on_pushButton_8_clicked()
     int nowRest = seatRest[nowx][nowy].toInt() - (ui->tab2_ticketCount->text()).toInt();
     seatRest[nowx][nowy] = QString::number(nowRest);
     ui->tab2_remain->setText((QString)"余票 " + seatRest[nowx][nowy]);
-}
-
-void MainWindow::on_tab3_ticketHistory_clicked(const QModelIndex &index)
-{
-    //TODO 把选择的那一项的车次号显示在上面的文本框里面
-}
-
-void MainWindow::on_group_refund_button_clicked()
-{
-    if(!(ui->group_num->text()).length())
-    {
-        QMessageBox::critical(NULL, "订票错误", "订票数量不能为空！", QMessageBox::Yes, QMessageBox::Yes);
-        return;
-    }
-    QString tmp = get((QString)"refund_ticket " + userInfo.id + (QString)" " + ui->group_num->text() +
-                      /* Train ID  +*/ (QString)" " + /* loc1  +*/ (QString)" " + /* loc2  + */(QString)" " //+
-                      /* Ticket Kind */);
-    if(tmp == "") return;
-    //TODO 发送订票
 }

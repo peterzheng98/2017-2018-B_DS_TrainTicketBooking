@@ -189,7 +189,7 @@
      <string notr="true"/>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -874,7 +874,7 @@
         <string> 选择席次</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_8">
+      <widget class="QPushButton" name="tab2_booking">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1057,10 +1057,10 @@
         </rect>
        </property>
        <property name="text">
-        <string>用户名</string>
+        <string>用户ID</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="tab3_logined_frame_username">
+      <widget class="QLineEdit" name="tab3_logined_frame_userid">
        <property name="geometry">
         <rect>
          <x>100</x>
@@ -1585,7 +1585,7 @@
      <x>0</x>
      <y>0</y>
      <width>796</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
