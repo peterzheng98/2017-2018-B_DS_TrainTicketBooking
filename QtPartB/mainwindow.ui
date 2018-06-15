@@ -960,10 +960,10 @@
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-image: url(:/new/label/QR.png);</string>
+        <string notr="true">image: url(:/new/label/QR.jpg);</string>
        </property>
        <property name="text">
-        <string>TextLabel</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLineEdit" name="tab2_chosen">

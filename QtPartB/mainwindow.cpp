@@ -838,6 +838,10 @@ void MainWindow::on_tab2_booking_clicked()
         QMessageBox::critical(NULL, "订票错误", "订票数量不能为零！", QMessageBox::Yes, QMessageBox::Yes);
         return;
     }
+    double cost = seatCost[nowx][nowy].toDouble() * ui->tab2_ticketCount->text().toInt();
+    QMessageBox message(QMessageBox::NoIcon, "请支付", (QString)"您需要支付￥" + QString::number(cost, 'f', 2) + (QString)"请扫描左边二维码！");
+    message.setIconPixmap(QPixmap(":/new/label/QR.jpg"));
+    message.exec();
     QString nowdate = ui->tab2_ticketShowing->item(nowx, 1)->text();
     QString tmp = get((QString)"buy_ticket " + userInfo.id + (QString)" " + ui->tab2_ticketCount->text() +
                       (QString)" " + id[nowx] + (QString)" " +
