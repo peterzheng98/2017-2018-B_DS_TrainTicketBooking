@@ -183,6 +183,8 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+QString readString = "";
+
 void MainWindow::socket_Read_Data()
 {
     qDebug() << "yeah!";
@@ -190,9 +192,7 @@ void MainWindow::socket_Read_Data()
     buffer = socket->readAll();
     if(!buffer.isEmpty())
     {
-        QString str = ui->tmpText->toPlainText();
-        str += buffer;
-        ui->tmpText->setText(str);
+        readString += buffer;
     }
     qDebug() << buffer.length();
 }
@@ -223,10 +223,11 @@ QString MainWindow::get(QString str)
     }
     qDebug() << "Connect successfully!";
     work(str);
-    ui->tmpText->setText("");
+    readString = "";
     while(socket->waitForReadyRead());
+    qDebug() << readString;
     socket->close();
-    return ui->tmpText->toPlainText();
+    return readString;
 }
 
 void MainWindow::do_with_privilege()
@@ -1308,7 +1309,7 @@ void MainWindow::on_tab7_query_train_clicked()
     ui->tab7_trainInf->setEditTriggers(QAbstractItemView::NoEditTriggers);//禁止修改
     ui->tab7_trainInf->setHorizontalHeaderLabels(headers);
 
-    ui->tab7_statInf->setColumnCount(5);
+    ui->tab7_statInf->setColumnCount(4 + seatcnt);
     ui->tab7_statInf->setRowCount(statcnt);
     ui->tab7_statInf->setEditTriggers(QAbstractItemView::NoEditTriggers);//禁止修改
     headers.clear();
@@ -1318,7 +1319,7 @@ void MainWindow::on_tab7_query_train_clicked()
     ui->tab7_statInf->setHorizontalHeaderLabels(headers);
     i = 0;
     cnt = 0;
-    for(; i < len && cnt < 6; i++)
+    for(; i < len && cnt < 5 + seatcnt; i++)
     {
         if(tmp[i] == '\n')break;
         str = "";
@@ -1344,7 +1345,7 @@ void MainWindow::on_tab7_query_train_clicked()
                 str += tmp[i];
                 i++;
             }
-            if(cnt == 3 + seatcnt)
+            if(cnt > 3)
             {
                 QString tmpstr = "";
                 int len = str.length();
