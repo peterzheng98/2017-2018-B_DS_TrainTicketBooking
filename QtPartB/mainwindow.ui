@@ -189,7 +189,7 @@
      <string notr="true"/>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -210,7 +210,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QLabel" name="userInfo_id">
+      <widget class="QLabel" name="label_45">
        <property name="geometry">
         <rect>
          <x>70</x>
@@ -223,13 +223,13 @@
         <string>您已登录！</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_39">
+      <widget class="QLabel" name="userInfo_id">
        <property name="geometry">
         <rect>
          <x>70</x>
          <y>50</y>
-         <width>72</width>
-         <height>15</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -1405,7 +1405,7 @@
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
-      <string>页</string>
+      <string>添加火车</string>
      </attribute>
      <widget class="QGroupBox" name="groupBox_4">
       <property name="geometry">

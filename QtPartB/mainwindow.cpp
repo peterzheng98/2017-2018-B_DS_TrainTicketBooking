@@ -213,7 +213,7 @@ QString MainWindow::get(QString str)
 {
     socket->abort();
     socket->connectToHost("101.132.131.164", 10774);
-    if(!socket->waitForConnected(30000))
+    if(!socket->waitForConnected(3000))
     {
         QMessageBox::critical(NULL, "网络错误", "连接失败！", QMessageBox::Yes, QMessageBox::Yes);
         qDebug() << "Connection failed!";
@@ -268,7 +268,7 @@ void MainWindow::on_login_frame_login_clicked()
         }
         else
         {
-            ui->userInfo_id->setText(tmp);
+            ui->userInfo_id->setText((QString)"您的ID： " + loginid);
             tmp = get((QString)"query_profile" + (QString)" " + loginid);
             if(tmp == "")return;
             int len = tmp.length();
@@ -473,7 +473,7 @@ void MainWindow::on_tab5_nologin_frame_register_clicked()
                 ui->userFrame->setVisible(true);
                 ui->user_frame_auth->setText("您的权限级别为：普通用户");
                 ui->user_frame_welcomeMessage->setText((QString)"欢迎您！" + registerName);
-                ui->userInfo_id->setText(tmp);
+                ui->userInfo_id->setText((QString)"您的ID： " + userInfo.id);
                 ui->tab1_nologin->setVisible(false);
                 ui->tab2_nologin->setVisible(false);
                 ui->tab3_nologin->setVisible(false);
@@ -1034,7 +1034,6 @@ void MainWindow::on_choose_file_clicked()
             }
             else
             {
-                ui->userInfo_id->setText(tmp);
                 QString loginid = "";
                 int len = sText.length();
                 int i = 0;
@@ -1047,6 +1046,7 @@ void MainWindow::on_choose_file_clicked()
                 if(tmp == "")return;
                 len = tmp.length();
                 userInfo.id = loginid;
+                ui->userInfo_id->setText((QString)"您的ID： " + loginid);
                 int flag = 2;
                 for(int i = len - 1; i >= 0; i--)
                     if(tmp[i] >= '0' && tmp[i] <= '9')
@@ -1091,7 +1091,7 @@ void MainWindow::on_choose_file_clicked()
 
 void MainWindow::on_addTrainBox_button_add_2_clicked()
 {
-    QString str = "add_train " + ui->add_train_id->text() + " " + ui->add_train_name->text() +
+    QString str = "add_train " + ui->add_train_id->text() + " " + ui->add_train_name->text() + " " +
             ui->add_train_cata->text() + " " + ui->addTrainBox_stat_num->text() + " " +
             ui->addTrainBox_price_num->text();
     for(int i = 0; i < ui->add_ticketname->columnCount(); i++)
@@ -1115,10 +1115,41 @@ void MainWindow::on_addTrainBox_button_add_2_clicked()
                 if(j < 4)str += ui->add_train->item(i, j)->text() + " ";
                 else
                 {
-                    str += "￥" + ui->add_train->item(i, j)->text();
+                    str += ui->add_train->item(i, j)->text();
                     if(j < ui->add_train->columnCount() - 1)str += " ";
                 }
             }
+            else
+            {
+                QMessageBox::critical(NULL, "添加火车错误", "火车信息不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+                return;
+            }
     }
     qDebug() << str;
+    QString tmp = get(str);
+    qDebug() << tmp;
+    if(tmp == "")return;
+    if(tmp[0] == '0')
+    {
+        QMessageBox::critical(NULL, "添加火车错误", "添加火车失败！", QMessageBox::Yes, QMessageBox::Yes);
+    }
+    else
+    {
+        QMessageBox::information(NULL, "添加火车成功", "添加火车成功", QMessageBox::Yes, QMessageBox::Yes);
+    }
+}
+
+void MainWindow::on_addTrainBox_reset_2_clicked()
+{
+    ui->add_train->clear();
+    ui->add_train->setRowCount(0);
+    ui->add_train->setColumnCount(0);
+    ui->add_ticketname->clear();
+    ui->add_ticketname->setRowCount(0);
+    ui->add_ticketname->setColumnCount(0);
+    ui->add_train_cata->setText("");
+    ui->add_train_id->setText("");
+    ui->add_train_name->setText("");
+    ui->addTrainBox_stat_num->setValue(1);
+    ui->addTrainBox_price_num->setValue(1);
 }

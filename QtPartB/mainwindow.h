@@ -81,6 +81,8 @@ private slots:
 
     void on_addTrainBox_button_add_2_clicked();
 
+    void on_addTrainBox_reset_2_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket *socket;
