@@ -8,7 +8,126 @@
 #include <QStringListModel>
 #include <QStandardItemModel>
 #include <QString>
+#include <QDir>
+#include <QFileDialog>
 #include <QComboBox>
+
+#include<iostream>
+#include<string>
+
+const int nowUserNum = 2017;
+
+#define shift(x, n) (((x) << (n)) | ((x) >> (32-(n))))
+#define F(x, y, z) (((x) & (y)) | ((~x) & (z)))
+#define G(x, y, z) (((x) & (z)) | ((y) & (~z)))
+#define H(x, y, z) ((x) ^ (y) ^ (z))
+#define I(x, y, z) ((y) ^ ((x) | (~z)))
+#define A 0x67452301
+#define B 0xefcdab89
+#define C 0x98badcfe
+#define D 0x10325476
+unsigned int strlength;
+unsigned int atemp;
+unsigned int btemp;
+unsigned int ctemp;
+unsigned int dtemp;
+const unsigned int k[] = {
+        0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
+        0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501, 0x698098d8,
+        0x8b44f7af, 0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193,
+        0xa679438e, 0x49b40821, 0xf61e2562, 0xc040b340, 0x265e5a51,
+        0xe9b6c7aa, 0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
+        0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed, 0xa9e3e905,
+        0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a, 0xfffa3942, 0x8771f681,
+        0x6d9d6122, 0xfde5380c, 0xa4beea44, 0x4bdecfa9, 0xf6bb4b60,
+        0xbebfbc70, 0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05,
+        0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665, 0xf4292244,
+        0x432aff97, 0xab9423a7, 0xfc93a039, 0x655b59c3, 0x8f0ccc92,
+        0xffeff47d, 0x85845dd1, 0x6fa87e4f, 0xfe2ce6e0, 0xa3014314,
+        0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391};
+//鍚戝乏浣嶇Щ鏁?
+const unsigned int s[] = {7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7,
+                          12, 17, 22, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
+                          4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 6, 10,
+                          15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21};
+const char str16[] = "0123456789abcdef";
+
+void mainLoop(unsigned int M[]) {
+    unsigned int f, g;
+    unsigned int a = atemp;
+    unsigned int b = btemp;
+    unsigned int c = ctemp;
+    unsigned int d = dtemp;
+    for (unsigned int i = 0; i < 64; i++) {
+        if (i < 16) {
+            f = F(b, c, d);
+            g = i;
+        } else if (i < 32) {
+            f = G(b, c, d);
+            g = (5 * i + 1) % 16;
+        } else if (i < 48) {
+            f = H(b, c, d);
+            g = (3 * i + 5) % 16;
+        } else {
+            f = I(b, c, d);
+            g = (7 * i) % 16;
+        }
+        unsigned int tmp = d;
+        d = c;
+        c = b;
+        b = b + shift((a + f + k[i] + M[g]), s[i]);
+        a = tmp;
+    }
+    atemp = a + atemp;
+    btemp = b + btemp;
+    ctemp = c + ctemp;
+    dtemp = d + dtemp;
+}
+
+unsigned int *add(std::string str) {
+    unsigned int num = ((str.length() + 8) / 64) + 1;
+    unsigned int *strByte = new unsigned int[num * 16];
+    strlength = num * 16;
+    for (unsigned int i = 0; i < num * 16; i++)
+        strByte[i] = 0;
+    for (unsigned int i = 0; i < str.length(); i++) {
+        strByte[i >> 2] |= (str[i]) << ((i % 4) * 8);
+    }
+    strByte[str.length() >> 2] |= 0x80 << (((str.length() % 4)) * 8);
+    strByte[num * 16 - 2] = str.length() * 8;
+    return strByte;
+}
+
+std::string changeHex(int a) {
+    int b;
+    std::string str1;
+    std::string str = "";
+    for (int i = 0; i < 4; i++) {
+        str1 = "";
+        b = ((a >> i * 8) % (1 << 8)) & 0xff;
+        for (int j = 0; j < 2; j++) {
+            str1.insert(0, 1, str16[b % 16]);
+            b = b / 16;
+        }
+        str += str1;
+    }
+    return str;
+}
+
+std::string getMD5(std::string source) {
+    atemp = A;
+    btemp = B;
+    ctemp = C;
+    dtemp = D;
+    unsigned int *strByte = add(source);
+    for (unsigned int i = 0; i < strlength / 16; i++) {
+        unsigned int num[16];
+        for (unsigned int j = 0; j < 16; j++)
+            num[j] = strByte[i * 16 + j];
+        mainLoop(num);
+    }
+    return changeHex(atemp).append(changeHex(btemp)).append(changeHex(ctemp)).append(changeHex(dtemp));
+}
 
 struct UserInfo{
     QString id;
@@ -115,7 +234,6 @@ void MainWindow::do_with_privilege()
     ui->tab4_logined_frame_usercheckid->setVisible(false);
     ui->tab4_logined_frame_modifyprivilege->setVisible(false);
     ui->tab4_logined_frame_modifyuserid->setVisible(false);
-    ui->groupBox_3->setVisible(false);
     ui->tab3_logined_frame_userid->setVisible(false);
     ui->label_22->setVisible(false);
 }
@@ -139,6 +257,7 @@ void MainWindow::on_login_frame_login_clicked()
     }
     else
     {
+        if(loginid.toInt() > nowUserNum)password = QString::fromStdString(getMD5(password.toStdString()));
         QString tmp = get((QString)"login" + (QString)" " + loginid + (QString)" " + password);
         if(tmp == "")return;
         if(tmp[0] != '1')
@@ -149,6 +268,7 @@ void MainWindow::on_login_frame_login_clicked()
         }
         else
         {
+            ui->userInfo_id->setText(tmp);
             tmp = get((QString)"query_profile" + (QString)" " + loginid);
             if(tmp == "")return;
             int len = tmp.length();
@@ -175,7 +295,6 @@ void MainWindow::on_login_frame_login_clicked()
             ui->userFrame->setVisible(true);
             ui->user_frame_auth->setText((QString)"您的权限级别为：" + (QString)(userInfo.privilege == 1 ? "普通用户" : "管理员"));
             ui->user_frame_welcomeMessage->setText((QString)"欢迎您！" + nowName);
-
             ui->tab1_nologin->setVisible(false);
             ui->tab2_nologin->setVisible(false);
             ui->tab3_nologin->setVisible(false);
@@ -255,6 +374,7 @@ void MainWindow::tab5_reset()
     ui->tab5_nologin_frame_name->setText("");
     ui->tab5_nologin_frame_password->setText("");
     ui->tab5_nologin_frame_phone->setText("");
+    ui->userInfo_id->setText("");
 }
 
 void MainWindow::on_user_frame_logout_clicked()
@@ -331,6 +451,7 @@ void MainWindow::on_tab5_nologin_frame_register_clicked()
         }
         if(flag)
         {
+            registerPassword = QString::fromStdString(getMD5(registerPassword.toStdString()));
             QString tmp = get((QString)"register" + (QString)" " + registerName + (QString)" " + registerPassword +
                               (QString)" " + registerEmail + (QString)" " + registerPhone);
             if(tmp.length() == 0)return;
@@ -351,8 +472,8 @@ void MainWindow::on_tab5_nologin_frame_register_clicked()
                 ui->loginFrame->setVisible(false);
                 ui->userFrame->setVisible(true);
                 ui->user_frame_auth->setText("您的权限级别为：普通用户");
-                ui->user_frame_welcomeMessage->setText((QString)"欢迎您！" + registerName +
-                                                       (QString)"您的ID为：" + tmp + (QString)"（请牢记！）");
+                ui->user_frame_welcomeMessage->setText((QString)"欢迎您！" + registerName);
+                ui->userInfo_id->setText(tmp);
                 ui->tab1_nologin->setVisible(false);
                 ui->tab2_nologin->setVisible(false);
                 ui->tab3_nologin->setVisible(false);
@@ -449,8 +570,8 @@ void MainWindow::on_tab4_logined_frame_modifyinfo_clicked()
     }
     QString tmp = get((QString)"modify_profile" + (QString)" " + userInfo.id + (QString)" " +
                       ui->tab4_logined_frame_username->text() + (QString)" " +
-                      ui->tab4_logined_frame_userword->text() + (QString)" " +
-                      ui->tab4_logined_frame_usermail->text() + (QString)" " +
+                      QString::fromStdString(getMD5(ui->tab4_logined_frame_userword->text().toStdString())) +
+                      (QString)" " + ui->tab4_logined_frame_usermail->text() + (QString)" " +
                       ui->tab4_logined_frame_userphone->text());
     if(tmp == "")return;
     if(tmp[0] != '1')
@@ -838,7 +959,7 @@ void MainWindow::on_tab2_booking_clicked()
         QMessageBox::critical(NULL, "订票错误", "订票数量不能为零！", QMessageBox::Yes, QMessageBox::Yes);
         return;
     }
-    if(ui->tab2_ticketCount->text().toInt() > seatRest[nowx][nowy])
+    if(ui->tab2_ticketCount->text().toInt() > seatRest[nowx][nowy].toInt())
     {
         QMessageBox::critical(NULL, "订票错误", "余票不足！", QMessageBox::Yes, QMessageBox::Yes);
         return;
@@ -860,14 +981,144 @@ void MainWindow::on_tab2_booking_clicked()
 
 void MainWindow::on_addTrainBox_reset_clicked()
 {
-    ui->addTrainBox_tid->setText("");
+    /*ui->addTrainBox_tid->setText("");
     ui->addTrainBox_tname->setText("");
     ui->addTrainBox_stat_num->setValue(1);
-    ui->addTrainBox_price_num->setValue(1);
+    ui->addTrainBox_price_num->setValue(1);*/
 }
 
 void MainWindow::on_pushButton_9_clicked()
 {
     tab2_reset();
     ui->tabWidget->setCurrentIndex(1);
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    int nowx = ui->addTrainBox_stat_num->text().toInt();
+    int nowy = ui->addTrainBox_price_num->text().toInt();
+    ui->add_train->setRowCount(nowx);
+    ui->add_train->setColumnCount(nowy + 4);
+    ui->add_ticketname->setRowCount(1);
+    QStringList headers;
+    ui->add_ticketname->setColumnCount(nowy);
+    for(int i = 1; i <= nowy; i++)
+        headers.push_back((QString)"座位种类" + QString::number(i));
+    ui->add_ticketname->setHorizontalHeaderLabels(headers);
+    ui->add_ticketname->setVerticalHeaderLabels(QStringList() << "座位名称");
+    headers.clear();
+    headers << "车站名称" << "出站时间" << "到站时间" << "停站时长";
+    for(int i = 1; i <= nowy; i++)
+        headers.push_back((QString)"票价" + QString::number(i));
+    ui->add_train->setHorizontalHeaderLabels(headers);
+}
+
+void MainWindow::on_choose_file_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), NULL, tr("*.*"));
+    if(!fileName.isEmpty())
+    {
+        ui->file->setText(fileName);
+        QFile file(fileName);
+        if(file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            QString sText = file.readAll();
+            file.close();
+            QString tmp = get(sText);
+            if(tmp == "")return;
+            if(tmp[0] != '1')
+            {
+                QMessageBox::critical(NULL, "登录错误", "用户ID或密码错误！", QMessageBox::Yes, QMessageBox::Yes);
+                ui->login_frame_id->setText("");
+                ui->login_frame_word->setText("");
+            }
+            else
+            {
+                ui->userInfo_id->setText(tmp);
+                QString loginid = "";
+                int len = sText.length();
+                int i = 0;
+                for(; i < len; i++)
+                    if(sText[i] == ' ')break;
+                for(i++; i < len; i++)
+                    if(sText[i] == ' ')break;
+                    else loginid += sText[i];
+                tmp = get((QString)"query_profile" + (QString)" " + loginid);
+                if(tmp == "")return;
+                len = tmp.length();
+                userInfo.id = loginid;
+                int flag = 2;
+                for(int i = len - 1; i >= 0; i--)
+                    if(tmp[i] >= '0' && tmp[i] <= '9')
+                    {
+                        if(tmp[i] == '1')flag = 1;
+                        else flag = 2;
+                        break;
+                    }
+                QString nowName = "";
+                for(int i = 0; i < len; i++)
+                    if(tmp[i] == ' ')break;
+                    else nowName += tmp[i];
+                if(flag == 1)
+                {
+                    userInfo.privilege = 1;
+                    do_with_privilege();
+                }
+                else userInfo.privilege = 2;
+                ui->loginFrame->setVisible(false);
+                ui->userFrame->setVisible(true);
+                ui->user_frame_auth->setText((QString)"您的权限级别为：" + (QString)(userInfo.privilege == 1 ? "普通用户" : "管理员"));
+                ui->user_frame_welcomeMessage->setText((QString)"欢迎您！" + nowName);
+                ui->tab1_nologin->setVisible(false);
+                ui->tab2_nologin->setVisible(false);
+                ui->tab3_nologin->setVisible(false);
+                ui->tab4_nologin->setVisible(false);
+                ui->tab5_nologin->setVisible(false);
+                ui->tab1_logined->setVisible(true);
+                ui->tab2_logined->setVisible(true);
+                ui->tab3_logined->setVisible(true);
+                ui->tab4_logined->setVisible(true);
+                ui->tab5_logined->setVisible(true);
+                if(loginid == "2018")
+                {
+                    ui->user_frame_welcomeMessage->setText("欢迎您！冯思远，您暂时被禁止订票");
+                    on_login_frame_reset_clicked();
+                }
+            }
+        }
+    }
+}
+
+void MainWindow::on_addTrainBox_button_add_2_clicked()
+{
+    QString str = "add_train " + ui->add_train_id->text() + " " + ui->add_train_name->text() +
+            ui->add_train_cata->text() + " " + ui->addTrainBox_stat_num->text() + " " +
+            ui->addTrainBox_price_num->text();
+    for(int i = 0; i < ui->add_ticketname->columnCount(); i++)
+        if(ui->add_ticketname->item(0,i)!=NULL)
+        {
+            qDebug()<<ui->add_ticketname->item(0,i)->text();
+            str += " " + ui->add_ticketname->item(0,i)->text();
+        }
+        else
+        {
+            QMessageBox::critical(NULL, "添加火车错误", "座位名称不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+            return;
+        }
+    qDebug() << str;
+    for(int i = 0; i < ui->add_train->rowCount(); i++)
+    {
+        str += '\n';
+        for(int j = 0; j < ui->add_train->columnCount(); j++)
+            if(ui->add_train->item(i, j) != NULL)
+            {
+                if(j < 4)str += ui->add_train->item(i, j)->text() + " ";
+                else
+                {
+                    str += "￥" + ui->add_train->item(i, j)->text();
+                    if(j < ui->add_train->columnCount() - 1)str += " ";
+                }
+            }
+    }
+    qDebug() << str;
 }

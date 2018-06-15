@@ -75,6 +75,12 @@ private slots:
 
     void on_pushButton_9_clicked();
 
+    void on_pushButton_4_clicked();
+
+    void on_choose_file_clicked();
+
+    void on_addTrainBox_button_add_2_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket *socket;

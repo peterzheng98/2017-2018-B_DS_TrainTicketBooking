@@ -123,7 +123,7 @@
       <string>使用文件登陆</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_35">
+    <widget class="QLabel" name="file">
      <property name="geometry">
       <rect>
        <x>370</x>
@@ -133,10 +133,10 @@
       </rect>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string/>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_3">
+    <widget class="QPushButton" name="choose_file">
      <property name="geometry">
       <rect>
        <x>440</x>
@@ -189,7 +189,7 @@
      <string notr="true"/>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>6</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -210,7 +210,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QLabel" name="label_14">
+      <widget class="QLabel" name="userInfo_id">
        <property name="geometry">
         <rect>
          <x>70</x>
@@ -221,6 +221,19 @@
        </property>
        <property name="text">
         <string>您已登录！</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_39">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>50</y>
+         <width>72</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
        </property>
       </widget>
      </widget>
@@ -364,19 +377,6 @@
         <string>密码</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_36">
-       <property name="geometry">
-        <rect>
-         <x>480</x>
-         <y>40</y>
-         <width>221</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>注册成功！</string>
-       </property>
-      </widget>
       <zorder>label_24</zorder>
       <zorder>label_16</zorder>
       <zorder>label_17</zorder>
@@ -386,7 +386,7 @@
       <zorder>tab5_nologin_frame_register</zorder>
       <zorder>tab5_nologin_frame_name</zorder>
       <zorder>label_15</zorder>
-      <zorder>label_36</zorder>
+      <zorder>user_frame_logout</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="tab">
@@ -629,172 +629,6 @@
        <property name="text">
         <string>换乘</string>
        </property>
-      </widget>
-      <widget class="QGroupBox" name="groupBox_3">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>270</y>
-         <width>541</width>
-         <height>151</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>添加火车</string>
-       </property>
-       <widget class="QLabel" name="label_30">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>40</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;火车ID&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="addTrainBox_tid">
-        <property name="geometry">
-         <rect>
-          <x>90</x>
-          <y>40</y>
-          <width>113</width>
-          <height>21</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="addTrainBox_tname">
-        <property name="geometry">
-         <rect>
-          <x>90</x>
-          <y>70</y>
-          <width>113</width>
-          <height>21</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="addTrainBox_cata">
-        <property name="geometry">
-         <rect>
-          <x>90</x>
-          <y>100</y>
-          <width>104</width>
-          <height>26</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_31">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>70</y>
-          <width>60</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>名字</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_32">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>100</y>
-          <width>60</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>类型</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_33">
-        <property name="geometry">
-         <rect>
-          <x>230</x>
-          <y>40</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>车站数</string>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="addTrainBox_stat_num">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>40</y>
-          <width>48</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>60</number>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="addTrainBox_price_num">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>70</y>
-          <width>48</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>5</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_34">
-        <property name="geometry">
-         <rect>
-          <x>230</x>
-          <y>70</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>票价数</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="addTrainBox_button_add">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>50</y>
-          <width>113</width>
-          <height>32</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>添加火车</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="addTrainBox_reset">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>90</y>
-          <width>113</width>
-          <height>32</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string> 重置</string>
-        </property>
-       </widget>
       </widget>
      </widget>
     </widget>
@@ -1458,6 +1292,23 @@
         <string>0000000</string>
        </property>
       </widget>
+      <zorder>label_8</zorder>
+      <zorder>tab4_logined_frame_userid</zorder>
+      <zorder>tab4_logined_frame_usercheckid</zorder>
+      <zorder>label_9</zorder>
+      <zorder>label_10</zorder>
+      <zorder>label_11</zorder>
+      <zorder>label_12</zorder>
+      <zorder>label_13</zorder>
+      <zorder>tab4_logined_frame_username</zorder>
+      <zorder>tab4_logined_frame_userword</zorder>
+      <zorder>tab4_logined_frame_userword_2</zorder>
+      <zorder>tab4_logined_frame_userphone</zorder>
+      <zorder>tab4_logined_frame_usermail</zorder>
+      <zorder>tab4_logined_frame_modifyinfo</zorder>
+      <zorder>tab4_logined_frame_modifyprivilege</zorder>
+      <zorder>tab4_logined_frame_modifyuserid</zorder>
+      <zorder>user_frame_logout</zorder>
      </widget>
      <widget class="QFrame" name="tab4_nologin">
       <property name="geometry">
@@ -1548,6 +1399,210 @@
        </property>
        <property name="text">
         <string> 调试信息</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_6">
+     <attribute name="title">
+      <string>页</string>
+     </attribute>
+     <widget class="QGroupBox" name="groupBox_4">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>10</y>
+        <width>771</width>
+        <height>461</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>添加火车</string>
+      </property>
+      <widget class="QLabel" name="label_42">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>260</y>
+         <width>51</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>车站数</string>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="addTrainBox_stat_num">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>260</y>
+         <width>48</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>60</number>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="addTrainBox_price_num">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>290</y>
+         <width>48</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>5</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_43">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>290</y>
+         <width>51</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>票价数</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="addTrainBox_button_add_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>360</y>
+         <width>113</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>添加火车</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="addTrainBox_reset_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>400</y>
+         <width>113</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string> 重置</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_4">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>320</y>
+         <width>111</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>开始填写信息</string>
+       </property>
+      </widget>
+      <widget class="QTableWidget" name="add_train">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>100</y>
+         <width>611</width>
+         <height>351</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QTableWidget" name="add_ticketname">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>10</y>
+         <width>611</width>
+         <height>71</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="add_train_id">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>113</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="add_train_name">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>160</y>
+         <width>113</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_14">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>72</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>火车ID</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_30">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>120</y>
+         <width>72</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>火车名字</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_31">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>190</y>
+         <width>72</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>火车类型</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="add_train_cata">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>220</y>
+         <width>113</width>
+         <height>21</height>
+        </rect>
        </property>
       </widget>
      </widget>
