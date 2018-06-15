@@ -200,7 +200,7 @@ int main() {
             myAlgorithm::Vector<int> vtknum[12];
             Status ret = selectA.I_selectUserBookedTicket((int) p_id, dat, catalog, vtk, vtknum);
             if (ret == Success && vtk.size() != 0) {
-                cout << "1\n";
+                cout <<  vtk.size() << "\n";
                 myAlgorithm::String st1, st2;
                 train tr;
                 for (int i = 0; i < vtk.size(); ++i) {
