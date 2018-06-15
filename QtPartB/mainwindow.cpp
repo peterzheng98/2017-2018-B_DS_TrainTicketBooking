@@ -20,13 +20,29 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
     socket = new QTcpSocket();
     QObject::connect(socket, &QTcpSocket::readyRead, this, &MainWindow::socket_Read_Data);
     QObject::connect(socket, &QTcpSocket::disconnected, this, &MainWindow::socket_Disconnected);
 
     ui->radioButton->setChecked(true);
     ui->userFrame->setVisible(false);
+
+    ui->tab2_ticketShowing->setColumnCount(6);//只设置列数，行数动态中增加
+    ui->tab2_ticketShowing->setSelectionBehavior(QAbstractItemView::SelectRows);//整行选中的方式
+    ui->tab2_ticketShowing->setEditTriggers(QAbstractItemView::NoEditTriggers);//禁止修改
+    ui->tab2_ticketShowing->setSelectionMode(QAbstractItemView::SingleSelection);//可以选中单个
+    ui->tab2_ticketShowing->setHorizontalHeaderLabels(QStringList()<<"始发站"<<"始发日期"<<"始发时间"
+                                                      << "终点站" << "到达日期" << "到达时间");
+    ui->tab2_ticketShowing->show();
+
+    ui->tab3_ticketHistory->setColumnCount(9);//只设置列数，行数动态中增加
+    ui->tab3_ticketHistory->setSelectionBehavior(QAbstractItemView::SelectRows);//整行选中的方式
+    ui->tab3_ticketHistory->setEditTriggers(QAbstractItemView::NoEditTriggers);//禁止修改
+    ui->tab3_ticketHistory->setSelectionMode(QAbstractItemView::SingleSelection);//可以选中单个
+    ui->tab3_ticketHistory->setHorizontalHeaderLabels(QStringList()<<"始发站"<<"始发日期"<<"始发时间"
+                                                      << "终点站" << "到达日期" << "到达时间" << "座位类型"
+                                                      << "购票数量" << "票价");
+    ui->tab3_ticketHistory->show();
 
     ui->tab1_nologin->setVisible(true);
     ui->tab2_nologin->setVisible(true);
@@ -92,6 +108,18 @@ QString MainWindow::get(QString str)
     return ui->tmpText->toPlainText();
 }
 
+void MainWindow::do_with_privilege()
+{
+    ui->label_8->setVisible(false);
+    ui->tab4_logined_frame_userid->setVisible(false);
+    ui->tab4_logined_frame_usercheckid->setVisible(false);
+    ui->tab4_logined_frame_modifyprivilege->setVisible(false);
+    ui->tab4_logined_frame_modifyuserid->setVisible(false);
+    ui->groupBox_3->setVisible(false);
+    ui->tab3_logined_frame_userid->setVisible(false);
+    ui->label_22->setVisible(false);
+}
+
 void MainWindow::on_login_frame_login_clicked()
 {
     QString loginid = ui->login_frame_id->text();
@@ -140,11 +168,7 @@ void MainWindow::on_login_frame_login_clicked()
             if(flag == 1)
             {
                 userInfo.privilege = 1;
-                ui->label_8->setVisible(false);
-                ui->tab4_logined_frame_userid->setVisible(false);
-                ui->tab4_logined_frame_usercheckid->setVisible(false);
-                ui->tab4_logined_frame_modifyprivilege->setVisible(false);
-                ui->tab4_logined_frame_modifyuserid->setVisible(false);
+                do_with_privilege();
             }
             else userInfo.privilege = 2;
             ui->loginFrame->setVisible(false);
@@ -178,17 +202,35 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::tab1_reset()
 {
-
+    ui->radioButton->setChecked(true);
+    ui->radioButton_2->setChecked(false);
+    ui->radioButton_3->setChecked(false);
+    ui->tab1_logined_frame_date->setDate(ui->tab1_logined_frame_date->date());
+    ui->tab1_logined_frame_loc1->setText("");
+    ui->tab1_logined_frame_loc2->setText("");
+    on_addTrainBox_reset_clicked();
+    ui->tab4_logined_frame_transfer->setChecked(false);
 }
 
 void MainWindow::tab2_reset()
 {
-
+    ui->tab2_ticketShowing->clearContents();
+    ui->tab2_ticketShowing->setRowCount(0);
+    ui->tab2_ticketCount->setText("");
+    ui->tab2_remain->setText("余票");
+    ui->tab2_price->setText("票价");
+    ui->tab2_chosen->setText("");
+    ui->tab2_cata->clear();
 }
 
 void MainWindow::tab3_reset()
 {
-
+    ui->group_num->setText("");
+    ui->group_tid->setText("");
+    ui->tab3_logined_frame_date->setDate(ui->tab3_logined_frame_date->date());
+    ui->tab3_ticketHistory->clearContents();
+    ui->tab3_ticketHistory->setRowCount(0);
+    ui->tab3_logined_frame_userid->setText("");
 }
 
 void MainWindow::tab4_reset()
@@ -305,11 +347,7 @@ void MainWindow::on_tab5_nologin_frame_register_clicked()
             {
                 userInfo.id = tmp;
                 userInfo.privilege = 1;
-                ui->label_8->setVisible(false);
-                ui->tab4_logined_frame_userid->setVisible(false);
-                ui->tab4_logined_frame_usercheckid->setVisible(false);
-                ui->tab4_logined_frame_modifyprivilege->setVisible(false);
-                ui->tab4_logined_frame_modifyuserid->setVisible(false);
+                do_with_privilege();
                 ui->loginFrame->setVisible(false);
                 ui->userFrame->setVisible(true);
                 ui->user_frame_auth->setText("您的权限级别为：普通用户");
@@ -465,33 +503,49 @@ void MainWindow::on_tab4_logined_frame_search_clicked()
     int lentmp = ttmp.length();
     for(int i = 0; i < lentmp; i++)
         if(ttmp[i] == '/')ttmp[i] = '-';
+    int transferflag = 0;
+    if(ui->tab1_logined_frame_loc1->text() == "" || ui->tab1_logined_frame_loc2->text() == "")
+    {
+        QMessageBox::critical(NULL, "查询车票错误", "出发地和目的地不能为空！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
 
     if(ui->tab4_logined_frame_transfer->isChecked())
     {
-        tmp = get((QString)"query_transfer " + ui->tab1_logined_frame_loc1->text() + (QString)" " +
+        if(userInfo.privilege == 2)
+        {
+            tmp = get((QString)"query_transfer " + ui->tab1_logined_frame_loc1->text() + (QString)" " +
                    ui->tab1_logined_frame_loc2->text() + (QString)" " + ttmp + (QString)" " + catalog);
+            transferflag = 1;
+        }
+        else
+        {
+            QMessageBox::critical(NULL, "查询车票错误", "您需要支付$5来获取这个功能！", QMessageBox::Yes, QMessageBox::Yes);
+            return;
+        }
     }
     else
     {
+        transferflag = 0;
         tmp = get((QString)"query_ticket " + ui->tab1_logined_frame_loc1->text() + (QString)" " +
                    ui->tab1_logined_frame_loc2->text() + (QString)" " + ttmp + (QString)" " + catalog);
     }
-    ui->tab2_ticketShowing->clear();
+    ui->tab2_ticketShowing->clearContents();
     ui->tab2_ticketShowing->setRowCount(0);
-    ui->tab2_ticketShowing->setColumnCount(6);//只设置列数，行数动态中增加
-    ui->tab2_ticketShowing->setHorizontalHeaderLabels(QStringList()<<"始发站"<<"始发日期"<<"始发时间"
-                                                      << "终点站" << "到达日期" << "到达时间");
-    ui->tab2_ticketShowing->setSelectionBehavior(QAbstractItemView::SelectRows);//整行选中的方式
-    ui->tab2_ticketShowing->setEditTriggers(QAbstractItemView::NoEditTriggers);//禁止修改
-    ui->tab2_ticketShowing->setSelectionMode(QAbstractItemView::SingleSelection);//可以选中单个
 
     int len = tmp.length();
     int i = 0;
     QString str = "";
-    for(; i < len; i++)
+    int cnt = 0;
+    if(transferflag)cnt = 2;
+    else
     {
-        if(tmp[i] == '\n')break;
-        str += tmp[i];
+        for(; i < len; i++)
+        {
+            if(tmp[i] == '\n')break;
+            str += tmp[i];
+        }
+        cnt = str.toInt();
     }
 
     id.clear();
@@ -499,7 +553,6 @@ void MainWindow::on_tab4_logined_frame_search_clicked()
     seatRest.clear();
     seatCost.clear();
 
-    int cnt = str.toInt();
     for(int k = 0; k < cnt; k++)
     {
         int RowCont = ui->tab2_ticketShowing->rowCount();
@@ -603,16 +656,8 @@ void MainWindow::on_tab3_logined_frame_search_clicked()
     if(searchUser == "")searchUser = userInfo.id;
     QString tmp = get((QString)"query_order " + searchUser + (QString)" " +
                   ttmp + (QString)" " + catalog);
-    ui->tab3_ticketHistory->clear();
+    ui->tab3_ticketHistory->clearContents();
     ui->tab3_ticketHistory->setRowCount(0);
-    qDebug() << ui->tab3_ticketHistory->rowCount() << "!!!????";
-    ui->tab3_ticketHistory->setColumnCount(9);//只设置列数，行数动态中增加
-    ui->tab3_ticketHistory->setHorizontalHeaderLabels(QStringList()<<"始发站"<<"始发日期"<<"始发时间"
-                                                      << "终点站" << "到达日期" << "到达时间" << "座位类型"
-                                                      << "购票数量" << "票价");
-    ui->tab3_ticketHistory->setSelectionBehavior(QAbstractItemView::SelectRows);//整行选中的方式
-    ui->tab3_ticketHistory->setEditTriggers(QAbstractItemView::NoEditTriggers);//禁止修改
-    ui->tab3_ticketHistory->setSelectionMode(QAbstractItemView::SingleSelection);//可以选中单个
 
     int len = tmp.length();
     int i = 0;
@@ -735,13 +780,18 @@ void MainWindow::on_tab3_ticketHistory_clicked(const QModelIndex &index)
 
 void MainWindow::on_group_refund_button_clicked()
 {
+    int now = ui->tab3_ticketHistory->currentRow();
+    if(ui->group_num->text() == "" || now == -1)
+    {
+        QMessageBox::critical(NULL, "退票错误", "请单击要退票的订单！", QMessageBox::Yes, QMessageBox::Yes);
+        return;
+    }
+    int nowNum = ui->group_num->text().toInt();
     if(!(ui->group_num->text()).length())
     {
         QMessageBox::critical(NULL, "退票错误", "退票数量不能为空！", QMessageBox::Yes, QMessageBox::Yes);
         return;
     }
-    int nowNum = ui->group_num->text().toInt();
-    int now = ui->tab3_ticketHistory->currentRow();
     if(nowNum > seatRestHistory[now].toInt())
     {
         QMessageBox::critical(NULL, "退票错误", "退票数量不能大于订票数量！", QMessageBox::Yes, QMessageBox::Yes);
@@ -756,7 +806,17 @@ void MainWindow::on_group_refund_button_clicked()
                       idHistory[belong[now]] + (QString)" " + loc1History[belong[now]]  + (QString)" " + loc2History[belong[now]] +
                       (QString)" " + dateHistory[belong[now]] + (QString)" " + seatKindHistory[now]);
     if(tmp == "") return;
-    //TODO 发送订票
+    if(tmp[0] == '1')
+    {
+        ui->tab3_logined_frame_search->click();
+        ui->group_num->setText("");
+        ui->group_tid->setText("");
+        QMessageBox::information(NULL, "退票成功", "退票成功！", QMessageBox::Yes, QMessageBox::Yes);
+    }
+    else
+    {
+        QMessageBox::critical(NULL, "退票错误", "退票失败！", QMessageBox::Yes, QMessageBox::Yes);
+    }
 }
 
 void MainWindow::on_tab2_booking_clicked()
@@ -787,4 +847,18 @@ void MainWindow::on_tab2_booking_clicked()
     int nowRest = seatRest[nowx][nowy].toInt() - (ui->tab2_ticketCount->text()).toInt();
     seatRest[nowx][nowy] = QString::number(nowRest);
     ui->tab2_remain->setText((QString)"余票 " + seatRest[nowx][nowy]);
+}
+
+void MainWindow::on_addTrainBox_reset_clicked()
+{
+    ui->addTrainBox_tid->setText("");
+    ui->addTrainBox_tname->setText("");
+    ui->addTrainBox_stat_num->setValue(1);
+    ui->addTrainBox_price_num->setValue(1);
+}
+
+void MainWindow::on_pushButton_9_clicked()
+{
+    tab2_reset();
+    ui->tabWidget->setCurrentIndex(1);
 }

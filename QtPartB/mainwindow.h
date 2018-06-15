@@ -69,6 +69,12 @@ private slots:
 
     void on_tab2_booking_clicked();
 
+    void do_with_privilege();
+
+    void on_addTrainBox_reset_clicked();
+
+    void on_pushButton_9_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket *socket;
