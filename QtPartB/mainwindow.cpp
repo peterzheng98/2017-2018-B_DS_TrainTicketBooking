@@ -397,6 +397,7 @@ void MainWindow::tab6_reset()
 
 void MainWindow::tab7_reset()
 {
+    on_tab7_reset_clicked();
     ui->groupBox_3->setVisible(false);
 }
 
